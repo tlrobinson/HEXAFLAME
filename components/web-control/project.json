@@ -1,0 +1,13 @@
+{
+  "name": "web-control",
+  "root": "web-control",
+  "targets": {
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "python3 -m http.server 8000 --bind 127.0.0.1"
+      }
+    }
+  }
+}

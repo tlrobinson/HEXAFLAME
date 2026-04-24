@@ -192,6 +192,8 @@
         -webkit-appearance: none;
         appearance: none;
         flex: 1;
+        min-width: 0;
+        width: auto;
         height: 4px;
         background: var(--surface2);
         border-radius: 2px;
@@ -269,6 +271,61 @@
         padding: 4px 8px;
       }
 
+      .btn-danger-compact {
+        padding: 4px 8px;
+        color: var(--red);
+        border-color: rgba(255, 56, 96, 0.35);
+        background: rgba(255, 56, 96, 0.08);
+      }
+      .btn-danger-compact:hover {
+        color: #fff;
+        border-color: var(--red);
+        background: rgba(255, 56, 96, 0.12);
+        box-shadow: 0 0 12px rgba(255, 56, 96, 0.12);
+      }
+
+      .connection-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .connection-label {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 12px;
+      }
+
+      .connection-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        align-self: stretch;
+        height: auto;
+        border-left: 1px solid var(--border-hi);
+        font-family: var(--mono);
+        font-size: 10px;
+        line-height: 1;
+        color: var(--text-dim);
+        opacity: 0;
+        pointer-events: none;
+        transition: all 150ms ease;
+      }
+
+      .connection-button.connected .connection-close {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .connection-button.connected .connection-close:hover {
+        color: #fff;
+        border-left-color: var(--red);
+        background: rgba(255, 56, 96, 0.12);
+      }
+
       .speed-readout {
         font-family: var(--mono);
         font-size: 11px;
@@ -328,6 +385,13 @@
         stroke-width: 2.5;
         stroke-linecap: round;
         stroke-linejoin: round;
+      }
+
+      .envelope-sweep {
+        stroke: var(--red);
+        stroke-width: 2;
+        stroke-linecap: round;
+        opacity: 0.95;
       }
 
       .envelope-marker {
@@ -592,17 +656,24 @@
         <div class="section">
           <div class="section-label">Connections</div>
           <div class="section-row">
-            <button id="midi-connect-button" type="button">MIDI</button>
+            <button id="midi-connect-button" class="connection-button" type="button">
+              <span class="connection-label">MIDI</span>
+              <span class="connection-close" aria-hidden="true">×</span>
+            </button>
             <span id="midi-status" class="status-text">Disconnected</span>
           </div>
           <div class="section-row">
-            <button id="serial-connect-button" type="button">Relay</button>
-            <button id="serial-disconnect-button" type="button" disabled>Disconnect</button>
+            <button id="serial-connect-button" class="connection-button" type="button">
+              <span class="connection-label">Relay</span>
+              <span class="connection-close" aria-hidden="true">×</span>
+            </button>
             <span id="serial-status" class="status-text">Disconnected</span>
           </div>
           <div class="section-row">
-            <button id="stepper-connect-button" type="button">Stepper</button>
-            <button id="stepper-disconnect-button" type="button" disabled>Disconnect</button>
+            <button id="stepper-connect-button" class="connection-button" type="button">
+              <span class="connection-label">Stepper</span>
+              <span class="connection-close" aria-hidden="true">×</span>
+            </button>
             <span id="stepper-status" class="status-text">Disconnected</span>
           </div>
         </div>
@@ -612,7 +683,6 @@
           <div class="section-label">Steppers</div>
           <div class="device-label">Stepper 1</div>
           <div class="section-row">
-            <button id="stepper-home-button" class="btn-compact" type="button" disabled>Home</button>
             <label for="stepper-position-slider">Position</label>
             <input
               id="stepper-position-slider"
@@ -624,6 +694,18 @@
               disabled
             />
             <output id="stepper-position-readout" for="stepper-position-slider">50.0%</output>
+            <button
+              id="stepper-home-button"
+              class="btn-compact"
+              type="button"
+              disabled
+            >
+              Home
+            </button>
+          </div>
+          <div class="section-row">
+            <label>Homed</label>
+            <span id="stepper-homed-state" class="metric-text">Unknown</span>
           </div>
           <div class="section-row">
             <label>Travel</label>
@@ -645,6 +727,7 @@
             <path class="envelope-grid" d="M0 46.5H260" />
             <path class="envelope-grid" d="M0 22.5H260" />
             <path id="stepper-envelope-path" class="envelope-path" d="M14 78 L70 14 L124 40 L190 40 L246 78" />
+            <line id="stepper-envelope-sweep" class="envelope-sweep" x1="14" y1="78" x2="14" y2="78" />
             <circle id="stepper-envelope-marker" class="envelope-marker" cx="14" cy="78" r="3.5" />
           </svg>
           <div class="param-row">
@@ -700,14 +783,8 @@
       const serialConnectButton = document.getElementById(
         "serial-connect-button",
       );
-      const serialDisconnectButton = document.getElementById(
-        "serial-disconnect-button",
-      );
       const stepperConnectButton = document.getElementById(
         "stepper-connect-button",
-      );
-      const stepperDisconnectButton = document.getElementById(
-        "stepper-disconnect-button",
       );
       const stepperHomeButton = document.getElementById("stepper-home-button");
       const stepperPositionSlider = document.getElementById(
@@ -716,11 +793,17 @@
       const stepperPositionReadout = document.getElementById(
         "stepper-position-readout",
       );
+      const stepperHomedStateText = document.getElementById(
+        "stepper-homed-state",
+      );
       const stepperTravelStepsText = document.getElementById(
         "stepper-travel-steps",
       );
       const stepperEnvelopePath = document.getElementById(
         "stepper-envelope-path",
+      );
+      const stepperEnvelopeSweep = document.getElementById(
+        "stepper-envelope-sweep",
       );
       const stepperEnvelopeMarker = document.getElementById(
         "stepper-envelope-marker",
@@ -751,6 +834,8 @@
       const outlineStats = document.getElementById("outline-stats");
       const spokeStats = document.getElementById("spoke-stats");
       const STORAGE_KEY = "hexagon-rings-state";
+      const RELAY_PORT_KEY = `${STORAGE_KEY}:relay-port`;
+      const STEPPER_PORT_KEY = `${STORAGE_KEY}:stepper-port`;
       const HIT_RADIUS = 10;
       const DEFAULT_RINGS = 2;
       const RELAY_CHANNEL_COUNT = 32;
@@ -795,6 +880,7 @@
       let stepperStatusMessage = "Stepper disconnected";
       let stepperBasePositionPercent = 50;
       let stepperPositionPercent = 50;
+      let stepperHomed = false;
       let stepperTravelSteps = null;
       let stepperQueuedPosition = null;
       let stepperPositionSendInProgress = false;
@@ -811,6 +897,7 @@
         sustainLevel: 0.55,
         releaseMs: 320,
         originPercent: 50,
+        velocityScale: 1,
         currentLevel: 0,
         phaseStartMs: 0,
         phaseStartLevel: 0,
@@ -959,9 +1046,7 @@
       function updateSerialUi(mappedCount = 0) {
         const serialSupported = "serial" in navigator;
         serialConnectButton.disabled = !serialSupported || relayPort !== null;
-        serialDisconnectButton.disabled = relayPort === null;
-        serialConnectButton.hidden = relayPort !== null;
-        serialDisconnectButton.hidden = relayPort === null;
+        serialConnectButton.classList.toggle("connected", relayPort !== null);
         if (!serialSupported) {
           serialStatus.textContent = "Web Serial unavailable in this browser";
           return;
@@ -981,20 +1066,24 @@
             : `${stepperTravelSteps.toLocaleString()} steps`;
       }
 
+      function canControlStepperPosition() {
+        return stepperPort !== null && stepperHomed;
+      }
+
+      function updateStepperHomedReadout() {
+        if (stepperPort === null) {
+          stepperHomedStateText.textContent = "Unknown";
+          return;
+        }
+
+        stepperHomedStateText.textContent = stepperHomed ? "Yes" : "No";
+      }
+
       function formatEnvelopeTime(ms) {
         return `${Math.round(ms)}ms`;
       }
 
-      function updateStepperEnvelopeUi() {
-        const sustainPercent = Math.round(stepperEnvelope.sustainLevel * 100);
-        stepperAttackReadout.textContent =
-          `A ${formatEnvelopeTime(stepperEnvelope.attackMs)}`;
-        stepperDecayReadout.textContent =
-          `D ${formatEnvelopeTime(stepperEnvelope.decayMs)}`;
-        stepperSustainReadout.textContent = `S ${sustainPercent}%`;
-        stepperReleaseReadout.textContent =
-          `R ${formatEnvelopeTime(stepperEnvelope.releaseMs)}`;
-
+      function getStepperEnvelopeGraphLayout() {
         const graphLeft = 14;
         const graphRight = 246;
         const graphBottom = 78;
@@ -1016,6 +1105,103 @@
         const sustainY =
           graphBottom - graphHeight * stepperEnvelope.sustainLevel;
 
+        return {
+          graphLeft,
+          graphRight,
+          graphBottom,
+          graphTop,
+          attackX,
+          decayX,
+          sustainEndX,
+          sustainY,
+          sustainWidthWeight,
+        };
+      }
+
+      function getStepperEnvelopeGraphPoint(now = performance.now()) {
+        const {
+          graphLeft,
+          graphRight,
+          graphBottom,
+          graphTop,
+          attackX,
+          decayX,
+          sustainEndX,
+          sustainY,
+          sustainWidthWeight,
+        } = getStepperEnvelopeGraphLayout();
+        const elapsed = Math.max(0, now - stepperEnvelope.phaseStartMs);
+
+        if (!stepperEnvelope.active) {
+          return { x: graphLeft, y: graphBottom };
+        }
+
+        if (stepperEnvelope.phase === "attack") {
+          const progress =
+            stepperEnvelope.attackMs <= 0
+              ? 1
+              : Math.min(elapsed / stepperEnvelope.attackMs, 1);
+          return {
+            x: graphLeft + (attackX - graphLeft) * progress,
+            y: graphBottom + (graphTop - graphBottom) * progress,
+          };
+        }
+
+        if (stepperEnvelope.phase === "decay") {
+          const progress =
+            stepperEnvelope.decayMs <= 0
+              ? 1
+              : Math.min(elapsed / stepperEnvelope.decayMs, 1);
+          return {
+            x: attackX + (decayX - attackX) * progress,
+            y: graphTop + (sustainY - graphTop) * progress,
+          };
+        }
+
+        if (stepperEnvelope.phase === "sustain") {
+          const progress = Math.min(elapsed / sustainWidthWeight, 1);
+          return {
+            x: decayX + (sustainEndX - decayX) * progress,
+            y: sustainY,
+          };
+        }
+
+        if (stepperEnvelope.phase === "release") {
+          const progress =
+            stepperEnvelope.releaseMs <= 0
+              ? 1
+              : Math.min(elapsed / stepperEnvelope.releaseMs, 1);
+          return {
+            x: sustainEndX + (graphRight - sustainEndX) * progress,
+            y: sustainY + (graphBottom - sustainY) * progress,
+          };
+        }
+
+        return { x: graphLeft, y: graphBottom };
+      }
+
+      function updateStepperEnvelopeUi(now = performance.now()) {
+        const sustainPercent = Math.round(stepperEnvelope.sustainLevel * 100);
+        stepperAttackReadout.textContent =
+          `A ${formatEnvelopeTime(stepperEnvelope.attackMs)}`;
+        stepperDecayReadout.textContent =
+          `D ${formatEnvelopeTime(stepperEnvelope.decayMs)}`;
+        stepperSustainReadout.textContent = `S ${sustainPercent}%`;
+        stepperReleaseReadout.textContent =
+          `R ${formatEnvelopeTime(stepperEnvelope.releaseMs)}`;
+
+        const {
+          graphLeft,
+          graphRight,
+          graphBottom,
+          graphTop,
+          attackX,
+          decayX,
+          sustainEndX,
+          sustainY,
+        } = getStepperEnvelopeGraphLayout();
+        const graphHeight = graphBottom - graphTop;
+
         stepperEnvelopePath.setAttribute(
           "d",
           `M ${graphLeft} ${graphBottom} ` +
@@ -1025,32 +1211,17 @@
             `L ${graphRight} ${graphBottom}`,
         );
 
-        const markerX = (() => {
-          switch (stepperEnvelope.phase) {
-            case "attack":
-              return attackX;
-            case "decay":
-              return decayX;
-            case "sustain":
-              return sustainEndX;
-            case "release":
-              return graphRight;
-            default:
-              return graphLeft;
-          }
-        })();
-        const markerY = (() => {
-          switch (stepperEnvelope.phase) {
-            case "attack":
-              return graphTop;
-            case "decay":
-            case "sustain":
-              return sustainY;
-            default:
-              return graphBottom;
-          }
-        })();
-        stepperEnvelopeMarker.setAttribute("cx", markerX.toFixed(1));
+        const point = getStepperEnvelopeGraphPoint(now);
+        const envelopeLevel = stepperEnvelope.active
+          ? stepperEnvelope.currentLevel
+          : 0;
+        const actualLevel = envelopeLevel * stepperEnvelope.velocityScale;
+        const markerY = graphBottom - graphHeight * actualLevel;
+        stepperEnvelopeSweep.setAttribute("x1", point.x.toFixed(1));
+        stepperEnvelopeSweep.setAttribute("x2", point.x.toFixed(1));
+        stepperEnvelopeSweep.setAttribute("y1", point.y.toFixed(1));
+        stepperEnvelopeSweep.setAttribute("y2", graphBottom.toFixed(1));
+        stepperEnvelopeMarker.setAttribute("cx", point.x.toFixed(1));
         stepperEnvelopeMarker.setAttribute("cy", markerY.toFixed(1));
       }
 
@@ -1067,7 +1238,7 @@
         if (scene) {
           render();
         }
-        if (send && stepperPort !== null) {
+        if (send && canControlStepperPosition()) {
           queueStepperPositionSend(sendDelayMs);
         }
       }
@@ -1078,7 +1249,9 @@
       ) {
         const outputPercent =
           stepperEnvelope.originPercent +
-          (100 - stepperEnvelope.originPercent) * stepperEnvelope.currentLevel;
+          (100 - stepperEnvelope.originPercent) *
+            stepperEnvelope.velocityScale *
+            stepperEnvelope.currentLevel;
         applyStepperOutputPosition(outputPercent, {
           send,
           save: false,
@@ -1112,6 +1285,7 @@
         stepperEnvelope.active = false;
         stepperEnvelope.noteHeld = false;
         stepperEnvelope.phase = "idle";
+        stepperEnvelope.velocityScale = 1;
         stepperEnvelope.currentLevel = 0;
         stepperEnvelope.phaseStartLevel = 0;
         if (stepperEnvelopeFrameId !== null) {
@@ -1179,12 +1353,18 @@
         }
 
         applyStepperEnvelopeOutput(true, STEPPER_ENVELOPE_SEND_DELAY_MS);
+        updateStepperEnvelopeUi(now);
         stepperEnvelopeFrameId = window.requestAnimationFrame(tickStepperEnvelope);
       }
 
-      function startStepperEnvelope() {
+      function startStepperEnvelope(velocity = 127) {
+        if (!canControlStepperPosition()) {
+          return false;
+        }
+
         const now = performance.now();
         stepperEnvelope.originPercent = stepperBasePositionPercent;
+        stepperEnvelope.velocityScale = Math.min(Math.max(velocity / 127, 0), 1);
         stepperEnvelope.noteHeld = true;
         if (!stepperEnvelope.active) {
           stepperEnvelope.active = true;
@@ -1198,7 +1378,9 @@
             tickStepperEnvelope,
           );
         }
-        midiStatus.textContent = "Stepper 1 ADSR";
+        midiStatus.textContent =
+          `Stepper 1 ADSR ${Math.round(stepperEnvelope.velocityScale * 100)}%`;
+        return true;
       }
 
       function releaseStepperEnvelope() {
@@ -1217,17 +1399,29 @@
         const serialSupported = "serial" in navigator;
         stepperConnectButton.disabled =
           !serialSupported || stepperPort !== null || stepperConnectInProgress;
-        stepperDisconnectButton.disabled = stepperPort === null;
         stepperHomeButton.disabled = stepperPort === null;
-        stepperConnectButton.hidden = stepperPort !== null || stepperConnectInProgress;
-        stepperDisconnectButton.hidden = stepperPort === null;
-        stepperPositionSlider.disabled = stepperPort === null;
+        stepperHomeButton.classList.toggle(
+          "btn-danger-compact",
+          stepperPort !== null && !stepperHomed,
+        );
+        stepperConnectButton.classList.toggle("connected", stepperPort !== null);
+        stepperPositionSlider.disabled = !canControlStepperPosition();
+        updateStepperHomedReadout();
         if (!serialSupported) {
           stepperStatus.textContent = "Web Serial unavailable in this browser";
           return;
         }
 
         stepperStatus.textContent = stepperStatusMessage;
+      }
+
+      function updateMidiUi() {
+        const midiSupported = Boolean(navigator.requestMIDIAccess);
+        midiConnectButton.disabled = !midiSupported;
+        midiConnectButton.classList.toggle("connected", midiInput !== null);
+        if (!midiSupported) {
+          midiStatus.textContent = "Web MIDI not supported";
+        }
       }
 
       function formatSerialBytes(bytes) {
@@ -1267,6 +1461,15 @@
       }
 
       function handleStepperLine(line) {
+        const calibratedMatch = line.match(/^Calibrated:\s*(yes|no)$/i);
+        if (calibratedMatch) {
+          stepperHomed = calibratedMatch[1].toLowerCase() === "yes";
+          if (!stepperHomed) {
+            stepperTravelSteps = null;
+            updateStepperTravelReadout();
+          }
+        }
+
         const travelMatch = line.match(/^Travel steps:\s*(\d+)$/i);
         if (travelMatch) {
           stepperTravelSteps = Number(travelMatch[1]);
@@ -1668,6 +1871,7 @@
         const glowAlpha = 0.14 + intensity * 0.42;
         const coreAlpha = 0.35 + intensity * 0.55;
         const centerRadius = 6 + intensity * 24;
+        const baseColor = spokeJets[0].color || "#ff3860";
 
         context.save();
         context.globalCompositeOperation = "screen";
@@ -1678,8 +1882,9 @@
           context.lineTo(jet.x2, jet.y2);
           context.lineCap = "round";
           context.lineWidth = outerWidth;
-          context.strokeStyle = `rgba(0, 229, 255, ${glowAlpha})`;
-          context.shadowColor = "rgba(0, 229, 255, 0.9)";
+          context.strokeStyle = baseColor;
+          context.globalAlpha = glowAlpha;
+          context.shadowColor = baseColor;
           context.shadowBlur = 10 + intensity * 28;
           context.stroke();
 
@@ -1688,7 +1893,8 @@
           context.lineTo(jet.x2, jet.y2);
           context.lineCap = "round";
           context.lineWidth = innerWidth;
-          context.strokeStyle = `rgba(255, 240, 160, ${coreAlpha})`;
+          context.strokeStyle = baseColor;
+          context.globalAlpha = coreAlpha;
           context.shadowBlur = 0;
           context.stroke();
         }
@@ -1701,12 +1907,13 @@
           centerNode.y,
           centerRadius,
         );
-        radial.addColorStop(0, `rgba(255, 240, 160, ${0.25 + intensity * 0.35})`);
-        radial.addColorStop(0.55, `rgba(0, 229, 255, ${0.12 + intensity * 0.25})`);
-        radial.addColorStop(1, "rgba(0, 229, 255, 0)");
+        radial.addColorStop(0, "rgba(255, 255, 255, 0.28)");
+        radial.addColorStop(0.28, baseColor);
+        radial.addColorStop(1, "rgba(0, 0, 0, 0)");
         context.beginPath();
         context.arc(centerNode.x, centerNode.y, centerRadius, 0, Math.PI * 2);
         context.fillStyle = radial;
+        context.globalAlpha = 0.18 + intensity * 0.28;
         context.fill();
 
         context.restore();
@@ -1952,6 +2159,75 @@
         return true;
       }
 
+      function getSerialPortKey(port) {
+        const info = port?.getInfo?.();
+        if (!info) {
+          return null;
+        }
+
+        if (
+          Number.isFinite(info.usbVendorId) ||
+          Number.isFinite(info.usbProductId)
+        ) {
+          return `usb:${info.usbVendorId ?? 0}:${info.usbProductId ?? 0}`;
+        }
+
+        if (Number.isFinite(info.bluetoothServiceClassId)) {
+          return `bt:${info.bluetoothServiceClassId}`;
+        }
+
+        return null;
+      }
+
+      function getRolePortStorageKey(role) {
+        return role === "relay" ? RELAY_PORT_KEY : STEPPER_PORT_KEY;
+      }
+
+      function getPreferredSerialPortKey(role) {
+        try {
+          return window.localStorage.getItem(getRolePortStorageKey(role));
+        } catch {
+          return null;
+        }
+      }
+
+      function setPreferredSerialPortKey(role, portKey) {
+        try {
+          const storageKey = getRolePortStorageKey(role);
+          if (!portKey) {
+            window.localStorage.removeItem(storageKey);
+            return;
+          }
+          window.localStorage.setItem(storageKey, portKey);
+        } catch {
+          // Ignore storage failures so serial controls still work.
+        }
+      }
+
+      function rememberSerialPortRole(role, port) {
+        const portKey = getSerialPortKey(port);
+        if (!portKey) {
+          return;
+        }
+
+        setPreferredSerialPortKey(role, portKey);
+        const otherRole = role === "relay" ? "stepper" : "relay";
+        if (getPreferredSerialPortKey(otherRole) === portKey) {
+          setPreferredSerialPortKey(otherRole, null);
+        }
+      }
+
+      function findPreferredSerialPort(ports, role) {
+        const preferredKey = getPreferredSerialPortKey(role);
+        if (!preferredKey) {
+          return null;
+        }
+
+        return (
+          ports.find((port) => getSerialPortKey(port) === preferredKey) || null
+        );
+      }
+
       async function writeRelayFrame(frame) {
         if (!relayPort?.writable) {
           throw new Error("Relay port is not connected");
@@ -2018,6 +2294,12 @@
 
       async function openRelayPort(port) {
         try {
+          if (port === stepperPort) {
+            relayStatusMessage = "Selected port is already in use by Stepper";
+            updateSerialUi(scene ? getRelayMappedNodeIds(scene).length : 0);
+            return;
+          }
+
           relayPort = port;
           await relayPort.open({
             baudRate: 115200,
@@ -2026,6 +2308,7 @@
             parity: "none",
             flowControl: "none",
           });
+          rememberSerialPortRole("relay", port);
           relayLastStates = Array(RELAY_CHANNEL_COUNT).fill(null);
           relayStatusMessage = "Relay sync connected";
           if (scene) {
@@ -2047,7 +2330,10 @@
         }
 
         try {
-          const port = await navigator.serial.requestPort();
+          const ports = await navigator.serial.getPorts();
+          const port =
+            findPreferredSerialPort(ports, "relay") ||
+            (await navigator.serial.requestPort());
           await openRelayPort(port);
         } catch (error) {
           console.error(error);
@@ -2061,8 +2347,9 @@
 
         try {
           const ports = await navigator.serial.getPorts();
-          if (ports.length > 0) {
-            await openRelayPort(ports[0]);
+          const port = findPreferredSerialPort(ports, "relay");
+          if (port) {
+            await openRelayPort(port);
           }
         } catch (error) {
           console.error(error);
@@ -2101,8 +2388,16 @@
         }
       }
 
+      async function requestStepperStatus() {
+        if (stepperPort === null) {
+          return;
+        }
+
+        await writeStepperCommand("status");
+      }
+
       async function processStepperPositionQueue() {
-        if (stepperPositionSendInProgress || stepperPort === null) {
+        if (stepperPositionSendInProgress || !canControlStepperPosition()) {
           return;
         }
 
@@ -2141,9 +2436,14 @@
       }
 
       function queueStepperPositionSend(delayMs = STEPPER_SEND_DELAY_MS) {
+        if (!canControlStepperPosition()) {
+          stepperQueuedPosition = null;
+          return;
+        }
+
         stepperQueuedPosition = stepperPositionPercent;
 
-        if (stepperPort === null || stepperPositionSendInProgress) {
+        if (stepperPositionSendInProgress) {
           return;
         }
 
@@ -2166,6 +2466,11 @@
           stepperPositionSendTimerId = null;
         }
 
+        if (!canControlStepperPosition()) {
+          stepperQueuedPosition = null;
+          return;
+        }
+
         stepperQueuedPosition = stepperPositionPercent;
         await processStepperPositionQueue();
       }
@@ -2180,6 +2485,9 @@
           stepperPositionSendTimerId = null;
         }
         stepperQueuedPosition = null;
+        stepperHomed = false;
+        stepperTravelSteps = null;
+        updateStepperTravelReadout();
         stepperStatusMessage = "Homing at 400Hz";
         updateStepperUi();
 
@@ -2250,11 +2558,17 @@
             parity: "none",
             flowControl: "none",
           });
-          stepperStatusMessage = "Stepper connected";
+          rememberSerialPortRole("stepper", port);
+          stepperHomed = false;
+          stepperTravelSteps = null;
+          updateStepperTravelReadout();
+          stepperStatusMessage = "Checking stepper status...";
           updateStepperUi();
           readStepperLoop(stepperPort);
+          await requestStepperStatus();
         } catch (error) {
           stepperPort = null;
+          stepperHomed = false;
           stepperStatusMessage =
             error?.name === "InvalidStateError"
               ? "Selected port is already open"
@@ -2278,8 +2592,43 @@
         updateStepperUi();
 
         try {
-          const port = await navigator.serial.requestPort();
+          const ports = await navigator.serial.getPorts();
+          const port =
+            findPreferredSerialPort(ports, "stepper") ||
+            (await navigator.serial.requestPort());
           await openStepperPort(port);
+        } catch (error) {
+          stepperStatusMessage = "Stepper disconnected";
+          updateStepperUi();
+          console.error(error);
+        } finally {
+          stepperConnectInProgress = false;
+          updateStepperUi();
+        }
+      }
+
+      async function autoConnectStepper() {
+        if (
+          !("serial" in navigator) ||
+          stepperPort !== null ||
+          stepperConnectInProgress
+        ) {
+          return;
+        }
+
+        stepperConnectInProgress = true;
+        stepperStatusMessage = "Connecting stepper...";
+        updateStepperUi();
+
+        try {
+          const ports = await navigator.serial.getPorts();
+          const port = findPreferredSerialPort(ports, "stepper");
+          if (port) {
+            await openStepperPort(port);
+          } else {
+            stepperStatusMessage = "Stepper disconnected";
+            updateStepperUi();
+          }
         } catch (error) {
           stepperStatusMessage = "Stepper disconnected";
           updateStepperUi();
@@ -2317,6 +2666,9 @@
 
         stepperPort = null;
         stepperReader = null;
+        stepperHomed = false;
+        stepperTravelSteps = null;
+        updateStepperTravelReadout();
         stepperStatusMessage = "Stepper disconnected";
         updateStepperUi();
       }
@@ -3204,8 +3556,12 @@ dfs sort shell-angle`,
         // Note On
         if (type === 0x90 && data2 > 0) {
           if (data1 === MIDI_NOTE_STEPPER_1_ENV) {
-            startStepperEnvelope();
-            midiStatus.textContent = `Stepper 1 ADSR on (note ${data1})`;
+            if (startStepperEnvelope(data2)) {
+              midiStatus.textContent =
+                `Stepper 1 ADSR on (note ${data1}, vel ${data2})`;
+            } else {
+              midiStatus.textContent = "Stepper 1 not homed";
+            }
             return;
           }
           if (data1 === MIDI_NOTE_ALL_OFF && scene) {
@@ -3311,9 +3667,13 @@ dfs sort shell-angle`,
           }
 
           if (data1 === MIDI_CC_STEPPER_1) {
-            setStepperBasePosition((data2 / 127) * 100);
-            midiStatus.textContent =
-              `Stepper 1: ${stepperBasePositionPercent.toFixed(1)}% (CC ${data1})`;
+            if (canControlStepperPosition()) {
+              setStepperBasePosition((data2 / 127) * 100);
+              midiStatus.textContent =
+                `Stepper 1: ${stepperBasePositionPercent.toFixed(1)}% (CC ${data1})`;
+            } else {
+              midiStatus.textContent = "Stepper 1 not homed";
+            }
             return;
           }
 
@@ -3367,18 +3727,30 @@ dfs sort shell-angle`,
         midiInput = input;
         midiInput.onmidimessage = handleMidiMessage;
         midiStatus.textContent = `Connected: ${input.name}`;
+        updateMidiUi();
         console.log("MIDI: connected to", input.name);
+      }
+
+      function disconnectMidi() {
+        if (midiInput) {
+          midiInput.onmidimessage = null;
+        }
+        midiInput = null;
+        midiStatus.textContent = "Disconnected";
+        updateMidiUi();
       }
 
       async function initMidi() {
         if (!navigator.requestMIDIAccess) {
           midiStatus.textContent = "Web MIDI not supported";
+          updateMidiUi();
           return;
         }
         try {
           midiAccess = await navigator.requestMIDIAccess({ sysex: false });
         } catch (err) {
           midiStatus.textContent = "MIDI access denied";
+          updateMidiUi();
           console.error("MIDI:", err);
           return;
         }
@@ -3398,12 +3770,14 @@ dfs sort shell-angle`,
             connectMidiInput(best);
           } else {
             midiStatus.textContent = "No MIDI devices found";
+            updateMidiUi();
           }
         }
 
         findAndConnect();
         midiAccess.onstatechange = () => {
           if (!midiInput || midiInput.state !== "connected") {
+            disconnectMidi();
             findAndConnect();
           }
         };
@@ -3568,11 +3942,27 @@ dfs sort shell-angle`,
       });
 
       resetButton.addEventListener("click", resetVisualization);
-      midiConnectButton.addEventListener("click", initMidi);
-      serialConnectButton.addEventListener("click", connectRelay);
-      serialDisconnectButton.addEventListener("click", disconnectRelay);
-      stepperConnectButton.addEventListener("click", connectStepper);
-      stepperDisconnectButton.addEventListener("click", disconnectStepper);
+      midiConnectButton.addEventListener("click", async (event) => {
+        if (event.target.closest(".connection-close")) {
+          disconnectMidi();
+          return;
+        }
+        await initMidi();
+      });
+      serialConnectButton.addEventListener("click", async (event) => {
+        if (event.target.closest(".connection-close")) {
+          await disconnectRelay();
+          return;
+        }
+        await connectRelay();
+      });
+      stepperConnectButton.addEventListener("click", async (event) => {
+        if (event.target.closest(".connection-close")) {
+          await disconnectStepper();
+          return;
+        }
+        await connectStepper();
+      });
       stepperHomeButton.addEventListener("click", homeStepper);
       jetModeSelect.addEventListener("change", () => {
         stopAnimation();
@@ -3703,6 +4093,12 @@ dfs sort shell-angle`,
           }
         });
       }
+      window.addEventListener("pagehide", () => {
+        disconnectStepper().catch((error) => console.error(error));
+      });
+      window.addEventListener("beforeunload", () => {
+        disconnectStepper().catch((error) => console.error(error));
+      });
       window.addEventListener("resize", render);
       document.getElementById("sidebar").addEventListener("transitionend", render);
 
@@ -3806,10 +4202,12 @@ dfs sort shell-angle`,
       updateStepperEnvelopeUi();
       updatePlayPauseButton();
       updateLoopToggleButton();
+      updateMidiUi();
       updateSerialUi(0);
       updateStepperUi();
       render();
       autoConnectRelay();
+      autoConnectStepper();
       initMidi();
     </script>
   </body>

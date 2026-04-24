@@ -1,0 +1,14 @@
+{
+  "name": "hexaflame-components",
+  "private": true,
+  "scripts": {
+    "nx": "nx",
+    "build": "nx run-many -t build",
+    "clean": "nx run-many -t clean",
+    "graph": "nx graph",
+    "dev:web-control": "nx run web-control:dev"
+  },
+  "devDependencies": {
+    "nx": "^21.0.0"
+  }
+}
