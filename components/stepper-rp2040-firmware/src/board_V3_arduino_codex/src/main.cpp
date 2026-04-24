@@ -83,8 +83,8 @@ void printSerialHelp() {
   Serial.println("Serial commands:");
   Serial.println("  home            - run homing at alternating demo speed");
   Serial.println("  home <hz>       - run homing at a specific frequency (e.g. 400 or 1200)");
-  Serial.println("  pos <percent> [hz] - move to a calibrated position from 0 to 100");
-  Serial.println("  step <n> [hz]   - move to an absolute step from 0 to total travel");
+  Serial.println("  pos <percent> [hz] - move to a calibrated position from 0 to 100 (default 1200Hz)");
+  Serial.println("  step <n> [hz]   - move to an absolute step from 0 to total travel (default 1200Hz)");
   Serial.println("  current status  - print TMC run/idle current settings");
   Serial.println("  current run <0-31>  - set TMC running current scale");
   Serial.println("  current idle <0-31> - set TMC holding current scale");
@@ -138,45 +138,35 @@ void runCentering(uint32_t requestedFrequency) {
 }
 
 void runMoveToPercent(float percent, uint32_t requestedFrequency) {
-  g_motionInProgress = true;
-
   if (!g_stepper.isCalibrated()) {
     Serial.println("Move rejected: run 'home' first to calibrate the travel range.");
-    g_motionInProgress = false;
     return;
   }
 
   const float clampedPercent = constrain(percent, 0.0f, 100.0f);
   const bool ok = g_stepper.moveToPercent(clampedPercent, requestedFrequency);
   if (ok) {
-    Serial.print("Moved to ");
-    Serial.print(g_stepper.getPositionPercent(), 1);
+    Serial.print("Moving to ");
+    Serial.print(clampedPercent, 1);
     Serial.println("%");
   } else {
     Serial.println("Move failed");
   }
-
-  g_motionInProgress = false;
 }
 
 void runMoveToStep(uint32_t targetStep, uint32_t requestedFrequency) {
-  g_motionInProgress = true;
-
   if (!g_stepper.isCalibrated()) {
     Serial.println("Move rejected: run 'home' first to calibrate the travel range.");
-    g_motionInProgress = false;
     return;
   }
 
   const bool ok = g_stepper.moveToStep(targetStep, requestedFrequency);
   if (ok) {
-    Serial.print("Moved to step ");
-    Serial.println(g_stepper.getCurrentPositionSteps());
+    Serial.print("Moving to step ");
+    Serial.println(targetStep);
   } else {
     Serial.println("Move failed");
   }
-
-  g_motionInProgress = false;
 }
 
 void handleSerialCommand(const String &rawLine) {
@@ -238,17 +228,20 @@ void handleSerialCommand(const String &rawLine) {
     return;
   }
 
-  if (g_motionInProgress) {
-    Serial.println("Busy");
-    return;
-  }
-
   if (command.equalsIgnoreCase("home") && arg1.length() == 0) {
+    if (g_motionInProgress || g_stepper.isMoveInProgress()) {
+      Serial.println("Busy");
+      return;
+    }
     runCentering(nextDemoFrequency());
     return;
   }
 
   if (command.equalsIgnoreCase("home")) {
+    if (g_motionInProgress || g_stepper.isMoveInProgress()) {
+      Serial.println("Busy");
+      return;
+    }
     uint32_t frequency = 0;
     if (!parseUnsignedLongArg(arg1, frequency) || frequency == 0 || arg2.length() != 0) {
       Serial.println("Invalid frequency. Example: home 1200");
@@ -349,6 +342,17 @@ void setup() {
 void loop() {
   processSerialInput();
 
+  const Stepper::MoveUpdate moveUpdate = g_stepper.serviceMove();
+  if (moveUpdate == Stepper::MoveUpdate::Completed) {
+    Serial.print("Moved to step ");
+    Serial.println(g_stepper.getCurrentPositionSteps());
+    Serial.print("Moved to ");
+    Serial.print(g_stepper.getPositionPercent(), 1);
+    Serial.println("%");
+  } else if (moveUpdate == Stepper::MoveUpdate::Failed) {
+    Serial.println("Move failed");
+  }
+
   const bool buttonLevel = digitalRead(kButtonPin);
   const uint32_t now = millis();
 
@@ -357,7 +361,8 @@ void loop() {
     g_lastButtonLevel = buttonLevel;
   }
 
-  if (!g_motionInProgress && !buttonLevel && (now - g_lastDebounceMs) >= kDebounceMs) {
+  if (!g_motionInProgress && !g_stepper.isMoveInProgress() && !buttonLevel &&
+      (now - g_lastDebounceMs) >= kDebounceMs) {
     g_homingRequested = true;
   }
 

@@ -8,6 +8,12 @@
 
 class Stepper {
 public:
+  enum class MoveUpdate : uint8_t {
+    None = 0,
+    Completed,
+    Failed,
+  };
+
   struct MicrostepSetting {
     const char *label;
     float reduction;
@@ -22,8 +28,10 @@ public:
   bool begin();
   bool tmcTest();
   bool centering(uint32_t requestedFrequency);
+  MoveUpdate serviceMove();
   bool moveToPercent(float percent, uint32_t requestedFrequency = 0);
   bool moveToStep(uint32_t targetStep, uint32_t requestedFrequency = 0);
+  bool isMoveInProgress() const;
   bool isCalibrated() const;
   uint32_t getTravelSteps() const;
   uint32_t getCurrentPositionSteps() const;
@@ -39,6 +47,8 @@ public:
 private:
   bool microStep(uint8_t mode);
   bool getFullRev(uint8_t mode, uint32_t &fullRev, uint8_t &sgAdj, uint8_t &serialNode);
+  void clearMoveState();
+  void updateMoveProgress();
   void setDirection(bool clockwise);
   uint32_t clampMoveFrequency(uint32_t requestedFrequency) const;
   uint32_t getStepperValue(uint32_t stepperFrequency) const;
@@ -73,6 +83,14 @@ private:
   uint8_t runCurrent_ = 31;
   uint8_t idleCurrent_ = 0;
   uint8_t holdDelay_ = 8;
+  bool moveInProgress_ = false;
+  bool moveDirectionPositive_ = true;
+  uint32_t moveStartPositionSteps_ = 0;
+  uint32_t moveTargetPositionSteps_ = 0;
+  uint32_t movePlannedSteps_ = 0;
+  uint32_t moveFrequency_ = 0;
+  uint32_t moveStartMs_ = 0;
+  uint32_t moveTimeoutMs_ = 0;
   volatile bool stepperSpinning_ = false;
   volatile bool stallguarded_ = false;
 

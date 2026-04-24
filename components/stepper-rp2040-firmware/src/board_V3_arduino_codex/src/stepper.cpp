@@ -186,10 +186,7 @@ uint32_t Stepper::clampMoveFrequency(uint32_t requestedFrequency) const {
   const uint32_t minFrequency = 400UL * sgAdj_;
   const uint32_t maxFrequency = 1200UL * sgAdj_;
   if (requestedFrequency == 0) {
-    if (lastMoveFrequency_ > 0) {
-      return lastMoveFrequency_;
-    }
-    return minFrequency;
+    return maxFrequency;
   }
   return constrain(requestedFrequency * sgAdj_, minFrequency, maxFrequency);
 }
@@ -253,6 +250,39 @@ void Stepper::stopStepper() {
   stepperSpinning_ = false;
 }
 
+void Stepper::clearMoveState() {
+  moveInProgress_ = false;
+  moveDirectionPositive_ = true;
+  moveStartPositionSteps_ = currentPositionSteps_;
+  moveTargetPositionSteps_ = currentPositionSteps_;
+  movePlannedSteps_ = 0;
+  moveFrequency_ = 0;
+  moveStartMs_ = 0;
+  moveTimeoutMs_ = 0;
+}
+
+void Stepper::updateMoveProgress() {
+  if (!moveInProgress_) {
+    return;
+  }
+
+  int32_t pulseCount = getPulseCount();
+  if (pulseCount < 0) {
+    pulseCount = 0;
+  }
+
+  const uint32_t completedSteps =
+      min<uint32_t>(static_cast<uint32_t>(pulseCount), movePlannedSteps_);
+  if (moveDirectionPositive_) {
+    currentPositionSteps_ =
+        min<uint32_t>(travelSteps_, moveStartPositionSteps_ + completedSteps);
+  } else if (completedSteps >= moveStartPositionSteps_) {
+    currentPositionSteps_ = 0;
+  } else {
+    currentPositionSteps_ = moveStartPositionSteps_ - completedSteps;
+  }
+}
+
 void Stepper::setStallguard(uint8_t threshold) {
   const uint8_t clamped = min<uint8_t>(threshold, 255);
   tmc_.setStallguardThreshold(clamped);
@@ -274,6 +304,10 @@ bool Stepper::tmcTest() {
 
 bool Stepper::isCalibrated() const {
   return calibrated_;
+}
+
+bool Stepper::isMoveInProgress() const {
+  return moveInProgress_;
 }
 
 uint32_t Stepper::getTravelSteps() const {
@@ -415,6 +449,10 @@ bool Stepper::homing(uint32_t stepperValue, uint32_t stepperFrequency, uint32_t 
 }
 
 bool Stepper::centering(uint32_t requestedFrequency) {
+  if (moveInProgress_) {
+    stopStepper();
+  }
+  clearMoveState();
   const uint32_t stepperFrequency = clampMoveFrequency(requestedFrequency);
   const uint32_t stepperValue = getStepperValue(stepperFrequency);
   const uint32_t startupLoops = 10;
@@ -481,6 +519,31 @@ bool Stepper::centering(uint32_t requestedFrequency) {
   return false;
 }
 
+Stepper::MoveUpdate Stepper::serviceMove() {
+  if (!moveInProgress_) {
+    return MoveUpdate::None;
+  }
+
+  updateMoveProgress();
+  if (!stepperSpinning_) {
+    currentPositionSteps_ = moveTargetPositionSteps_;
+    lastMoveFrequency_ = moveFrequency_;
+    clearMoveState();
+    return MoveUpdate::Completed;
+  }
+
+  if ((millis() - moveStartMs_) <= moveTimeoutMs_) {
+    return MoveUpdate::None;
+  }
+
+  stopStepper();
+  travelSteps_ = 0;
+  currentPositionSteps_ = 0;
+  calibrated_ = false;
+  clearMoveState();
+  return MoveUpdate::Failed;
+}
+
 bool Stepper::moveToPercent(float percent, uint32_t requestedFrequency) {
   if (!calibrated_ || travelSteps_ == 0) {
     return false;
@@ -504,21 +567,35 @@ bool Stepper::moveToStep(uint32_t targetStep, uint32_t requestedFrequency) {
     targetStep = travelSteps_;
   }
 
-  const int32_t delta = static_cast<int32_t>(targetStep) - static_cast<int32_t>(currentPositionSteps_);
-  if (delta == 0) {
+  if (moveInProgress_) {
+    updateMoveProgress();
+    stopStepper();
+    clearMoveState();
+  }
+
+  const int32_t refreshedDelta = static_cast<int32_t>(targetStep) - static_cast<int32_t>(currentPositionSteps_);
+  if (refreshedDelta == 0) {
     return true;
   }
 
   const uint32_t moveFrequency = clampMoveFrequency(requestedFrequency);
   const uint32_t stepperValue = getStepperValue(moveFrequency);
-  const uint32_t moveSteps = static_cast<uint32_t>(abs(delta));
+  const uint32_t moveSteps = static_cast<uint32_t>(abs(refreshedDelta));
   const uint32_t moveTimeMs = 100UL + (moveSteps * 1000UL) / max<uint32_t>(1, moveFrequency);
 
   stopStepper();
   setPulseCounter(0);
-  setDirection(delta > 0);
+  setDirection(refreshedDelta > 0);
   setPulsesToDo(moveSteps);
   pio_sm_put_blocking(pio_, smStep_, stepperValue);
+  moveInProgress_ = true;
+  moveDirectionPositive_ = refreshedDelta > 0;
+  moveStartPositionSteps_ = currentPositionSteps_;
+  moveTargetPositionSteps_ = targetStep;
+  movePlannedSteps_ = moveSteps;
+  moveFrequency_ = moveFrequency;
+  moveStartMs_ = millis();
+  moveTimeoutMs_ = moveTimeMs;
   startStepper();
 
   if (debug_) {
@@ -531,17 +608,6 @@ bool Stepper::moveToStep(uint32_t targetStep, uint32_t requestedFrequency) {
     Serial.println(" steps)");
   }
 
-  delay(moveTimeMs);
-  if (stepperSpinning_) {
-    stopStepper();
-    travelSteps_ = 0;
-    currentPositionSteps_ = 0;
-    calibrated_ = false;
-    return false;
-  }
-
-  currentPositionSteps_ = targetStep;
-  lastMoveFrequency_ = moveFrequency;
   return true;
 }
 

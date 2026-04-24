@@ -265,6 +265,10 @@
         box-shadow: 0 0 12px rgba(0, 229, 255, 0.15);
       }
 
+      .btn-compact {
+        padding: 4px 8px;
+      }
+
       .speed-readout {
         font-family: var(--mono);
         font-size: 11px;
@@ -283,6 +287,23 @@
         text-overflow: ellipsis;
         white-space: nowrap;
         flex: 1;
+      }
+
+      .device-label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-bright);
+        margin-bottom: 8px;
+      }
+
+      .metric-text {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--text);
+        flex: 1;
+        white-space: nowrap;
       }
 
       /* ── Legend ─────────────────────────────────── */
@@ -538,6 +559,35 @@
             <button id="serial-disconnect-button" type="button" disabled>Disconnect</button>
             <span id="serial-status" class="status-text">Disconnected</span>
           </div>
+          <div class="section-row">
+            <button id="stepper-connect-button" type="button">Stepper</button>
+            <button id="stepper-disconnect-button" type="button" disabled>Disconnect</button>
+            <span id="stepper-status" class="status-text">Disconnected</span>
+          </div>
+        </div>
+        
+        <!-- Steppers -->
+        <div class="section">
+          <div class="section-label">Steppers</div>
+          <div class="device-label">Stepper 1</div>
+          <div class="section-row">
+            <button id="stepper-home-button" class="btn-compact" type="button" disabled>Home</button>
+            <label for="stepper-position-slider">Position</label>
+            <input
+              id="stepper-position-slider"
+              type="range"
+              min="0"
+              max="100"
+              step="0.1"
+              value="50"
+              disabled
+            />
+            <output id="stepper-position-readout" for="stepper-position-slider">50.0%</output>
+          </div>
+          <div class="section-row">
+            <label>Travel</label>
+            <span id="stepper-travel-steps" class="metric-text">Unknown</span>
+          </div>
         </div>
 
         <!-- Stats -->
@@ -588,6 +638,22 @@
       const serialDisconnectButton = document.getElementById(
         "serial-disconnect-button",
       );
+      const stepperConnectButton = document.getElementById(
+        "stepper-connect-button",
+      );
+      const stepperDisconnectButton = document.getElementById(
+        "stepper-disconnect-button",
+      );
+      const stepperHomeButton = document.getElementById("stepper-home-button");
+      const stepperPositionSlider = document.getElementById(
+        "stepper-position-slider",
+      );
+      const stepperPositionReadout = document.getElementById(
+        "stepper-position-readout",
+      );
+      const stepperTravelStepsText = document.getElementById(
+        "stepper-travel-steps",
+      );
       const editorToggleButton = document.getElementById("editor-toggle-button");
       const editorPanel = document.getElementById("editor-panel");
       const animationEditor = document.getElementById("animation-editor");
@@ -598,6 +664,7 @@
       const midiConnectButton = document.getElementById("midi-connect-button");
       const midiStatus = document.getElementById("midi-status");
       const serialStatus = document.getElementById("serial-status");
+      const stepperStatus = document.getElementById("stepper-status");
       const outlineStats = document.getElementById("outline-stats");
       const spokeStats = document.getElementById("spoke-stats");
       const STORAGE_KEY = "hexagon-rings-state";
@@ -605,6 +672,8 @@
       const DEFAULT_RINGS = 2;
       const RELAY_CHANNEL_COUNT = 32;
       const RELAY_SLAVE_ADDRESS = 1;
+      const STEPPER_SERIAL_BAUD = 115200;
+      const STEPPER_SEND_DELAY_MS = 75;
       const activeNodes = new Set();
       const knownNodeIds = new Set();
       let scene = null;
@@ -637,6 +706,15 @@
       let relayStateQueue = [];
       let relayLastStates = Array(RELAY_CHANNEL_COUNT).fill(null);
       let relayStatusMessage = "Relay sync disconnected";
+      let stepperPort = null;
+      let stepperReader = null;
+      let stepperStatusMessage = "Stepper disconnected";
+      let stepperPositionPercent = 50;
+      let stepperTravelSteps = null;
+      let stepperQueuedPosition = null;
+      let stepperPositionSendInProgress = false;
+      let stepperPositionSendTimerId = null;
+      let stepperConnectInProgress = false;
 
       const SQRT3 = Math.sqrt(3);
       const directions = [
@@ -792,6 +870,89 @@
         serialStatus.textContent = `${relayStatusMessage} (${mappedCount}/${RELAY_CHANNEL_COUNT} mapped)`;
       }
 
+      function updateStepperReadout() {
+        stepperPositionReadout.value = `${stepperPositionPercent.toFixed(1)}%`;
+      }
+
+      function updateStepperTravelReadout() {
+        stepperTravelStepsText.textContent =
+          stepperTravelSteps === null
+            ? "Unknown"
+            : `${stepperTravelSteps.toLocaleString()} steps`;
+      }
+
+      function updateStepperUi() {
+        const serialSupported = "serial" in navigator;
+        stepperConnectButton.disabled =
+          !serialSupported || stepperPort !== null || stepperConnectInProgress;
+        stepperDisconnectButton.disabled = stepperPort === null;
+        stepperHomeButton.disabled = stepperPort === null;
+        stepperConnectButton.hidden = stepperPort !== null || stepperConnectInProgress;
+        stepperDisconnectButton.hidden = stepperPort === null;
+        stepperPositionSlider.disabled = stepperPort === null;
+        if (!serialSupported) {
+          stepperStatus.textContent = "Web Serial unavailable in this browser";
+          return;
+        }
+
+        stepperStatus.textContent = stepperStatusMessage;
+      }
+
+      function formatSerialBytes(bytes) {
+        return [...bytes]
+          .map((value) => value.toString(16).padStart(2, "0"))
+          .join(" ");
+      }
+
+      function logSerialTx(label, payload) {
+        if (typeof payload === "string") {
+          console.log(`[serial tx][${label}]`, JSON.stringify(payload));
+          return;
+        }
+
+        console.log(`[serial tx][${label}]`, formatSerialBytes(payload));
+      }
+
+      function logSerialRx(label, payload) {
+        if (typeof payload === "string") {
+          console.log(`[serial rx][${label}]`, JSON.stringify(payload));
+          return;
+        }
+
+        console.log(`[serial rx][${label}]`, formatSerialBytes(payload));
+      }
+
+      function syncStepperPositionFromBoard(percent) {
+        stepperPositionPercent = Math.min(Math.max(percent, 0), 100);
+        stepperPositionSlider.value = stepperPositionPercent.toFixed(1);
+        updateStepperReadout();
+        saveState();
+      }
+
+      function handleStepperLine(line) {
+        const travelMatch = line.match(/^Travel steps:\s*(\d+)$/i);
+        if (travelMatch) {
+          stepperTravelSteps = Number(travelMatch[1]);
+          updateStepperTravelReadout();
+          saveState();
+        }
+
+        const movedMatch = line.match(/^Moved to\s+([0-9]+(?:\.[0-9]+)?)%$/i);
+        if (movedMatch) {
+          syncStepperPositionFromBoard(Number(movedMatch[1]));
+        }
+
+        const currentPositionMatch = line.match(
+          /^Current position:\s*([0-9]+(?:\.[0-9]+)?)%$/i,
+        );
+        if (currentPositionMatch) {
+          syncStepperPositionFromBoard(Number(currentPositionMatch[1]));
+        }
+
+        stepperStatusMessage = line;
+        updateStepperUi();
+      }
+
       function setActiveFromFrame(frame) {
         activeNodes.clear();
         for (const nodeId of frame) {
@@ -839,6 +1000,8 @@
               ? parsed.selectedSequenceId
               : "ripple";
           const animationSpeed = Number(parsed.animationSpeed);
+          const stepperPositionPercent = Number(parsed.stepperPositionPercent);
+          const stepperTravelSteps = Number(parsed.stepperTravelSteps);
           const savedCustomScripts =
             parsed.customScripts &&
             typeof parsed.customScripts === "object"
@@ -856,6 +1019,12 @@
             animationSpeed: Number.isFinite(animationSpeed)
               ? animationSpeed
               : 12,
+            stepperPositionPercent: Number.isFinite(stepperPositionPercent)
+              ? stepperPositionPercent
+              : 50,
+            stepperTravelSteps: Number.isFinite(stepperTravelSteps)
+              ? stepperTravelSteps
+              : null,
             customScripts: savedCustomScripts,
           };
         } catch {
@@ -876,6 +1045,8 @@
               animationLoopEnabled,
               selectedSequenceId,
               animationSpeed,
+              stepperPositionPercent,
+              stepperTravelSteps,
               customScripts:
                 Object.keys(customScripts).length > 0
                   ? customScripts
@@ -1356,6 +1527,7 @@
           throw new Error("Relay port is not connected");
         }
 
+        logSerialTx("relay", frame);
         const writer = relayPort.writable.getWriter();
         try {
           await writer.write(frame);
@@ -1483,6 +1655,216 @@
         relayLastStates = Array(RELAY_CHANNEL_COUNT).fill(null);
         relayStatusMessage = "Relay sync disconnected";
         updateSerialUi(scene ? getRelayMappedNodeIds(scene).length : 0);
+      }
+
+      async function writeStepperCommand(command) {
+        if (!stepperPort?.writable) {
+          throw new Error("Stepper port is not connected");
+        }
+
+        logSerialTx("stepper", command);
+        const writer = stepperPort.writable.getWriter();
+        try {
+          await writer.write(new TextEncoder().encode(`${command}\n`));
+        } finally {
+          writer.releaseLock();
+        }
+      }
+
+      async function processStepperPositionQueue() {
+        if (stepperPositionSendInProgress || stepperPort === null) {
+          return;
+        }
+
+        stepperPositionSendInProgress = true;
+
+        try {
+          while (stepperQueuedPosition !== null && stepperPort !== null) {
+            const nextPosition = stepperQueuedPosition;
+            stepperQueuedPosition = null;
+            await writeStepperCommand(`pos ${nextPosition.toFixed(1)}`);
+            stepperStatusMessage = `Stepper connected at ${nextPosition.toFixed(1)}%`;
+            updateStepperUi();
+          }
+        } catch (error) {
+          console.error(error);
+          stepperStatusMessage = "Stepper write failed";
+          updateStepperUi();
+        } finally {
+          stepperPositionSendInProgress = false;
+        }
+      }
+
+      function queueStepperPositionSend() {
+        if (stepperPositionSendTimerId !== null) {
+          window.clearTimeout(stepperPositionSendTimerId);
+        }
+
+        stepperPositionSendTimerId = window.setTimeout(() => {
+          stepperPositionSendTimerId = null;
+          stepperQueuedPosition = stepperPositionPercent;
+          processStepperPositionQueue();
+        }, STEPPER_SEND_DELAY_MS);
+      }
+
+      async function flushStepperPositionSend() {
+        if (stepperPositionSendTimerId !== null) {
+          window.clearTimeout(stepperPositionSendTimerId);
+          stepperPositionSendTimerId = null;
+        }
+
+        stepperQueuedPosition = stepperPositionPercent;
+        await processStepperPositionQueue();
+      }
+
+      async function homeStepper() {
+        if (stepperPort === null) {
+          return;
+        }
+
+        if (stepperPositionSendTimerId !== null) {
+          window.clearTimeout(stepperPositionSendTimerId);
+          stepperPositionSendTimerId = null;
+        }
+        stepperQueuedPosition = null;
+        stepperStatusMessage = "Homing at 400Hz";
+        updateStepperUi();
+
+        try {
+          await writeStepperCommand("home 400");
+        } catch (error) {
+          console.error(error);
+          stepperStatusMessage = "Stepper home failed";
+          updateStepperUi();
+        }
+      }
+
+      async function readStepperLoop(port) {
+        const decoder = new TextDecoder();
+        let buffered = "";
+
+        while (stepperPort === port && port.readable) {
+          const reader = port.readable.getReader();
+          stepperReader = reader;
+          try {
+            while (stepperPort === port) {
+              const { value, done } = await reader.read();
+              if (done) {
+                break;
+              }
+              const chunk = decoder.decode(value, { stream: true });
+              if (chunk.length > 0) {
+                logSerialRx("stepper", chunk);
+              }
+              buffered += chunk;
+              const lines = buffered.split(/\r?\n/);
+              buffered = lines.pop() || "";
+              for (const rawLine of lines) {
+                const line = rawLine.trim();
+                if (!line || line === ">" || line.startsWith(">")) {
+                  continue;
+                }
+                handleStepperLine(line);
+              }
+            }
+          } catch (error) {
+            if (stepperPort === port) {
+              console.error(error);
+              stepperStatusMessage = "Stepper read error";
+              updateStepperUi();
+            }
+          } finally {
+            stepperReader = null;
+            reader.releaseLock();
+          }
+          break;
+        }
+      }
+
+      async function openStepperPort(port) {
+        try {
+          if (port === relayPort) {
+            stepperStatusMessage = "Selected port is already in use by Relay";
+            updateStepperUi();
+            return;
+          }
+
+          stepperPort = port;
+          await stepperPort.open({
+            baudRate: STEPPER_SERIAL_BAUD,
+            dataBits: 8,
+            stopBits: 1,
+            parity: "none",
+            flowControl: "none",
+          });
+          stepperStatusMessage = "Stepper connected";
+          updateStepperUi();
+          readStepperLoop(stepperPort);
+        } catch (error) {
+          stepperPort = null;
+          stepperStatusMessage =
+            error?.name === "InvalidStateError"
+              ? "Selected port is already open"
+              : "Stepper connection failed";
+          updateStepperUi();
+          console.error(error);
+        }
+      }
+
+      async function connectStepper() {
+        if (
+          !("serial" in navigator) ||
+          stepperPort !== null ||
+          stepperConnectInProgress
+        ) {
+          return;
+        }
+
+        stepperConnectInProgress = true;
+        stepperStatusMessage = "Connecting stepper...";
+        updateStepperUi();
+
+        try {
+          const port = await navigator.serial.requestPort();
+          await openStepperPort(port);
+        } catch (error) {
+          stepperStatusMessage = "Stepper disconnected";
+          updateStepperUi();
+          console.error(error);
+        } finally {
+          stepperConnectInProgress = false;
+          updateStepperUi();
+        }
+      }
+
+      async function disconnectStepper() {
+        if (stepperPositionSendTimerId !== null) {
+          window.clearTimeout(stepperPositionSendTimerId);
+          stepperPositionSendTimerId = null;
+        }
+        stepperQueuedPosition = null;
+        stepperPositionSendInProgress = false;
+
+        if (stepperReader !== null) {
+          try {
+            await stepperReader.cancel();
+          } catch (error) {
+            console.error(error);
+          }
+        }
+
+        if (stepperPort !== null) {
+          try {
+            await stepperPort.close();
+          } catch (error) {
+            console.error(error);
+          }
+        }
+
+        stepperPort = null;
+        stepperReader = null;
+        stepperStatusMessage = "Stepper disconnected";
+        updateStepperUi();
       }
 
       function buildPath(currentScene, targetId) {
@@ -2349,6 +2731,7 @@ dfs sort shell-angle`,
       // Speed knob: auto-detect first CC in 1-8 or 70-77 range.
 
       const MIDI_CC_SPEED = 36;
+      const MIDI_CC_STEPPER_1 = 37;
       const MIDI_CC_BACK = 25;
       const MIDI_CC_NEXT = 26;
       const MIDI_CC_PLAY = 27;
@@ -2419,6 +2802,19 @@ dfs sort shell-angle`,
             saveState();
             midiStatus.textContent =
               `Speed: ${animationSpeed.toFixed(1)} steps/s`;
+            return;
+          }
+
+          if (data1 === MIDI_CC_STEPPER_1) {
+            stepperPositionPercent = (data2 / 127) * 100;
+            stepperPositionSlider.value = stepperPositionPercent.toFixed(1);
+            updateStepperReadout();
+            saveState();
+            if (stepperPort !== null) {
+              queueStepperPositionSend();
+            }
+            midiStatus.textContent =
+              `Stepper 1: ${stepperPositionPercent.toFixed(1)}% (CC ${data1})`;
             return;
           }
 
@@ -2674,6 +3070,9 @@ dfs sort shell-angle`,
       midiConnectButton.addEventListener("click", initMidi);
       serialConnectButton.addEventListener("click", connectRelay);
       serialDisconnectButton.addEventListener("click", disconnectRelay);
+      stepperConnectButton.addEventListener("click", connectStepper);
+      stepperDisconnectButton.addEventListener("click", disconnectStepper);
+      stepperHomeButton.addEventListener("click", homeStepper);
       jetModeSelect.addEventListener("change", () => {
         stopAnimation();
         jetMode = jetModeSelect.value;
@@ -2776,6 +3175,22 @@ dfs sort shell-angle`,
         updateSpeedReadout();
         saveState();
       });
+      stepperPositionSlider.addEventListener("input", () => {
+        stepperPositionPercent = Number(stepperPositionSlider.value);
+        updateStepperReadout();
+        saveState();
+        if (stepperPort !== null) {
+          queueStepperPositionSend();
+        }
+      });
+      stepperPositionSlider.addEventListener("change", async () => {
+        stepperPositionPercent = Number(stepperPositionSlider.value);
+        updateStepperReadout();
+        saveState();
+        if (stepperPort !== null) {
+          await flushStepperPositionSend();
+        }
+      });
 
       ringsInput.addEventListener("input", () => {
         stopAnimation();
@@ -2786,6 +3201,9 @@ dfs sort shell-angle`,
         navigator.serial.addEventListener("disconnect", async (event) => {
           if (event.target === relayPort) {
             await disconnectRelay();
+          }
+          if (event.target === stepperPort) {
+            await disconnectStepper();
           }
         });
       }
@@ -2838,15 +3256,30 @@ dfs sort shell-angle`,
         animationSpeed = Math.min(Math.max(savedState.animationSpeed, 1), 18);
       }
 
+      if (Number.isFinite(savedState?.stepperPositionPercent)) {
+        stepperPositionPercent = Math.min(
+          Math.max(savedState.stepperPositionPercent, 0),
+          100,
+        );
+      }
+
+      if (Number.isFinite(savedState?.stepperTravelSteps)) {
+        stepperTravelSteps = Math.max(savedState.stepperTravelSteps, 0);
+      }
+
       jetModeSelect.value = jetMode;
       sequenceSelect.value = selectedSequenceId;
       updateEditorFromSequence();
       speedSlider.value = String(animationSpeed);
+      stepperPositionSlider.value = stepperPositionPercent.toFixed(1);
       updateLabelModeSelect();
       updateSpeedReadout();
+      updateStepperReadout();
+      updateStepperTravelReadout();
       updatePlayPauseButton();
       updateLoopToggleButton();
       updateSerialUi(0);
+      updateStepperUi();
       render();
       autoConnectRelay();
       initMidi();
