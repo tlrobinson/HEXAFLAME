@@ -14,6 +14,16 @@ import {
   drawOutlineGlow,
   drawStepperGlow,
 } from "./render/canvas";
+import {
+  RELAY_CHANNEL_COUNT,
+  buildRelayStates,
+  buildRelayWriteMultipleFrame,
+  findPreferredSerialPort,
+  getRelayMappedNodeIds,
+  parseRelayCommandInput,
+  relayStatesEqual,
+  rememberSerialPortRole,
+} from "./devices/relay";
 
       const canvas = document.getElementById("hex-canvas");
       const context = canvas.getContext("2d");
@@ -119,8 +129,6 @@ import {
       const HIT_RADIUS = 10;
       const DEFAULT_RINGS = 2;
       const DEVICE_LOG_LIMIT = 250;
-      const RELAY_CHANNEL_COUNT = 32;
-      const RELAY_SLAVE_ADDRESS = 1;
       const STEPPER_SERIAL_BAUD = 115200;
       const STEPPER_SEND_DELAY_MS = 75;
       const STEPPER_ENVELOPE_SEND_DELAY_MS = 20;
@@ -221,61 +229,6 @@ import {
         }
 
         return deduped;
-      }
-
-      function crc16Modbus(bytes) {
-        let crc = 0xffff;
-
-        for (const byte of bytes) {
-          crc ^= byte;
-          for (let bit = 0; bit < 8; bit += 1) {
-            if (crc & 0x0001) {
-              crc = (crc >> 1) ^ 0xa001;
-            } else {
-              crc >>= 1;
-            }
-          }
-        }
-
-        return crc;
-      }
-
-      function buildRelayWriteFrame(channelIndex, enabled) {
-        const payload = [
-          RELAY_SLAVE_ADDRESS,
-          0x05,
-          (channelIndex >> 8) & 0xff,
-          channelIndex & 0xff,
-          enabled ? 0xff : 0x00,
-          0x00,
-        ];
-        const crc = crc16Modbus(payload);
-        return new Uint8Array([...payload, crc & 0xff, (crc >> 8) & 0xff]);
-      }
-
-      function buildRelayWriteMultipleFrame(states) {
-        const coilBytes = Array(4).fill(0);
-
-        for (let index = 0; index < RELAY_CHANNEL_COUNT; index += 1) {
-          if (!states[index]) {
-            continue;
-          }
-
-          coilBytes[Math.floor(index / 8)] |= 1 << (index % 8);
-        }
-
-        const payload = [
-          RELAY_SLAVE_ADDRESS,
-          0x0f,
-          0x00,
-          0x00,
-          0x00,
-          RELAY_CHANNEL_COUNT,
-          coilBytes.length,
-          ...coilBytes,
-        ];
-        const crc = crc16Modbus(payload);
-        return new Uint8Array([...payload, crc & 0xff, (crc >> 8) & 0xff]);
       }
 
       function updateSerialUi(mappedCount = 0) {
@@ -1121,124 +1074,19 @@ import {
           : "Loop Off";
       }
 
-      function getRelayMappedNodeIds(currentScene) {
-        const distanceMap = buildDistanceMap(currentScene);
-        return [...currentScene.nodes]
-          .sort((left, right) => {
-            const distanceDelta =
-              (distanceMap.get(left.id) ?? 0) -
-              (distanceMap.get(right.id) ?? 0);
-            if (distanceDelta !== 0) {
-              return distanceDelta;
-            }
-
-            const typeDelta =
-              (left.type === "center" ? 0 : 1) -
-              (right.type === "center" ? 0 : 1);
-            if (typeDelta !== 0) {
-              return typeDelta;
-            }
-
-            return angleFromCenter(left) - angleFromCenter(right);
-          })
-          .slice(0, RELAY_CHANNEL_COUNT)
-          .map((node) => node.id);
+      function getMappedRelayNodeIds(currentScene) {
+        return getRelayMappedNodeIds(
+          currentScene,
+          buildDistanceMap(currentScene),
+          angleFromCenter,
+        );
       }
 
-      function buildRelayStates(currentScene) {
-        const mappedNodeIds = getRelayMappedNodeIds(currentScene);
-        const states = Array(RELAY_CHANNEL_COUNT).fill(false);
-
-        for (let index = 0; index < mappedNodeIds.length; index += 1) {
-          states[index] = activeNodes.has(mappedNodeIds[index]);
-        }
-
-        return {
-          mappedNodeIds,
-          states,
-        };
-      }
-
-      function relayStatesEqual(left, right) {
-        if (left.length !== right.length) {
-          return false;
-        }
-
-        for (let index = 0; index < left.length; index += 1) {
-          if (left[index] !== right[index]) {
-            return false;
-          }
-        }
-
-        return true;
-      }
-
-      function getSerialPortKey(port) {
-        const info = port?.getInfo?.();
-        if (!info) {
-          return null;
-        }
-
-        if (
-          Number.isFinite(info.usbVendorId) ||
-          Number.isFinite(info.usbProductId)
-        ) {
-          return `usb:${info.usbVendorId ?? 0}:${info.usbProductId ?? 0}`;
-        }
-
-        if (Number.isFinite(info.bluetoothServiceClassId)) {
-          return `bt:${info.bluetoothServiceClassId}`;
-        }
-
-        return null;
-      }
-
-      function getRolePortStorageKey(role) {
-        return role === "relay" ? RELAY_PORT_KEY : STEPPER_PORT_KEY;
-      }
-
-      function getPreferredSerialPortKey(role) {
-        try {
-          return window.localStorage.getItem(getRolePortStorageKey(role));
-        } catch {
-          return null;
-        }
-      }
-
-      function setPreferredSerialPortKey(role, portKey) {
-        try {
-          const storageKey = getRolePortStorageKey(role);
-          if (!portKey) {
-            window.localStorage.removeItem(storageKey);
-            return;
-          }
-          window.localStorage.setItem(storageKey, portKey);
-        } catch {
-          // Ignore storage failures so serial controls still work.
-        }
-      }
-
-      function rememberSerialPortRole(role, port) {
-        const portKey = getSerialPortKey(port);
-        if (!portKey) {
-          return;
-        }
-
-        setPreferredSerialPortKey(role, portKey);
-        const otherRole = role === "relay" ? "stepper" : "relay";
-        if (getPreferredSerialPortKey(otherRole) === portKey) {
-          setPreferredSerialPortKey(otherRole, null);
-        }
-      }
-
-      function findPreferredSerialPort(ports, role) {
-        const preferredKey = getPreferredSerialPortKey(role);
-        if (!preferredKey) {
-          return null;
-        }
-
-        return (
-          ports.find((port) => getSerialPortKey(port) === preferredKey) || null
+      function getRelayStateSnapshot(currentScene) {
+        return buildRelayStates(
+          currentScene,
+          getMappedRelayNodeIds(currentScene),
+          activeNodes,
         );
       }
 
@@ -1256,31 +1104,6 @@ import {
         }
       }
 
-      function parseRelayCommandInput(command) {
-        const trimmed = command.trim();
-        if (!trimmed) {
-          return null;
-        }
-
-        const hexPrefixMatch = trimmed.match(/^hex\s*:\s*(.+)$/i);
-        const hexText = hexPrefixMatch ? hexPrefixMatch[1].trim() : trimmed;
-        const hexTokens = hexText.split(/[\s,]+/).filter(Boolean);
-        const looksLikeHexBytes =
-          hexTokens.length > 0 &&
-          hexTokens.every((token) => /^(?:0x)?[0-9a-f]{1,2}$/i.test(token));
-
-        if (hexPrefixMatch || looksLikeHexBytes) {
-          if (!looksLikeHexBytes) {
-            throw new Error("Relay hex bytes must be 00-ff, separated by spaces or commas");
-          }
-          return new Uint8Array(
-            hexTokens.map((token) => Number.parseInt(token.replace(/^0x/i, ""), 16)),
-          );
-        }
-
-        return new TextEncoder().encode(`${command}\n`);
-      }
-
       async function sendRelayCommand(command) {
         const frame = parseRelayCommandInput(command);
         if (!frame || frame.length === 0) {
@@ -1289,7 +1112,7 @@ import {
 
         await writeRelayFrame(frame);
         relayStatusMessage = "Relay command sent";
-        updateSerialUi(scene ? getRelayMappedNodeIds(scene).length : 0);
+        updateSerialUi(scene ? getMappedRelayNodeIds(scene).length : 0);
       }
 
       async function processRelaySyncQueue() {
@@ -1317,7 +1140,7 @@ import {
         } finally {
           relaySyncInProgress = false;
           if (scene) {
-            updateSerialUi(getRelayMappedNodeIds(scene).length);
+            updateSerialUi(getMappedRelayNodeIds(scene).length);
           } else {
             updateSerialUi(0);
           }
@@ -1325,7 +1148,7 @@ import {
       }
 
       function syncRelayOutputs(currentScene) {
-        const { mappedNodeIds, states } = buildRelayStates(currentScene);
+        const { mappedNodeIds, states } = getRelayStateSnapshot(currentScene);
         updateSerialUi(mappedNodeIds.length);
 
         if (relayPort === null) {
@@ -1360,7 +1183,7 @@ import {
             if (relayPort === port) {
               console.error(error);
               relayStatusMessage = "Relay read error";
-              updateSerialUi(scene ? getRelayMappedNodeIds(scene).length : 0);
+              updateSerialUi(scene ? getMappedRelayNodeIds(scene).length : 0);
             }
           } finally {
             relayReader = null;
@@ -1373,7 +1196,7 @@ import {
         try {
           if (port === stepperPort) {
             relayStatusMessage = "Selected port is already in use by Stepper";
-            updateSerialUi(scene ? getRelayMappedNodeIds(scene).length : 0);
+            updateSerialUi(scene ? getMappedRelayNodeIds(scene).length : 0);
             return;
           }
 
@@ -1385,7 +1208,7 @@ import {
             parity: "none",
             flowControl: "none",
           });
-          rememberSerialPortRole("relay", port);
+          rememberSerialPortRole("relay", port, RELAY_PORT_KEY, STEPPER_PORT_KEY);
           relayLastStates = Array(RELAY_CHANNEL_COUNT).fill(null);
           relayStatusMessage = "Relay sync connected";
           appendDeviceLog("relay", "event", "connected");
@@ -1398,7 +1221,7 @@ import {
         } catch (error) {
           relayPort = null;
           relayStatusMessage = "Relay connection failed";
-          updateSerialUi(scene ? getRelayMappedNodeIds(scene).length : 0);
+          updateSerialUi(scene ? getMappedRelayNodeIds(scene).length : 0);
           console.error(error);
         }
       }
@@ -1411,7 +1234,7 @@ import {
         try {
           const ports = await navigator.serial.getPorts();
           const port =
-            findPreferredSerialPort(ports, "relay") ||
+            findPreferredSerialPort(ports, "relay", RELAY_PORT_KEY, STEPPER_PORT_KEY) ||
             (await navigator.serial.requestPort());
           await openRelayPort(port);
         } catch (error) {
@@ -1426,7 +1249,7 @@ import {
 
         try {
           const ports = await navigator.serial.getPorts();
-          const port = findPreferredSerialPort(ports, "relay");
+          const port = findPreferredSerialPort(ports, "relay", RELAY_PORT_KEY, STEPPER_PORT_KEY);
           if (port) {
             await openRelayPort(port);
           }
@@ -1462,7 +1285,7 @@ import {
         if (wasConnected) {
           appendDeviceLog("relay", "event", "disconnected");
         }
-        updateSerialUi(scene ? getRelayMappedNodeIds(scene).length : 0);
+        updateSerialUi(scene ? getMappedRelayNodeIds(scene).length : 0);
       }
 
       async function writeStepperCommand(command) {
@@ -1660,7 +1483,7 @@ import {
             parity: "none",
             flowControl: "none",
           });
-          rememberSerialPortRole("stepper", port);
+          rememberSerialPortRole("stepper", port, RELAY_PORT_KEY, STEPPER_PORT_KEY);
           stepperHomed = false;
           stepperTravelSteps = null;
           updateStepperTravelReadout();
@@ -1697,7 +1520,7 @@ import {
         try {
           const ports = await navigator.serial.getPorts();
           const port =
-            findPreferredSerialPort(ports, "stepper") ||
+            findPreferredSerialPort(ports, "stepper", RELAY_PORT_KEY, STEPPER_PORT_KEY) ||
             (await navigator.serial.requestPort());
           await openStepperPort(port);
         } catch (error) {
@@ -1725,7 +1548,7 @@ import {
 
         try {
           const ports = await navigator.serial.getPorts();
-          const port = findPreferredSerialPort(ports, "stepper");
+          const port = findPreferredSerialPort(ports, "stepper", RELAY_PORT_KEY, STEPPER_PORT_KEY);
           if (port) {
             await openStepperPort(port);
           } else {
@@ -2688,7 +2511,7 @@ dfs sort shell-angle`,
           }
           const chIndex = midiPadMap.get(data1);
           if (chIndex !== undefined && scene) {
-            const mappedIds = getRelayMappedNodeIds(scene);
+            const mappedIds = getMappedRelayNodeIds(scene);
             if (chIndex < mappedIds.length) {
               midiHeldNotes.add(data1);
               stopAnimation();
@@ -2712,7 +2535,7 @@ dfs sort shell-angle`,
           }
           const chIndex = midiPadMap.get(data1);
           if (chIndex !== undefined && scene) {
-            const mappedIds = getRelayMappedNodeIds(scene);
+            const mappedIds = getMappedRelayNodeIds(scene);
             if (chIndex < mappedIds.length) {
               midiHeldNotes.delete(data1);
               activeNodes.delete(mappedIds[chIndex]);
@@ -3034,7 +2857,7 @@ dfs sort shell-angle`,
 
         updateStats();
         drawDistanceLabels(context, scene.nodes, buildDistanceMap(scene), labelMode);
-        drawChannelLabels(context, scene, getRelayMappedNodeIds(scene), labelMode);
+        drawChannelLabels(context, scene, getMappedRelayNodeIds(scene), labelMode);
         drawAddressLabels(context, scene.nodes, labelMode);
         drawHoverNode(
           context,
@@ -3113,7 +2936,7 @@ dfs sort shell-angle`,
         } catch (error) {
           console.error(error);
           relayStatusMessage = error?.message || "Relay command failed";
-          updateSerialUi(scene ? getRelayMappedNodeIds(scene).length : 0);
+          updateSerialUi(scene ? getMappedRelayNodeIds(scene).length : 0);
         }
       });
       stepperCommandForm.addEventListener("submit", async (event) => {
