@@ -152,6 +152,166 @@
         background: var(--bg);
       }
 
+      .log-pane {
+        flex-shrink: 0;
+        width: 360px;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background:
+          linear-gradient(180deg, rgba(255, 106, 61, 0.08), transparent 28%),
+          var(--surface);
+        border-left: 1px solid var(--border);
+        transition: margin-right 220ms cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .log-pane.collapsed {
+        margin-right: -360px;
+      }
+
+      .log-pane-toggle {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 20;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        padding: 0;
+        background: var(--surface2);
+        border: 1px solid var(--border-hi);
+        border-radius: 8px;
+        color: var(--orange);
+        cursor: pointer;
+        transition: all 180ms ease;
+        box-shadow: 0 0 12px rgba(255, 106, 61, 0.1);
+      }
+      .log-pane-toggle:hover {
+        background: var(--surface);
+        border-color: var(--orange);
+        box-shadow: 0 0 20px rgba(255, 106, 61, 0.2);
+      }
+      .log-pane:not(.collapsed) .log-pane-toggle {
+        right: 370px;
+      }
+
+      .log-pane-header {
+        flex-shrink: 0;
+        padding: 16px 16px 12px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .log-pane-title-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .log-pane h2 {
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-bright);
+      }
+
+      .log-pane-subtitle {
+        margin-top: 6px;
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--text-dim);
+      }
+
+      .log-pane-body {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+        padding: 12px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border-hi) transparent;
+      }
+
+      .device-log {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: rgba(12, 10, 20, 0.58);
+        overflow: hidden;
+        margin-bottom: 12px;
+      }
+      .device-log:last-child { margin-bottom: 0; }
+
+      .device-log-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .device-log-title {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-bright);
+      }
+
+      .device-log-count {
+        font-family: var(--mono);
+        font-size: 9px;
+        color: var(--text-dim);
+      }
+
+      .device-log-stream {
+        height: 190px;
+        overflow: auto;
+        padding: 8px;
+        font-family: var(--mono);
+        font-size: 10px;
+        line-height: 1.45;
+        color: var(--text);
+        scrollbar-width: thin;
+        scrollbar-color: var(--border-hi) transparent;
+      }
+
+      .log-entry {
+        display: grid;
+        grid-template-columns: 52px 26px 1fr;
+        gap: 6px;
+        align-items: baseline;
+        padding: 2px 0;
+        border-bottom: 1px solid rgba(120, 80, 255, 0.06);
+      }
+      .log-entry:last-child { border-bottom: none; }
+
+      .log-time {
+        color: var(--text-dim);
+      }
+
+      .log-dir {
+        font-weight: 700;
+      }
+      .log-dir.tx { color: var(--cyan); }
+      .log-dir.rx { color: var(--orange); }
+      .log-dir.event { color: var(--magenta); }
+
+      .log-payload {
+        min-width: 0;
+        overflow-wrap: anywhere;
+        white-space: pre-wrap;
+      }
+
+      .log-empty {
+        padding: 8px 0;
+        color: var(--text-dim);
+        font-style: italic;
+      }
+
       .canvas-wrap {
         flex: 1;
         min-height: 0;
@@ -168,7 +328,7 @@
         height: 100%;
         border-radius: 12px;
         background: #0a0816;
-        border: 1px solid var(--border);
+        border: none;
       }
 
       /* ── Form Controls ─────────────────────────── */
@@ -218,6 +378,40 @@
         border: 2px solid var(--bg);
         box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
         cursor: pointer;
+      }
+
+      input[type="text"] {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--text-bright);
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 6px 8px;
+        outline: none;
+      }
+      input[type="text"]:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 1px rgba(0, 229, 255, 0.16);
+      }
+
+      .command-row {
+        display: flex;
+        gap: 6px;
+        margin: -2px 0 8px 0;
+      }
+      .command-row:last-child { margin-bottom: 0; }
+
+      .device-log-command {
+        margin: 0;
+        padding: 8px;
+        border-top: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .command-input {
+        flex: 1;
+        min-width: 0;
       }
 
       select {
@@ -387,6 +581,10 @@
         stroke-linejoin: round;
       }
 
+      .envelope-fill {
+        fill: rgba(255, 56, 96, 0.12);
+      }
+
       .envelope-sweep {
         stroke: var(--red);
         stroke-width: 2;
@@ -536,6 +734,9 @@
         .sidebar { width: 260px; }
         .sidebar.collapsed { margin-left: -260px; }
         .sidebar:not(.collapsed) ~ .main-area .sidebar-toggle { left: 270px; }
+        .log-pane { width: min(320px, 86vw); }
+        .log-pane.collapsed { margin-right: min(-320px, -86vw); }
+        .log-pane:not(.collapsed) .log-pane-toggle { right: calc(min(320px, 86vw) + 10px); }
       }
     </style>
   </head>
@@ -726,6 +927,7 @@
             <path class="envelope-grid" d="M0 70.5H260" />
             <path class="envelope-grid" d="M0 46.5H260" />
             <path class="envelope-grid" d="M0 22.5H260" />
+            <path id="stepper-envelope-fill" class="envelope-fill" d="M14 78 L14 78 L14 78 Z" />
             <path id="stepper-envelope-path" class="envelope-path" d="M14 78 L70 14 L124 40 L190 40 L246 78" />
             <line id="stepper-envelope-sweep" class="envelope-sweep" x1="14" y1="78" x2="14" y2="78" />
             <circle id="stepper-envelope-marker" class="envelope-marker" cx="14" cy="78" r="3.5" />
@@ -764,6 +966,67 @@
         <canvas id="hex-canvas"></canvas>
       </div>
     </div>
+    <aside id="log-pane" class="log-pane collapsed">
+      <button class="log-pane-toggle" id="log-pane-toggle" type="button" title="Toggle device logs" aria-label="Toggle device logs">⚙</button>
+      <div class="log-pane-header">
+        <div class="log-pane-title-row">
+          <h2>Device Logs</h2>
+          <button id="clear-device-logs-button" class="btn-compact" type="button">Clear</button>
+        </div>
+        <div class="log-pane-subtitle">Inbound and outbound messages by device</div>
+      </div>
+      <div class="log-pane-body">
+        <section class="device-log" aria-labelledby="midi-log-title">
+          <div class="device-log-header">
+            <div id="midi-log-title" class="device-log-title">MIDI</div>
+            <div id="midi-log-count" class="device-log-count">0 entries</div>
+          </div>
+          <div id="midi-log-stream" class="device-log-stream" aria-live="polite">
+            <div class="log-empty">No MIDI traffic yet.</div>
+          </div>
+        </section>
+        <section class="device-log" aria-labelledby="relay-log-title">
+          <div class="device-log-header">
+            <div id="relay-log-title" class="device-log-title">Relay</div>
+            <div id="relay-log-count" class="device-log-count">0 entries</div>
+          </div>
+          <div id="relay-log-stream" class="device-log-stream" aria-live="polite">
+            <div class="log-empty">No relay traffic yet.</div>
+          </div>
+          <form id="relay-command-form" class="command-row device-log-command">
+            <input
+              id="relay-command-input"
+              class="command-input"
+              type="text"
+              placeholder="hex: 01 05 00 00 ff 00"
+              autocomplete="off"
+              disabled
+            />
+            <button id="relay-command-send-button" class="btn-compact" type="submit" disabled>Send</button>
+          </form>
+        </section>
+        <section class="device-log" aria-labelledby="stepper-log-title">
+          <div class="device-log-header">
+            <div id="stepper-log-title" class="device-log-title">Stepper</div>
+            <div id="stepper-log-count" class="device-log-count">0 entries</div>
+          </div>
+          <div id="stepper-log-stream" class="device-log-stream" aria-live="polite">
+            <div class="log-empty">No stepper traffic yet.</div>
+          </div>
+          <form id="stepper-command-form" class="command-row device-log-command">
+            <input
+              id="stepper-command-input"
+              class="command-input"
+              type="text"
+              placeholder="status, home 400, pos 50"
+              autocomplete="off"
+              disabled
+            />
+            <button id="stepper-command-send-button" class="btn-compact" type="submit" disabled>Send</button>
+          </form>
+        </section>
+      </div>
+    </aside>
 
     <script>
       const canvas = document.getElementById("hex-canvas");
@@ -802,6 +1065,9 @@
       const stepperEnvelopePath = document.getElementById(
         "stepper-envelope-path",
       );
+      const stepperEnvelopeFill = document.getElementById(
+        "stepper-envelope-fill",
+      );
       const stepperEnvelopeSweep = document.getElementById(
         "stepper-envelope-sweep",
       );
@@ -831,13 +1097,42 @@
       const midiStatus = document.getElementById("midi-status");
       const serialStatus = document.getElementById("serial-status");
       const stepperStatus = document.getElementById("stepper-status");
+      const relayCommandForm = document.getElementById("relay-command-form");
+      const relayCommandInput = document.getElementById("relay-command-input");
+      const relayCommandSendButton = document.getElementById(
+        "relay-command-send-button",
+      );
+      const stepperCommandForm = document.getElementById("stepper-command-form");
+      const stepperCommandInput = document.getElementById(
+        "stepper-command-input",
+      );
+      const stepperCommandSendButton = document.getElementById(
+        "stepper-command-send-button",
+      );
+      const logPane = document.getElementById("log-pane");
+      const logPaneToggleButton = document.getElementById("log-pane-toggle");
+      const clearDeviceLogsButton = document.getElementById(
+        "clear-device-logs-button",
+      );
+      const deviceLogStreams = {
+        midi: document.getElementById("midi-log-stream"),
+        relay: document.getElementById("relay-log-stream"),
+        stepper: document.getElementById("stepper-log-stream"),
+      };
+      const deviceLogCounts = {
+        midi: document.getElementById("midi-log-count"),
+        relay: document.getElementById("relay-log-count"),
+        stepper: document.getElementById("stepper-log-count"),
+      };
       const outlineStats = document.getElementById("outline-stats");
       const spokeStats = document.getElementById("spoke-stats");
       const STORAGE_KEY = "hexagon-rings-state";
       const RELAY_PORT_KEY = `${STORAGE_KEY}:relay-port`;
       const STEPPER_PORT_KEY = `${STORAGE_KEY}:stepper-port`;
+      const LOG_PANE_COLLAPSED_KEY = `${STORAGE_KEY}:log-pane-collapsed`;
       const HIT_RADIUS = 10;
       const DEFAULT_RINGS = 2;
+      const DEVICE_LOG_LIMIT = 250;
       const RELAY_CHANNEL_COUNT = 32;
       const RELAY_SLAVE_ADDRESS = 1;
       const STEPPER_SERIAL_BAUD = 115200;
@@ -857,8 +1152,13 @@
       let animationFrameIndex = 0;
       let animationTimerId = null;
       let midiAccess = null;
-      let midiInput = null;
+      const midiInputs = new Map();
       const midiHeldNotes = new Set();
+      const deviceLogs = {
+        midi: [],
+        relay: [],
+        stepper: [],
+      };
       // M-VAVE SMC-PAD: pad note -> relay channel (1-indexed)
       const midiPadMap = new Map([
         [49, 0],  // ch1
@@ -871,6 +1171,7 @@
       const MIDI_NOTE_ALL_OFF = 48;
       const MIDI_NOTE_ALL_ON = 51;
       let relayPort = null;
+      let relayReader = null;
       let relaySyncInProgress = false;
       let relayStateQueue = [];
       let relayLastStates = Array(RELAY_CHANNEL_COUNT).fill(null);
@@ -1045,7 +1346,9 @@
 
       function updateSerialUi(mappedCount = 0) {
         const serialSupported = "serial" in navigator;
-        serialConnectButton.disabled = !serialSupported || relayPort !== null;
+        serialConnectButton.disabled = !serialSupported;
+        relayCommandInput.disabled = !serialSupported || relayPort === null;
+        relayCommandSendButton.disabled = !serialSupported || relayPort === null;
         serialConnectButton.classList.toggle("connected", relayPort !== null);
         if (!serialSupported) {
           serialStatus.textContent = "Web Serial unavailable in this browser";
@@ -1212,6 +1515,30 @@
         );
 
         const point = getStepperEnvelopeGraphPoint(now);
+        const fillSegments = [`M ${graphLeft} ${graphBottom}`];
+        if (stepperEnvelope.active) {
+          if (stepperEnvelope.phase === "attack") {
+            fillSegments.push(`L ${point.x.toFixed(1)} ${point.y.toFixed(1)}`);
+          } else if (stepperEnvelope.phase === "decay") {
+            fillSegments.push(`L ${attackX.toFixed(1)} ${graphTop.toFixed(1)}`);
+            fillSegments.push(`L ${point.x.toFixed(1)} ${point.y.toFixed(1)}`);
+          } else if (stepperEnvelope.phase === "sustain") {
+            fillSegments.push(`L ${attackX.toFixed(1)} ${graphTop.toFixed(1)}`);
+            fillSegments.push(`L ${decayX.toFixed(1)} ${sustainY.toFixed(1)}`);
+            fillSegments.push(`L ${point.x.toFixed(1)} ${point.y.toFixed(1)}`);
+          } else if (stepperEnvelope.phase === "release") {
+            fillSegments.push(`L ${attackX.toFixed(1)} ${graphTop.toFixed(1)}`);
+            fillSegments.push(`L ${decayX.toFixed(1)} ${sustainY.toFixed(1)}`);
+            fillSegments.push(`L ${sustainEndX.toFixed(1)} ${sustainY.toFixed(1)}`);
+            fillSegments.push(`L ${point.x.toFixed(1)} ${point.y.toFixed(1)}`);
+          }
+        } else {
+          fillSegments.push(`L ${graphLeft} ${graphBottom}`);
+        }
+        fillSegments.push(`L ${point.x.toFixed(1)} ${graphBottom.toFixed(1)}`);
+        fillSegments.push("Z");
+        stepperEnvelopeFill.setAttribute("d", fillSegments.join(" "));
+
         const envelopeLevel = stepperEnvelope.active
           ? stepperEnvelope.currentLevel
           : 0;
@@ -1358,10 +1685,6 @@
       }
 
       function startStepperEnvelope(velocity = 127) {
-        if (!canControlStepperPosition()) {
-          return false;
-        }
-
         const now = performance.now();
         stepperEnvelope.originPercent = stepperBasePositionPercent;
         stepperEnvelope.velocityScale = Math.min(Math.max(velocity / 127, 0), 1);
@@ -1372,7 +1695,7 @@
           stepperEnvelope.phaseStartLevel = 0;
         }
         updateStepperEnvelopePhase("attack", now);
-        applyStepperEnvelopeOutput(true, STEPPER_ENVELOPE_SEND_DELAY_MS);
+        applyStepperEnvelopeOutput(canControlStepperPosition(), STEPPER_ENVELOPE_SEND_DELAY_MS);
         if (stepperEnvelopeFrameId === null) {
           stepperEnvelopeFrameId = window.requestAnimationFrame(
             tickStepperEnvelope,
@@ -1380,7 +1703,7 @@
         }
         midiStatus.textContent =
           `Stepper 1 ADSR ${Math.round(stepperEnvelope.velocityScale * 100)}%`;
-        return true;
+        return canControlStepperPosition();
       }
 
       function releaseStepperEnvelope() {
@@ -1398,7 +1721,7 @@
       function updateStepperUi() {
         const serialSupported = "serial" in navigator;
         stepperConnectButton.disabled =
-          !serialSupported || stepperPort !== null || stepperConnectInProgress;
+          !serialSupported || stepperConnectInProgress;
         stepperHomeButton.disabled = stepperPort === null;
         stepperHomeButton.classList.toggle(
           "btn-danger-compact",
@@ -1406,6 +1729,9 @@
         );
         stepperConnectButton.classList.toggle("connected", stepperPort !== null);
         stepperPositionSlider.disabled = !canControlStepperPosition();
+        stepperCommandInput.disabled = !serialSupported || stepperPort === null;
+        stepperCommandSendButton.disabled =
+          !serialSupported || stepperPort === null;
         updateStepperHomedReadout();
         if (!serialSupported) {
           stepperStatus.textContent = "Web Serial unavailable in this browser";
@@ -1418,7 +1744,7 @@
       function updateMidiUi() {
         const midiSupported = Boolean(navigator.requestMIDIAccess);
         midiConnectButton.disabled = !midiSupported;
-        midiConnectButton.classList.toggle("connected", midiInput !== null);
+        midiConnectButton.classList.toggle("connected", midiInputs.size > 0);
         if (!midiSupported) {
           midiStatus.textContent = "Web MIDI not supported";
         }
@@ -1430,7 +1756,148 @@
           .join(" ");
       }
 
+      function formatLogTime(timestampMs) {
+        const date = new Date(timestampMs);
+        return [
+          date.getHours().toString().padStart(2, "0"),
+          date.getMinutes().toString().padStart(2, "0"),
+          date.getSeconds().toString().padStart(2, "0"),
+        ].join(":");
+      }
+
+      function formatLogPayload(payload) {
+        if (typeof payload === "string") {
+          const normalized = payload.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+          return normalized.length > 0 ? normalized : "(empty)";
+        }
+
+        if (payload instanceof Uint8Array || Array.isArray(payload)) {
+          return formatSerialBytes(payload);
+        }
+
+        return String(payload);
+      }
+
+      function formatMidiBytes(bytes) {
+        return [...bytes]
+          .map((value) => value.toString(16).padStart(2, "0"))
+          .join(" ");
+      }
+
+      function getMidiInputLabel(input) {
+        return input?.name || input?.manufacturer || input?.id || "MIDI input";
+      }
+
+      function formatMidiMessage(data, input = null) {
+        const bytes = [...data];
+        const [status = 0, data1 = 0, data2 = 0] = bytes;
+        const channel = (status & 0x0f) + 1;
+        const type = status & 0xf0;
+        const source = input ? `${getMidiInputLabel(input)}: ` : "";
+        const suffix = ` (${formatMidiBytes(bytes)})`;
+
+        if (type === 0x80 || (type === 0x90 && data2 === 0)) {
+          return `${source}Note Off ch${channel} note ${data1}${suffix}`;
+        }
+
+        if (type === 0x90) {
+          return `${source}Note On ch${channel} note ${data1} vel ${data2}${suffix}`;
+        }
+
+        if (type === 0xb0) {
+          return `${source}CC ch${channel} #${data1} = ${data2}${suffix}`;
+        }
+
+        if (type === 0xc0) {
+          return `${source}Program Change ch${channel} ${data1}${suffix}`;
+        }
+
+        if (type === 0xe0) {
+          const value = ((data2 & 0x7f) << 7) | (data1 & 0x7f);
+          return `${source}Pitch Bend ch${channel} ${value}${suffix}`;
+        }
+
+        return `${source}MIDI ${suffix}`;
+      }
+
+      function renderDeviceLog(role) {
+        const stream = deviceLogStreams[role];
+        const count = deviceLogCounts[role];
+        const entries = deviceLogs[role];
+        if (!stream || !count || !entries) {
+          return;
+        }
+
+        count.textContent = `${entries.length} ${entries.length === 1 ? "entry" : "entries"}`;
+        stream.replaceChildren();
+
+        if (entries.length === 0) {
+          const empty = document.createElement("div");
+          empty.className = "log-empty";
+          empty.textContent = `No ${role} traffic yet.`;
+          stream.appendChild(empty);
+          return;
+        }
+
+        for (const entry of entries) {
+          const row = document.createElement("div");
+          row.className = "log-entry";
+
+          const time = document.createElement("span");
+          time.className = "log-time";
+          time.textContent = formatLogTime(entry.timestampMs);
+
+          const direction = document.createElement("span");
+          direction.className = `log-dir ${entry.direction}`;
+          direction.textContent = entry.direction.toUpperCase();
+
+          const payload = document.createElement("span");
+          payload.className = "log-payload";
+          payload.textContent = entry.payload;
+
+          row.append(time, direction, payload);
+          stream.appendChild(row);
+        }
+
+        stream.scrollTop = stream.scrollHeight;
+      }
+
+      function appendDeviceLog(role, direction, payload) {
+        const entries = deviceLogs[role];
+        if (!entries) {
+          return;
+        }
+
+        entries.push({
+          timestampMs: Date.now(),
+          direction,
+          payload: formatLogPayload(payload),
+        });
+        if (entries.length > DEVICE_LOG_LIMIT) {
+          entries.splice(0, entries.length - DEVICE_LOG_LIMIT);
+        }
+        renderDeviceLog(role);
+      }
+
+      function clearDeviceLogs() {
+        for (const role of Object.keys(deviceLogs)) {
+          deviceLogs[role] = [];
+          renderDeviceLog(role);
+        }
+      }
+
+      function setLogPaneCollapsed(collapsed) {
+        logPane.classList.toggle("collapsed", collapsed);
+        logPaneToggleButton.setAttribute("aria-expanded", String(!collapsed));
+        try {
+          window.localStorage.setItem(LOG_PANE_COLLAPSED_KEY, collapsed ? "1" : "0");
+        } catch {
+          // Ignore storage failures; the pane can still be toggled.
+        }
+      }
+
       function logSerialTx(label, payload) {
+        appendDeviceLog(label, "tx", payload);
         if (typeof payload === "string") {
           console.log(`[serial tx][${label}]`, JSON.stringify(payload));
           return;
@@ -1440,6 +1907,7 @@
       }
 
       function logSerialRx(label, payload) {
+        appendDeviceLog(label, "rx", payload);
         if (typeof payload === "string") {
           console.log(`[serial rx][${label}]`, JSON.stringify(payload));
           return;
@@ -1919,6 +2387,45 @@
         context.restore();
       }
 
+      function drawOutlineGlow(currentScene) {
+        const outlineJets = currentScene.jets.filter(
+          (jet) => jet.kind === "outline" && activeNodes.has(jet.controllerId),
+        );
+        if (outlineJets.length === 0) {
+          return;
+        }
+
+        context.save();
+        context.globalCompositeOperation = "screen";
+
+        for (const jet of outlineJets) {
+          const baseColor = jet.color || "#6c5ce7";
+
+          context.beginPath();
+          context.moveTo(jet.x1, jet.y1);
+          context.lineTo(jet.x2, jet.y2);
+          context.lineCap = "round";
+          context.lineWidth = 15;
+          context.strokeStyle = baseColor;
+          context.globalAlpha = 0.5;
+          context.shadowColor = baseColor;
+          context.shadowBlur = 30;
+          context.stroke();
+
+          context.beginPath();
+          context.moveTo(jet.x1, jet.y1);
+          context.lineTo(jet.x2, jet.y2);
+          context.lineCap = "round";
+          context.lineWidth = 7.5;
+          context.strokeStyle = baseColor;
+          context.globalAlpha = 0.9;
+          context.shadowBlur = 0;
+          context.stroke();
+        }
+
+        context.restore();
+      }
+
       function drawHoverNode(node) {
         if (!node) {
           return;
@@ -2242,6 +2749,42 @@
         }
       }
 
+      function parseRelayCommandInput(command) {
+        const trimmed = command.trim();
+        if (!trimmed) {
+          return null;
+        }
+
+        const hexPrefixMatch = trimmed.match(/^hex\s*:\s*(.+)$/i);
+        const hexText = hexPrefixMatch ? hexPrefixMatch[1].trim() : trimmed;
+        const hexTokens = hexText.split(/[\s,]+/).filter(Boolean);
+        const looksLikeHexBytes =
+          hexTokens.length > 0 &&
+          hexTokens.every((token) => /^(?:0x)?[0-9a-f]{1,2}$/i.test(token));
+
+        if (hexPrefixMatch || looksLikeHexBytes) {
+          if (!looksLikeHexBytes) {
+            throw new Error("Relay hex bytes must be 00-ff, separated by spaces or commas");
+          }
+          return new Uint8Array(
+            hexTokens.map((token) => Number.parseInt(token.replace(/^0x/i, ""), 16)),
+          );
+        }
+
+        return new TextEncoder().encode(`${command}\n`);
+      }
+
+      async function sendRelayCommand(command) {
+        const frame = parseRelayCommandInput(command);
+        if (!frame || frame.length === 0) {
+          return;
+        }
+
+        await writeRelayFrame(frame);
+        relayStatusMessage = "Relay command sent";
+        updateSerialUi(scene ? getRelayMappedNodeIds(scene).length : 0);
+      }
+
       async function processRelaySyncQueue() {
         if (relaySyncInProgress || relayPort === null) {
           return;
@@ -2292,6 +2835,33 @@
         processRelaySyncQueue();
       }
 
+      async function readRelayLoop(port) {
+        while (relayPort === port && port.readable) {
+          const reader = port.readable.getReader();
+          relayReader = reader;
+          try {
+            while (relayPort === port) {
+              const { value, done } = await reader.read();
+              if (done) {
+                break;
+              }
+              if (value?.length > 0) {
+                logSerialRx("relay", value);
+              }
+            }
+          } catch (error) {
+            if (relayPort === port) {
+              console.error(error);
+              relayStatusMessage = "Relay read error";
+              updateSerialUi(scene ? getRelayMappedNodeIds(scene).length : 0);
+            }
+          } finally {
+            relayReader = null;
+            reader.releaseLock();
+          }
+        }
+      }
+
       async function openRelayPort(port) {
         try {
           if (port === stepperPort) {
@@ -2311,6 +2881,8 @@
           rememberSerialPortRole("relay", port);
           relayLastStates = Array(RELAY_CHANNEL_COUNT).fill(null);
           relayStatusMessage = "Relay sync connected";
+          appendDeviceLog("relay", "event", "connected");
+          readRelayLoop(relayPort);
           if (scene) {
             syncRelayOutputs(scene);
           } else {
@@ -2357,8 +2929,16 @@
       }
 
       async function disconnectRelay() {
+        const wasConnected = relayPort !== null;
         relayStateQueue = [];
         relaySyncInProgress = false;
+        if (relayReader !== null) {
+          try {
+            await relayReader.cancel();
+          } catch (error) {
+            console.error(error);
+          }
+        }
 
         if (relayPort !== null) {
           try {
@@ -2369,8 +2949,12 @@
         }
 
         relayPort = null;
+        relayReader = null;
         relayLastStates = Array(RELAY_CHANNEL_COUNT).fill(null);
         relayStatusMessage = "Relay sync disconnected";
+        if (wasConnected) {
+          appendDeviceLog("relay", "event", "disconnected");
+        }
         updateSerialUi(scene ? getRelayMappedNodeIds(scene).length : 0);
       }
 
@@ -2386,6 +2970,17 @@
         } finally {
           writer.releaseLock();
         }
+      }
+
+      async function sendStepperCommand(command) {
+        const trimmed = command.trim();
+        if (!trimmed) {
+          return;
+        }
+
+        await writeStepperCommand(trimmed);
+        stepperStatusMessage = `Stepper command sent: ${trimmed}`;
+        updateStepperUi();
       }
 
       async function requestStepperStatus() {
@@ -2563,6 +3158,7 @@
           stepperTravelSteps = null;
           updateStepperTravelReadout();
           stepperStatusMessage = "Checking stepper status...";
+          appendDeviceLog("stepper", "event", "connected");
           updateStepperUi();
           readStepperLoop(stepperPort);
           await requestStepperStatus();
@@ -2640,6 +3236,7 @@
       }
 
       async function disconnectStepper() {
+        const wasConnected = stepperPort !== null;
         if (stepperPositionSendTimerId !== null) {
           window.clearTimeout(stepperPositionSendTimerId);
           stepperPositionSendTimerId = null;
@@ -2670,6 +3267,9 @@
         stepperTravelSteps = null;
         updateStepperTravelReadout();
         stepperStatusMessage = "Stepper disconnected";
+        if (wasConnected) {
+          appendDeviceLog("stepper", "event", "disconnected");
+        }
         updateStepperUi();
       }
 
@@ -3552,16 +4152,15 @@ dfs sort shell-angle`,
       function handleMidiMessage(event) {
         const [status, data1, data2] = event.data;
         const type = status & 0xf0;
+        appendDeviceLog("midi", "rx", formatMidiMessage(event.data, event.target));
 
         // Note On
         if (type === 0x90 && data2 > 0) {
           if (data1 === MIDI_NOTE_STEPPER_1_ENV) {
-            if (startStepperEnvelope(data2)) {
-              midiStatus.textContent =
-                `Stepper 1 ADSR on (note ${data1}, vel ${data2})`;
-            } else {
-              midiStatus.textContent = "Stepper 1 not homed";
-            }
+            const sendsToStepper = startStepperEnvelope(data2);
+            midiStatus.textContent = sendsToStepper
+              ? `Stepper 1 ADSR on (note ${data1}, vel ${data2})`
+              : `Stepper 1 ADSR visual only (note ${data1}, vel ${data2})`;
             return;
           }
           if (data1 === MIDI_NOTE_ALL_OFF && scene) {
@@ -3723,20 +4322,70 @@ dfs sort shell-angle`,
       }
 
       function connectMidiInput(input) {
-        if (midiInput) midiInput.onmidimessage = null;
-        midiInput = input;
-        midiInput.onmidimessage = handleMidiMessage;
-        midiStatus.textContent = `Connected: ${input.name}`;
+        if (midiInputs.has(input.id)) {
+          return;
+        }
+
+        input.onmidimessage = handleMidiMessage;
+        midiInputs.set(input.id, input);
+        const label = getMidiInputLabel(input);
+        midiStatus.textContent =
+          midiInputs.size === 1
+            ? `Connected: ${label}`
+            : `Connected: ${midiInputs.size} MIDI inputs`;
         updateMidiUi();
-        console.log("MIDI: connected to", input.name);
+        appendDeviceLog("midi", "event", `connected: ${label}`);
+        console.log("MIDI: connected to", label);
+      }
+
+      function connectAllMidiInputs() {
+        if (!midiAccess) {
+          return;
+        }
+
+        let connectedCount = 0;
+        const availableInputs = [...midiAccess.inputs.values()]
+          .map((input) => `${getMidiInputLabel(input)} [${input.state || "unknown"}]`);
+        appendDeviceLog(
+          "midi",
+          "event",
+          availableInputs.length > 0
+            ? `available inputs: ${availableInputs.join(", ")}`
+            : "available inputs: none",
+        );
+        for (const input of midiAccess.inputs.values()) {
+          if (input.state === "connected" || input.state === undefined) {
+            connectMidiInput(input);
+            connectedCount += 1;
+          }
+        }
+
+        for (const [id, input] of midiInputs) {
+          if (input.state !== "connected" || !midiAccess.inputs.has(id)) {
+            input.onmidimessage = null;
+            midiInputs.delete(id);
+            appendDeviceLog("midi", "event", `disconnected: ${getMidiInputLabel(input)}`);
+          }
+        }
+
+        if (connectedCount === 0) {
+          midiStatus.textContent = "No MIDI devices found";
+        } else if (midiInputs.size > 1) {
+          midiStatus.textContent = `Connected: ${midiInputs.size} MIDI inputs`;
+        }
+        updateMidiUi();
       }
 
       function disconnectMidi() {
-        if (midiInput) {
-          midiInput.onmidimessage = null;
+        for (const input of midiInputs.values()) {
+          input.onmidimessage = null;
         }
-        midiInput = null;
+        const hadInputs = midiInputs.size > 0;
+        midiInputs.clear();
         midiStatus.textContent = "Disconnected";
+        if (hadInputs) {
+          appendDeviceLog("midi", "event", "disconnected");
+        }
         updateMidiUi();
       }
 
@@ -3755,32 +4404,8 @@ dfs sort shell-angle`,
           return;
         }
 
-        function findAndConnect() {
-          let best = null;
-          for (const input of midiAccess.inputs.values()) {
-            if (
-              !best ||
-              input.name.toLowerCase().includes("smc") ||
-              input.name.toLowerCase().includes("m-vave")
-            ) {
-              best = input;
-            }
-          }
-          if (best) {
-            connectMidiInput(best);
-          } else {
-            midiStatus.textContent = "No MIDI devices found";
-            updateMidiUi();
-          }
-        }
-
-        findAndConnect();
-        midiAccess.onstatechange = () => {
-          if (!midiInput || midiInput.state !== "connected") {
-            disconnectMidi();
-            findAndConnect();
-          }
-        };
+        connectAllMidiInputs();
+        midiAccess.onstatechange = connectAllMidiInputs;
       }
 
       function stopAnimation() {
@@ -3894,6 +4519,7 @@ dfs sort shell-angle`,
           drawJet(jet, active, hovered);
         }
 
+        drawOutlineGlow(scene);
         drawStepperGlow(scene);
 
         updateStats();
@@ -3940,6 +4566,11 @@ dfs sort shell-angle`,
         document.getElementById("sidebar").classList.toggle("collapsed");
         render();
       });
+      logPaneToggleButton.addEventListener("click", () => {
+        setLogPaneCollapsed(!logPane.classList.contains("collapsed"));
+        render();
+      });
+      clearDeviceLogsButton.addEventListener("click", clearDeviceLogs);
 
       resetButton.addEventListener("click", resetVisualization);
       midiConnectButton.addEventListener("click", async (event) => {
@@ -3962,6 +4593,28 @@ dfs sort shell-angle`,
           return;
         }
         await connectStepper();
+      });
+      relayCommandForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        try {
+          await sendRelayCommand(relayCommandInput.value);
+          relayCommandInput.value = "";
+        } catch (error) {
+          console.error(error);
+          relayStatusMessage = error?.message || "Relay command failed";
+          updateSerialUi(scene ? getRelayMappedNodeIds(scene).length : 0);
+        }
+      });
+      stepperCommandForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        try {
+          await sendStepperCommand(stepperCommandInput.value);
+          stepperCommandInput.value = "";
+        } catch (error) {
+          console.error(error);
+          stepperStatusMessage = "Stepper command failed";
+          updateStepperUi();
+        }
       });
       stepperHomeButton.addEventListener("click", homeStepper);
       jetModeSelect.addEventListener("change", () => {
@@ -4094,9 +4747,11 @@ dfs sort shell-angle`,
         });
       }
       window.addEventListener("pagehide", () => {
+        disconnectRelay().catch((error) => console.error(error));
         disconnectStepper().catch((error) => console.error(error));
       });
       window.addEventListener("beforeunload", () => {
+        disconnectRelay().catch((error) => console.error(error));
         disconnectStepper().catch((error) => console.error(error));
       });
       window.addEventListener("resize", render);
@@ -4205,6 +4860,17 @@ dfs sort shell-angle`,
       updateMidiUi();
       updateSerialUi(0);
       updateStepperUi();
+      let logPaneCollapsed = true;
+      try {
+        logPaneCollapsed =
+          window.localStorage.getItem(LOG_PANE_COLLAPSED_KEY) !== "0";
+      } catch {
+        logPaneCollapsed = true;
+      }
+      setLogPaneCollapsed(logPaneCollapsed);
+      for (const role of Object.keys(deviceLogs)) {
+        renderDeviceLog(role);
+      }
       render();
       autoConnectRelay();
       autoConnectStepper();
