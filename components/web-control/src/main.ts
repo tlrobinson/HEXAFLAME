@@ -6,6 +6,13 @@ import {
   getCenterNode,
 } from "./scene/hex-grid";
 import {
+  createAdsrEnvelope,
+  getAdsrOutputValue,
+  releaseAdsrEnvelope,
+  tickAdsrEnvelope,
+  triggerAdsrEnvelope,
+} from "./control/adsr";
+import {
   drawAddressLabels,
   drawChannelLabels,
   drawDistanceLabels,
@@ -192,20 +199,14 @@ import {
       let stepperLastSendAtMs = -Infinity;
       let stepperConnectInProgress = false;
       let stepperEnvelopeFrameId = null;
-      const stepperEnvelope = {
-        active: false,
-        noteHeld: false,
-        phase: "idle",
+      const stepperEnvelope = createAdsrEnvelope({
         attackMs: 180,
         decayMs: 220,
         sustainLevel: 0.55,
         releaseMs: 320,
-        originPercent: 50,
-        velocityScale: 1,
-        currentLevel: 0,
-        phaseStartMs: 0,
-        phaseStartLevel: 0,
-      };
+      });
+      stepperEnvelope.originValue = 50;
+      stepperEnvelope.targetValue = 100;
 
       function angleFromCenter(node) {
         return Math.atan2(
@@ -466,16 +467,13 @@ import {
         }
       }
 
-      function applyStepperEnvelopeOutput(
+      function applyCenterEnvelopeOutput(
         send = true,
         sendDelayMs = STEPPER_ENVELOPE_SEND_DELAY_MS,
       ) {
-        const outputPercent =
-          stepperEnvelope.originPercent +
-          (100 - stepperEnvelope.originPercent) *
-            stepperEnvelope.velocityScale *
-            stepperEnvelope.currentLevel;
-        applyStepperOutputPosition(outputPercent, {
+        // The ADSR module is controller-agnostic; this adapter maps it to
+        // the current center-spoke actuator, which is still Stepper 1 today.
+        applyStepperOutputPosition(getAdsrOutputValue(stepperEnvelope), {
           send,
           save: false,
           sendDelayMs,
@@ -497,121 +495,57 @@ import {
         saveState();
       }
 
-      function updateStepperEnvelopePhase(phase, now) {
-        stepperEnvelope.phase = phase;
-        stepperEnvelope.phaseStartMs = now;
-        stepperEnvelope.phaseStartLevel = stepperEnvelope.currentLevel;
-        updateStepperEnvelopeUi();
-      }
-
-      function stopStepperEnvelope() {
-        stepperEnvelope.active = false;
-        stepperEnvelope.noteHeld = false;
-        stepperEnvelope.phase = "idle";
-        stepperEnvelope.velocityScale = 1;
-        stepperEnvelope.currentLevel = 0;
-        stepperEnvelope.phaseStartLevel = 0;
-        if (stepperEnvelopeFrameId !== null) {
-          window.cancelAnimationFrame(stepperEnvelopeFrameId);
-          stepperEnvelopeFrameId = null;
-        }
-        applyStepperOutputPosition(stepperEnvelope.originPercent, {
-          send: true,
-          save: false,
-          sendDelayMs: STEPPER_ENVELOPE_SEND_DELAY_MS,
-        });
-        updateStepperEnvelopeUi();
-        saveState();
-      }
-
-      function tickStepperEnvelope(now) {
-        if (!stepperEnvelope.active) {
+      function tickCenterEnvelope(now) {
+        const result = tickAdsrEnvelope(stepperEnvelope, now);
+        if (!result.active && !result.stopped) {
           stepperEnvelopeFrameId = null;
           return;
         }
 
-        const elapsed = now - stepperEnvelope.phaseStartMs;
-        if (stepperEnvelope.phase === "attack") {
-          const progress =
-            stepperEnvelope.attackMs <= 0
-              ? 1
-              : Math.min(elapsed / stepperEnvelope.attackMs, 1);
-          stepperEnvelope.currentLevel =
-            stepperEnvelope.phaseStartLevel +
-            (1 - stepperEnvelope.phaseStartLevel) * progress;
-          if (progress >= 1) {
-            stepperEnvelope.currentLevel = 1;
-            updateStepperEnvelopePhase("decay", now);
-          }
-        } else if (stepperEnvelope.phase === "decay") {
-          const progress =
-            stepperEnvelope.decayMs <= 0
-              ? 1
-              : Math.min(elapsed / stepperEnvelope.decayMs, 1);
-          stepperEnvelope.currentLevel =
-            1 + (stepperEnvelope.sustainLevel - 1) * progress;
-          if (progress >= 1) {
-            stepperEnvelope.currentLevel = stepperEnvelope.sustainLevel;
-            updateStepperEnvelopePhase(
-              stepperEnvelope.noteHeld ? "sustain" : "release",
-              now,
-            );
-          }
-        } else if (stepperEnvelope.phase === "sustain") {
-          stepperEnvelope.currentLevel = stepperEnvelope.sustainLevel;
-          if (!stepperEnvelope.noteHeld) {
-            updateStepperEnvelopePhase("release", now);
-          }
-        } else if (stepperEnvelope.phase === "release") {
-          const progress =
-            stepperEnvelope.releaseMs <= 0
-              ? 1
-              : Math.min(elapsed / stepperEnvelope.releaseMs, 1);
-          stepperEnvelope.currentLevel =
-            stepperEnvelope.phaseStartLevel * (1 - progress);
-          if (progress >= 1) {
-            stopStepperEnvelope();
-            return;
-          }
+        if (result.stopped) {
+          stepperEnvelopeFrameId = null;
+          applyStepperOutputPosition(stepperEnvelope.originValue, {
+            send: true,
+            save: false,
+            sendDelayMs: STEPPER_ENVELOPE_SEND_DELAY_MS,
+          });
+          updateStepperEnvelopeUi(now);
+          saveState();
+          return;
         }
 
-        applyStepperEnvelopeOutput(true, STEPPER_ENVELOPE_SEND_DELAY_MS);
+        applyCenterEnvelopeOutput(true, STEPPER_ENVELOPE_SEND_DELAY_MS);
         updateStepperEnvelopeUi(now);
-        stepperEnvelopeFrameId = window.requestAnimationFrame(tickStepperEnvelope);
+        stepperEnvelopeFrameId = window.requestAnimationFrame(tickCenterEnvelope);
       }
 
-      function startStepperEnvelope(velocity = 127) {
+      function startCenterEnvelope(velocity = 127) {
         const now = performance.now();
-        stepperEnvelope.originPercent = stepperBasePositionPercent;
-        stepperEnvelope.velocityScale = Math.min(Math.max(velocity / 127, 0), 1);
-        stepperEnvelope.noteHeld = true;
-        if (!stepperEnvelope.active) {
-          stepperEnvelope.active = true;
-          stepperEnvelope.currentLevel = 0;
-          stepperEnvelope.phaseStartLevel = 0;
-        }
-        updateStepperEnvelopePhase("attack", now);
-        applyStepperEnvelopeOutput(canControlStepperPosition(), STEPPER_ENVELOPE_SEND_DELAY_MS);
+        triggerAdsrEnvelope(stepperEnvelope, {
+          velocity,
+          originValue: stepperBasePositionPercent,
+          targetValue: 100,
+          now,
+        });
+        updateStepperEnvelopeUi(now);
+        applyCenterEnvelopeOutput(canControlStepperPosition(), STEPPER_ENVELOPE_SEND_DELAY_MS);
         if (stepperEnvelopeFrameId === null) {
           stepperEnvelopeFrameId = window.requestAnimationFrame(
-            tickStepperEnvelope,
+            tickCenterEnvelope,
           );
         }
         midiStatus.textContent =
-          `Stepper 1 ADSR ${Math.round(stepperEnvelope.velocityScale * 100)}%`;
+          `Center ADSR ${Math.round(stepperEnvelope.velocityScale * 100)}%`;
         return canControlStepperPosition();
       }
 
-      function releaseStepperEnvelope() {
-        if (!stepperEnvelope.active) {
+      function releaseCenterEnvelope() {
+        if (!releaseAdsrEnvelope(stepperEnvelope, performance.now())) {
           return;
         }
 
-        stepperEnvelope.noteHeld = false;
-        if (stepperEnvelope.phase !== "release") {
-          updateStepperEnvelopePhase("release", performance.now());
-        }
-        midiStatus.textContent = "Stepper 1 Release";
+        updateStepperEnvelopeUi();
+        midiStatus.textContent = "Center Release";
       }
 
       function updateStepperUi() {
@@ -864,13 +798,18 @@ import {
           const animationSpeed = Number(parsed.animationSpeed);
           const stepperPositionPercent = Number(parsed.stepperPositionPercent);
           const stepperTravelSteps = Number(parsed.stepperTravelSteps);
-          const stepperEnvelopeAttackMs = Number(parsed.stepperEnvelopeAttackMs);
-          const stepperEnvelopeDecayMs = Number(parsed.stepperEnvelopeDecayMs);
-          const stepperEnvelopeSustainLevel = Number(
-            parsed.stepperEnvelopeSustainLevel,
+          const centerEnvelopeAttackMs = Number(
+            parsed.centerEnvelopeAttackMs ?? parsed.stepperEnvelopeAttackMs,
           );
-          const stepperEnvelopeReleaseMs = Number(
-            parsed.stepperEnvelopeReleaseMs,
+          const centerEnvelopeDecayMs = Number(
+            parsed.centerEnvelopeDecayMs ?? parsed.stepperEnvelopeDecayMs,
+          );
+          const centerEnvelopeSustainLevel = Number(
+            parsed.centerEnvelopeSustainLevel ??
+              parsed.stepperEnvelopeSustainLevel,
+          );
+          const centerEnvelopeReleaseMs = Number(
+            parsed.centerEnvelopeReleaseMs ?? parsed.stepperEnvelopeReleaseMs,
           );
           const savedCustomScripts =
             parsed.customScripts &&
@@ -895,17 +834,17 @@ import {
             stepperTravelSteps: Number.isFinite(stepperTravelSteps)
               ? stepperTravelSteps
               : null,
-            stepperEnvelopeAttackMs: Number.isFinite(stepperEnvelopeAttackMs)
-              ? stepperEnvelopeAttackMs
+            centerEnvelopeAttackMs: Number.isFinite(centerEnvelopeAttackMs)
+              ? centerEnvelopeAttackMs
               : 180,
-            stepperEnvelopeDecayMs: Number.isFinite(stepperEnvelopeDecayMs)
-              ? stepperEnvelopeDecayMs
+            centerEnvelopeDecayMs: Number.isFinite(centerEnvelopeDecayMs)
+              ? centerEnvelopeDecayMs
               : 220,
-            stepperEnvelopeSustainLevel: Number.isFinite(stepperEnvelopeSustainLevel)
-              ? stepperEnvelopeSustainLevel
+            centerEnvelopeSustainLevel: Number.isFinite(centerEnvelopeSustainLevel)
+              ? centerEnvelopeSustainLevel
               : 0.55,
-            stepperEnvelopeReleaseMs: Number.isFinite(stepperEnvelopeReleaseMs)
-              ? stepperEnvelopeReleaseMs
+            centerEnvelopeReleaseMs: Number.isFinite(centerEnvelopeReleaseMs)
+              ? centerEnvelopeReleaseMs
               : 320,
             customScripts: savedCustomScripts,
           };
@@ -929,10 +868,10 @@ import {
               animationSpeed,
               stepperPositionPercent: stepperBasePositionPercent,
               stepperTravelSteps,
-              stepperEnvelopeAttackMs: stepperEnvelope.attackMs,
-              stepperEnvelopeDecayMs: stepperEnvelope.decayMs,
-              stepperEnvelopeSustainLevel: stepperEnvelope.sustainLevel,
-              stepperEnvelopeReleaseMs: stepperEnvelope.releaseMs,
+              centerEnvelopeAttackMs: stepperEnvelope.attackMs,
+              centerEnvelopeDecayMs: stepperEnvelope.decayMs,
+              centerEnvelopeSustainLevel: stepperEnvelope.sustainLevel,
+              centerEnvelopeReleaseMs: stepperEnvelope.releaseMs,
               customScripts:
                 Object.keys(customScripts).length > 0
                   ? customScripts
@@ -2429,7 +2368,7 @@ dfs sort shell-angle`,
       // ── MIDI Controller (M-VAVE SMC-PAD) ────────────────────
       //
       // Pads: Note On/Off, default notes 36-47 (C2-B2).
-      //   Note 36 triggers Stepper 1 ADSR, other mapped pads momentarily
+      //   Note 36 triggers the center ADSR envelope, other mapped pads momentarily
       //   trigger relay channels.
       // Transport: CC 115=prev, CC 116=next, CC 117=stop, CC 118=play
       // Speed knob: auto-detect first CC in 1-8 or 70-77 range.
@@ -2442,10 +2381,10 @@ dfs sort shell-angle`,
         // Note On
         if (type === 0x90 && data2 > 0) {
           if (data1 === MIDI_NOTE_STEPPER_1_ENV) {
-            const sendsToStepper = startStepperEnvelope(data2);
+            const sendsToStepper = startCenterEnvelope(data2);
             midiStatus.textContent = sendsToStepper
-              ? `Stepper 1 ADSR on (note ${data1}, vel ${data2})`
-              : `Stepper 1 ADSR visual only (note ${data1}, vel ${data2})`;
+              ? `Center ADSR on (note ${data1}, vel ${data2})`
+              : `Center ADSR visual only (note ${data1}, vel ${data2})`;
             return;
           }
           if (data1 === MIDI_NOTE_ALL_OFF && scene) {
@@ -2485,7 +2424,7 @@ dfs sort shell-angle`,
         // Note Off
         if (type === 0x80 || (type === 0x90 && data2 === 0)) {
           if (data1 === MIDI_NOTE_STEPPER_1_ENV) {
-            releaseStepperEnvelope();
+            releaseCenterEnvelope();
             return;
           }
           const chIndex = MIDI_PAD_MAP.get(data1);
@@ -2508,7 +2447,7 @@ dfs sort shell-angle`,
             updateStepperEnvelopeUi();
             saveState();
             midiStatus.textContent =
-              `Stepper 1 Attack: ${Math.round(stepperEnvelope.attackMs)}ms`;
+              `Center Attack: ${Math.round(stepperEnvelope.attackMs)}ms`;
             return;
           }
 
@@ -2517,7 +2456,7 @@ dfs sort shell-angle`,
             updateStepperEnvelopeUi();
             saveState();
             midiStatus.textContent =
-              `Stepper 1 Decay: ${Math.round(stepperEnvelope.decayMs)}ms`;
+              `Center Decay: ${Math.round(stepperEnvelope.decayMs)}ms`;
             return;
           }
 
@@ -2526,7 +2465,7 @@ dfs sort shell-angle`,
             updateStepperEnvelopeUi();
             saveState();
             midiStatus.textContent =
-              `Stepper 1 Sustain: ${Math.round(stepperEnvelope.sustainLevel * 100)}%`;
+              `Center Sustain: ${Math.round(stepperEnvelope.sustainLevel * 100)}%`;
             return;
           }
 
@@ -2535,7 +2474,7 @@ dfs sort shell-angle`,
             updateStepperEnvelopeUi();
             saveState();
             midiStatus.textContent =
-              `Stepper 1 Release: ${Math.round(stepperEnvelope.releaseMs)}ms`;
+              `Center Release: ${Math.round(stepperEnvelope.releaseMs)}ms`;
             return;
           }
 
@@ -3081,35 +3020,35 @@ dfs sort shell-angle`,
         stepperTravelSteps = Math.max(savedState.stepperTravelSteps, 0);
       }
 
-      if (Number.isFinite(savedState?.stepperEnvelopeAttackMs)) {
+      if (Number.isFinite(savedState?.centerEnvelopeAttackMs)) {
         stepperEnvelope.attackMs = Math.min(
-          Math.max(savedState.stepperEnvelopeAttackMs, 20),
+          Math.max(savedState.centerEnvelopeAttackMs, 20),
           2000,
         );
       }
 
-      if (Number.isFinite(savedState?.stepperEnvelopeDecayMs)) {
+      if (Number.isFinite(savedState?.centerEnvelopeDecayMs)) {
         stepperEnvelope.decayMs = Math.min(
-          Math.max(savedState.stepperEnvelopeDecayMs, 20),
+          Math.max(savedState.centerEnvelopeDecayMs, 20),
           2000,
         );
       }
 
-      if (Number.isFinite(savedState?.stepperEnvelopeSustainLevel)) {
+      if (Number.isFinite(savedState?.centerEnvelopeSustainLevel)) {
         stepperEnvelope.sustainLevel = Math.min(
-          Math.max(savedState.stepperEnvelopeSustainLevel, 0),
+          Math.max(savedState.centerEnvelopeSustainLevel, 0),
           1,
         );
       }
 
-      if (Number.isFinite(savedState?.stepperEnvelopeReleaseMs)) {
+      if (Number.isFinite(savedState?.centerEnvelopeReleaseMs)) {
         stepperEnvelope.releaseMs = Math.min(
-          Math.max(savedState.stepperEnvelopeReleaseMs, 20),
+          Math.max(savedState.centerEnvelopeReleaseMs, 20),
           2000,
         );
       }
 
-      stepperEnvelope.originPercent = stepperBasePositionPercent;
+      stepperEnvelope.originValue = stepperBasePositionPercent;
 
       jetModeSelect.value = jetMode;
       sequenceSelect.value = selectedSequenceId;
