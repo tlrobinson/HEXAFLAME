@@ -24,6 +24,26 @@ import {
   relayStatesEqual,
   rememberSerialPortRole,
 } from "./devices/relay";
+import {
+  MIDI_CC_BACK,
+  MIDI_CC_NEXT,
+  MIDI_CC_PAUSE,
+  MIDI_CC_PLAY,
+  MIDI_CC_SPEED,
+  MIDI_CC_STEPPER_1,
+  MIDI_CC_STEPPER_1_ATTACK,
+  MIDI_CC_STEPPER_1_DECAY,
+  MIDI_CC_STEPPER_1_RELEASE,
+  MIDI_CC_STEPPER_1_SUSTAIN,
+  MIDI_NOTE_ALL_OFF,
+  MIDI_NOTE_ALL_ON,
+  MIDI_NOTE_STEPPER_1_ENV,
+  MIDI_PAD_MAP,
+  connectAllMidiInputs as connectMidiAccessInputs,
+  disconnectMidiInputs,
+  formatMidiMessage,
+  getMidiInputLabel,
+} from "./devices/midi";
 
       const canvas = document.getElementById("hex-canvas");
       const context = canvas.getContext("2d");
@@ -153,17 +173,6 @@ import {
         relay: [],
         stepper: [],
       };
-      // M-VAVE SMC-PAD: pad note -> relay channel (1-indexed)
-      const midiPadMap = new Map([
-        [49, 0],  // ch1
-        [50, 1],  // ch2
-        [47, 2],  // ch3
-        [42, 3],  // ch4
-        [41, 4],  // ch5
-        [44, 5],  // ch6
-      ]);
-      const MIDI_NOTE_ALL_OFF = 48;
-      const MIDI_NOTE_ALL_ON = 51;
       let relayPort = null;
       let relayReader = null;
       let relaySyncInProgress = false;
@@ -663,48 +672,6 @@ import {
         }
 
         return String(payload);
-      }
-
-      function formatMidiBytes(bytes) {
-        return [...bytes]
-          .map((value) => value.toString(16).padStart(2, "0"))
-          .join(" ");
-      }
-
-      function getMidiInputLabel(input) {
-        return input?.name || input?.manufacturer || input?.id || "MIDI input";
-      }
-
-      function formatMidiMessage(data, input = null) {
-        const bytes = [...data];
-        const [status = 0, data1 = 0, data2 = 0] = bytes;
-        const channel = (status & 0x0f) + 1;
-        const type = status & 0xf0;
-        const source = input ? `${getMidiInputLabel(input)}: ` : "";
-        const suffix = ` (${formatMidiBytes(bytes)})`;
-
-        if (type === 0x80 || (type === 0x90 && data2 === 0)) {
-          return `${source}Note Off ch${channel} note ${data1}${suffix}`;
-        }
-
-        if (type === 0x90) {
-          return `${source}Note On ch${channel} note ${data1} vel ${data2}${suffix}`;
-        }
-
-        if (type === 0xb0) {
-          return `${source}CC ch${channel} #${data1} = ${data2}${suffix}`;
-        }
-
-        if (type === 0xc0) {
-          return `${source}Program Change ch${channel} ${data1}${suffix}`;
-        }
-
-        if (type === 0xe0) {
-          const value = ((data2 & 0x7f) << 7) | (data1 & 0x7f);
-          return `${source}Pitch Bend ch${channel} ${value}${suffix}`;
-        }
-
-        return `${source}MIDI ${suffix}`;
       }
 
       function renderDeviceLog(role) {
@@ -2467,18 +2434,6 @@ dfs sort shell-angle`,
       // Transport: CC 115=prev, CC 116=next, CC 117=stop, CC 118=play
       // Speed knob: auto-detect first CC in 1-8 or 70-77 range.
 
-      const MIDI_NOTE_STEPPER_1_ENV = 36;
-      const MIDI_CC_STEPPER_1_ATTACK = 30;
-      const MIDI_CC_STEPPER_1_DECAY = 31;
-      const MIDI_CC_STEPPER_1_SUSTAIN = 32;
-      const MIDI_CC_STEPPER_1_RELEASE = 33;
-      const MIDI_CC_SPEED = 36;
-      const MIDI_CC_STEPPER_1 = 37;
-      const MIDI_CC_BACK = 25;
-      const MIDI_CC_NEXT = 26;
-      const MIDI_CC_PLAY = 27;
-      const MIDI_CC_PAUSE = 28;
-
       function handleMidiMessage(event) {
         const [status, data1, data2] = event.data;
         const type = status & 0xf0;
@@ -2509,7 +2464,7 @@ dfs sort shell-angle`,
             midiStatus.textContent = "All On";
             return;
           }
-          const chIndex = midiPadMap.get(data1);
+          const chIndex = MIDI_PAD_MAP.get(data1);
           if (chIndex !== undefined && scene) {
             const mappedIds = getMappedRelayNodeIds(scene);
             if (chIndex < mappedIds.length) {
@@ -2533,7 +2488,7 @@ dfs sort shell-angle`,
             releaseStepperEnvelope();
             return;
           }
-          const chIndex = midiPadMap.get(data1);
+          const chIndex = MIDI_PAD_MAP.get(data1);
           if (chIndex !== undefined && scene) {
             const mappedIds = getMappedRelayNodeIds(scene);
             if (chIndex < mappedIds.length) {
@@ -2651,67 +2606,44 @@ dfs sort shell-angle`,
           `MIDI: ${[...event.data].map((b) => b.toString(16).padStart(2, "0")).join(" ")}`;
       }
 
-      function connectMidiInput(input) {
-        if (midiInputs.has(input.id)) {
-          return;
-        }
-
-        input.onmidimessage = handleMidiMessage;
-        midiInputs.set(input.id, input);
-        const label = getMidiInputLabel(input);
-        midiStatus.textContent =
-          midiInputs.size === 1
-            ? `Connected: ${label}`
-            : `Connected: ${midiInputs.size} MIDI inputs`;
-        updateMidiUi();
-        appendDeviceLog("midi", "event", `connected: ${label}`);
-        console.log("MIDI: connected to", label);
-      }
-
       function connectAllMidiInputs() {
         if (!midiAccess) {
           return;
         }
 
-        let connectedCount = 0;
-        const availableInputs = [...midiAccess.inputs.values()]
-          .map((input) => `${getMidiInputLabel(input)} [${input.state || "unknown"}]`);
+        const result = connectMidiAccessInputs(
+          midiAccess,
+          midiInputs,
+          handleMidiMessage,
+        );
         appendDeviceLog(
           "midi",
           "event",
-          availableInputs.length > 0
-            ? `available inputs: ${availableInputs.join(", ")}`
+          result.availableInputs.length > 0
+            ? `available inputs: ${result.availableInputs.join(", ")}`
             : "available inputs: none",
         );
-        for (const input of midiAccess.inputs.values()) {
-          if (input.state === "connected" || input.state === undefined) {
-            connectMidiInput(input);
-            connectedCount += 1;
-          }
+        for (const label of result.connectedLabels) {
+          appendDeviceLog("midi", "event", `connected: ${label}`);
+          console.log("MIDI: connected to", label);
+        }
+        for (const label of result.disconnectedLabels) {
+          appendDeviceLog("midi", "event", `disconnected: ${label}`);
         }
 
-        for (const [id, input] of midiInputs) {
-          if (input.state !== "connected" || !midiAccess.inputs.has(id)) {
-            input.onmidimessage = null;
-            midiInputs.delete(id);
-            appendDeviceLog("midi", "event", `disconnected: ${getMidiInputLabel(input)}`);
-          }
-        }
-
-        if (connectedCount === 0) {
+        if (result.connectableCount === 0) {
           midiStatus.textContent = "No MIDI devices found";
         } else if (midiInputs.size > 1) {
           midiStatus.textContent = `Connected: ${midiInputs.size} MIDI inputs`;
+        } else if (midiInputs.size === 1) {
+          midiStatus.textContent =
+            `Connected: ${getMidiInputLabel(midiInputs.values().next().value)}`;
         }
         updateMidiUi();
       }
 
       function disconnectMidi() {
-        for (const input of midiInputs.values()) {
-          input.onmidimessage = null;
-        }
-        const hadInputs = midiInputs.size > 0;
-        midiInputs.clear();
+        const hadInputs = disconnectMidiInputs(midiInputs);
         midiStatus.textContent = "Disconnected";
         if (hadInputs) {
           appendDeviceLog("midi", "event", "disconnected");
