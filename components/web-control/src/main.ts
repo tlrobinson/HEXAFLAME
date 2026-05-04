@@ -1,5 +1,10 @@
 // @ts-nocheck
 import "./styles.css";
+import {
+  buildDistanceMap,
+  buildScene,
+  getCenterNode,
+} from "./scene/hex-grid";
 
       const canvas = document.getElementById("hex-canvas");
       const context = canvas.getContext("2d");
@@ -175,58 +180,6 @@ import "./styles.css";
         phaseStartMs: 0,
         phaseStartLevel: 0,
       };
-
-      const SQRT3 = Math.sqrt(3);
-      const directions = [
-        [1, 0],
-        [1, -1],
-        [0, -1],
-        [-1, 0],
-        [-1, 1],
-        [0, 1],
-      ];
-
-      function cubeToPixel(q, r, size) {
-        return {
-          x: size * 1.5 * q,
-          y: size * SQRT3 * (r + q / 2),
-        };
-      }
-
-      function pointKey(x, y) {
-        return `${Math.round(x * 1000)}:${Math.round(y * 1000)}`;
-      }
-
-      function segmentKey(a, b) {
-        return a < b ? `${a}|${b}` : `${b}|${a}`;
-      }
-
-      function partialSegment(fromX, fromY, toX, toY, fraction) {
-        return {
-          x1: fromX,
-          y1: fromY,
-          x2: fromX + (toX - fromX) * fraction,
-          y2: fromY + (toY - fromY) * fraction,
-        };
-      }
-
-      function latticeShell(a, b) {
-        return Math.max(Math.abs(a), Math.abs(b), Math.abs(a - b));
-      }
-
-      function formatSigned(value) {
-        return value >= 0 ? `+${value}` : String(value);
-      }
-
-      function makeAddress(type, a, b) {
-        const shell = latticeShell(a, b);
-        return `${type}${shell}:${formatSigned(a)},${formatSigned(b)}`;
-      }
-
-      function shellFromAddress(address) {
-        const match = /^.(\d+):/.exec(address);
-        return match ? Number(match[1]) : 0;
-      }
 
       function angleFromCenter(node) {
         return Math.atan2(
@@ -1062,46 +1015,6 @@ import "./styles.css";
         }
       }
 
-      function ringCoordinates(radius) {
-        if (radius === 0) {
-          return [[0, 0]];
-        }
-
-        const cells = [];
-        let q = directions[4][0] * radius;
-        let r = directions[4][1] * radius;
-
-        for (let side = 0; side < directions.length; side += 1) {
-          for (let step = 0; step < radius; step += 1) {
-            cells.push([q, r]);
-            q += directions[side][0];
-            r += directions[side][1];
-          }
-        }
-
-        return cells;
-      }
-
-      function allCoordinates(totalRings) {
-        const cells = [];
-        for (let radius = 0; radius < totalRings; radius += 1) {
-          cells.push(...ringCoordinates(radius));
-        }
-        return cells;
-      }
-
-      function hexVertices(centerX, centerY, size) {
-        const vertices = [];
-        for (let i = 0; i < 6; i += 1) {
-          const angle = 60 * i * (Math.PI / 180);
-          vertices.push({
-            x: centerX + size * Math.cos(angle),
-            y: centerY + size * Math.sin(angle),
-          });
-        }
-        return vertices;
-      }
-
       function syncActiveNodes(nodes) {
         const validIds = new Set(nodes.map((node) => node.id));
         let changed = false;
@@ -1124,154 +1037,6 @@ import "./styles.css";
         if (changed) {
           saveState();
         }
-      }
-
-      function buildScene(totalRings, width, height) {
-        const coords = allCoordinates(totalRings);
-        const maxRadius = Math.max(totalRings - 1, 0);
-        const maxX = 1.5 * maxRadius + 1;
-        const maxY = SQRT3 * (maxRadius + 1);
-        const size = Math.min(width / (2 * maxX), height / (2 * maxY)) * 0.92;
-        const originX = width / 2;
-        const originY = height / 2;
-        const nodes = [];
-        const nodeMap = new Map();
-        const jets = [];
-        const vertexOffsets = [
-          [1, 0],
-          [0, 1],
-          [-1, 1],
-          [-1, 0],
-          [0, -1],
-          [1, -1],
-        ];
-
-        for (const [q, r] of coords) {
-          const point = cubeToPixel(q, r, size);
-          const centerX = originX + point.x;
-          const centerY = originY + point.y;
-          const latticeA = q - r;
-          const latticeB = q + 2 * r;
-          const centerId = `c:${q},${r}`;
-          const centerNode = {
-            id: centerId,
-            type: "center",
-            x: centerX,
-            y: centerY,
-            latticeA,
-            latticeB,
-            shell: latticeShell(latticeA, latticeB),
-            address: makeAddress("C", latticeA, latticeB),
-            neighbors: new Set(),
-            controlledJetIds: [],
-          };
-          nodes.push(centerNode);
-          nodeMap.set(centerId, centerNode);
-
-          const vertices = hexVertices(centerX, centerY, size).map(
-            (vertex, index) => {
-              const vertexA = latticeA + vertexOffsets[index][0];
-              const vertexB = latticeB + vertexOffsets[index][1];
-              const id = `v:${pointKey(vertex.x, vertex.y)}`;
-              if (!nodeMap.has(id)) {
-                const vertexNode = {
-                  id,
-                  type: "vertex",
-                  x: vertex.x,
-                  y: vertex.y,
-                  latticeA: vertexA,
-                  latticeB: vertexB,
-                  shell: latticeShell(vertexA, vertexB),
-                  address: makeAddress("V", vertexA, vertexB),
-                  neighbors: new Set(),
-                  controlledJetIds: [],
-                };
-                nodes.push(vertexNode);
-                nodeMap.set(id, vertexNode);
-              }
-              return nodeMap.get(id);
-            },
-          );
-
-          for (const vertexNode of vertices) {
-            const spokeId = `s:${centerId}:${vertexNode.id}`;
-            centerNode.neighbors.add(vertexNode.id);
-            vertexNode.neighbors.add(centerId);
-            jets.push({
-              id: spokeId,
-              kind: "spoke",
-              color: "#ff3860",
-              controllerId: centerId,
-              ...partialSegment(
-                centerX,
-                centerY,
-                vertexNode.x,
-                vertexNode.y,
-                0.75,
-              ),
-            });
-            centerNode.controlledJetIds.push(spokeId);
-          }
-
-          for (let i = 0; i < vertices.length; i += 1) {
-            const start = vertices[i];
-            const end = vertices[(i + 1) % vertices.length];
-            const edgeId = segmentKey(start.id, end.id);
-            const forwardJetId = `${edgeId}:${start.id}`;
-            const backwardJetId = `${edgeId}:${end.id}`;
-            start.neighbors.add(end.id);
-            end.neighbors.add(start.id);
-
-            if (!start.controlledJetIds.includes(forwardJetId)) {
-              start.controlledJetIds.push(forwardJetId);
-              jets.push({
-                id: forwardJetId,
-                kind: "outline",
-                color: "#6c5ce7",
-                controllerId: start.id,
-                ...partialSegment(start.x, start.y, end.x, end.y, 0.75),
-              });
-            }
-
-            if (!end.controlledJetIds.includes(backwardJetId)) {
-              end.controlledJetIds.push(backwardJetId);
-              jets.push({
-                id: backwardJetId,
-                kind: "outline",
-                color: "#6c5ce7",
-                controllerId: end.id,
-                ...partialSegment(end.x, end.y, start.x, start.y, 0.75),
-              });
-            }
-          }
-        }
-
-        const includeOutlines = jetMode !== "spokes";
-        const includeSpokes = jetMode !== "outlines";
-
-        const filteredNodes = nodes
-          .filter((node) =>
-            node.type === "center" ? includeSpokes : includeOutlines,
-          )
-          .map((node) => ({ ...node }));
-        const filteredNodeIds = new Set(filteredNodes.map((n) => n.id));
-        for (const node of filteredNodes) {
-          node.neighbors = new Set(
-            [...node.neighbors].filter((id) => filteredNodeIds.has(id)),
-          );
-        }
-        const filteredJets = jets.filter((jet) =>
-          filteredNodeIds.has(jet.controllerId),
-        );
-
-        syncActiveNodes(filteredNodes);
-
-        return {
-          size,
-          allNodes: nodes,
-          nodes: filteredNodes,
-          jets: filteredJets,
-        };
       }
 
       function drawJet(jet, active, hovered) {
@@ -1548,42 +1313,6 @@ import "./styles.css";
         loopToggleButton.textContent = animationLoopEnabled
           ? "Loop On"
           : "Loop Off";
-      }
-
-      function getCenterNode(currentScene) {
-        return (
-          currentScene.allNodes.find(
-            (node) => node.type === "center" && node.id === "c:0,0",
-          ) || null
-        );
-      }
-
-      function buildDistanceMap(currentScene) {
-        const centerNode = getCenterNode(currentScene);
-        if (!centerNode) {
-          return new Map();
-        }
-
-        const distanceMap = new Map([[centerNode.id, 0]]);
-        const queue = [centerNode];
-
-        while (queue.length > 0) {
-          const node = queue.shift();
-          const distance = distanceMap.get(node.id);
-          for (const neighborId of node.neighbors) {
-            if (distanceMap.has(neighborId)) {
-              continue;
-            }
-            distanceMap.set(neighborId, distance + 1);
-            queue.push(
-              currentScene.allNodes.find(
-                (candidate) => candidate.id === neighborId,
-              ),
-            );
-          }
-        }
-
-        return distanceMap;
       }
 
       function getRelayMappedNodeIds(currentScene) {
@@ -3423,7 +3152,9 @@ dfs sort shell-angle`,
           Number(ringsInput.value),
           canvas.clientWidth,
           canvas.clientHeight,
+          jetMode,
         );
+        syncActiveNodes(scene.nodes);
         const fullScene = {
           ...scene,
           nodes: scene.allNodes,
@@ -3483,7 +3214,8 @@ dfs sort shell-angle`,
         const height = canvas.clientHeight;
         context.clearRect(0, 0, width, height);
 
-        scene = buildScene(totalRings, width, height);
+        scene = buildScene(totalRings, width, height, jetMode);
+        syncActiveNodes(scene.nodes);
 
         for (const jet of scene.jets) {
           const active = activeNodes.has(jet.controllerId);
