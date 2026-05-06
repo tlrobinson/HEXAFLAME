@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hexaflame Layout</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <script type="module" src="/src/layout.ts"></script>
+  </head>
+  <body>
+    <aside class="layout-sidebar">
+      <header>
+        <p class="eyebrow">Hexaflame</p>
+        <h1>Jet + Tubing Layout</h1>
+      </header>
+
+      <section class="control-card">
+        <h2>Hex Field</h2>
+        <label class="range-row" for="hex-radius">
+          <span>Hex radius</span>
+          <output id="hex-radius-readout" for="hex-radius">220 mm</output>
+        </label>
+        <input id="hex-radius" type="range" min="100" max="400" step="5" value="220" />
+      </section>
+
+      <section class="control-card">
+        <h2>Manifolds</h2>
+        <label class="range-row" for="manifold-count">
+          <span>Manifolds</span>
+          <output id="manifold-count-readout" for="manifold-count">4</output>
+        </label>
+        <input id="manifold-count" type="range" min="1" max="12" step="1" value="4" />
+
+        <label class="range-row" for="jets-per-manifold">
+          <span>Jets per manifold</span>
+          <output id="jets-per-manifold-readout" for="jets-per-manifold">8</output>
+        </label>
+        <input id="jets-per-manifold" type="range" min="1" max="16" step="1" value="8" />
+
+        <label class="range-row" for="manifold-radius">
+          <span>Manifold radius</span>
+          <output id="manifold-radius-readout" for="manifold-radius">650 mm</output>
+        </label>
+        <input id="manifold-radius" type="range" min="250" max="1400" step="10" value="650" />
+
+        <fieldset class="segmented-control">
+          <legend>Valve outlet side</legend>
+          <label>
+            <input type="radio" name="valve-side" value="inner" />
+            <span>Inner</span>
+          </label>
+          <label>
+            <input type="radio" name="valve-side" value="outer" />
+            <span>Outer</span>
+          </label>
+          <label>
+            <input type="radio" name="valve-side" value="both" checked />
+            <span>Both</span>
+          </label>
+        </fieldset>
+      </section>
+
+      <section class="control-card stats-card">
+        <h2>Summary</h2>
+        <dl>
+          <div>
+            <dt>Jets</dt>
+            <dd id="jet-count">0</dd>
+          </div>
+          <div>
+            <dt>Valves</dt>
+            <dd id="valve-count">0</dd>
+          </div>
+          <div>
+            <dt>Assigned</dt>
+            <dd id="assigned-count">0</dd>
+          </div>
+          <div>
+            <dt>Capacity</dt>
+            <dd id="capacity-status">0 spare</dd>
+          </div>
+          <div>
+            <dt>Total Tube</dt>
+            <dd id="tube-total">0.00 m</dd>
+          </div>
+          <div>
+            <dt>Std Dev</dt>
+            <dd id="tube-stddev">0 mm</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="control-card tube-card">
+        <h2>Tube Lengths</h2>
+        <div id="tube-histogram" class="tube-histogram" aria-label="Tube length histogram"></div>
+      </section>
+    </aside>
+
+    <main class="layout-main">
+      <canvas id="layout-canvas" aria-label="Hexaflame layout drawing"></canvas>
+      <div class="legend">
+        <span><i class="legend-dot jet-dot"></i>Jet</span>
+        <span><i class="legend-dot valve-dot"></i>Valve</span>
+        <span><i class="legend-line"></i>Tubing</span>
+      </div>
+    </main>
+  </body>
+</html>

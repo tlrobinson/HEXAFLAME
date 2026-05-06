@@ -32,6 +32,16 @@ import {
   rememberSerialPortRole,
 } from "./devices/relay";
 import {
+  STEPPER_ENVELOPE_SEND_DELAY_MS,
+  STEPPER_SEND_DELAY_MS,
+  STEPPER_SERIAL_BAUD,
+  buildStepperHomeCommand,
+  buildStepperPositionCommand,
+  parseStepperProtocolLine,
+  readStepperTextLines,
+  writeStepperTextCommand,
+} from "./devices/stepper";
+import {
   MIDI_CC_BACK,
   MIDI_CC_NEXT,
   MIDI_CC_PAUSE,
@@ -156,9 +166,6 @@ import {
       const HIT_RADIUS = 10;
       const DEFAULT_RINGS = 2;
       const DEVICE_LOG_LIMIT = 250;
-      const STEPPER_SERIAL_BAUD = 115200;
-      const STEPPER_SEND_DELAY_MS = 75;
-      const STEPPER_ENVELOPE_SEND_DELAY_MS = 20;
       const activeNodes = new Set();
       const knownNodeIds = new Set();
       let scene = null;
@@ -717,35 +724,22 @@ import {
       }
 
       function handleStepperLine(line) {
-        const calibratedMatch = line.match(/^Calibrated:\s*(yes|no)$/i);
-        if (calibratedMatch) {
-          stepperHomed = calibratedMatch[1].toLowerCase() === "yes";
-          if (!stepperHomed) {
-            stepperTravelSteps = null;
-            updateStepperTravelReadout();
-          }
+        const update = parseStepperProtocolLine(line);
+        if (update.homed !== undefined) {
+          stepperHomed = update.homed;
         }
 
-        const travelMatch = line.match(/^Travel steps:\s*(\d+)$/i);
-        if (travelMatch) {
-          stepperTravelSteps = Number(travelMatch[1]);
+        if (update.travelSteps !== undefined) {
+          stepperTravelSteps = update.travelSteps;
           updateStepperTravelReadout();
           saveState();
         }
 
-        const movedMatch = line.match(/^Moved to\s+([0-9]+(?:\.[0-9]+)?)%$/i);
-        if (movedMatch) {
-          syncStepperPositionFromBoard(Number(movedMatch[1]));
+        if (update.positionPercent !== undefined) {
+          syncStepperPositionFromBoard(update.positionPercent);
         }
 
-        const currentPositionMatch = line.match(
-          /^Current position:\s*([0-9]+(?:\.[0-9]+)?)%$/i,
-        );
-        if (currentPositionMatch) {
-          syncStepperPositionFromBoard(Number(currentPositionMatch[1]));
-        }
-
-        stepperStatusMessage = line;
+        stepperStatusMessage = update.statusMessage;
         updateStepperUi();
       }
 
@@ -1195,17 +1189,9 @@ import {
       }
 
       async function writeStepperCommand(command) {
-        if (!stepperPort?.writable) {
-          throw new Error("Stepper port is not connected");
-        }
-
-        logSerialTx("stepper", command);
-        const writer = stepperPort.writable.getWriter();
-        try {
-          await writer.write(new TextEncoder().encode(`${command}\n`));
-        } finally {
-          writer.releaseLock();
-        }
+        await writeStepperTextCommand(stepperPort, command, (payload) => {
+          logSerialTx("stepper", payload);
+        });
       }
 
       async function sendStepperCommand(command) {
@@ -1238,7 +1224,7 @@ import {
           if (stepperQueuedPosition !== null && stepperPort !== null) {
             const nextPosition = stepperQueuedPosition;
             stepperQueuedPosition = null;
-            await writeStepperCommand(`pos ${nextPosition.toFixed(1)}`);
+            await writeStepperCommand(buildStepperPositionCommand(nextPosition));
             stepperLastSendAtMs = performance.now();
             stepperStatusMessage = `Stepper connected at ${nextPosition.toFixed(1)}%`;
             updateStepperUi();
@@ -1323,7 +1309,7 @@ import {
         updateStepperUi();
 
         try {
-          await writeStepperCommand("home 400");
+          await writeStepperCommand(buildStepperHomeCommand());
         } catch (error) {
           console.error(error);
           stepperStatusMessage = "Stepper home failed";
@@ -1332,45 +1318,23 @@ import {
       }
 
       async function readStepperLoop(port) {
-        const decoder = new TextDecoder();
-        let buffered = "";
-
-        while (stepperPort === port && port.readable) {
-          const reader = port.readable.getReader();
-          stepperReader = reader;
-          try {
-            while (stepperPort === port) {
-              const { value, done } = await reader.read();
-              if (done) {
-                break;
-              }
-              const chunk = decoder.decode(value, { stream: true });
-              if (chunk.length > 0) {
-                logSerialRx("stepper", chunk);
-              }
-              buffered += chunk;
-              const lines = buffered.split(/\r?\n/);
-              buffered = lines.pop() || "";
-              for (const rawLine of lines) {
-                const line = rawLine.trim();
-                if (!line || line === ">" || line.startsWith(">")) {
-                  continue;
-                }
-                handleStepperLine(line);
-              }
-            }
-          } catch (error) {
+        await readStepperTextLines(port, {
+          isActive: (currentPort) => stepperPort === currentPort,
+          onReader: (reader) => {
+            stepperReader = reader;
+          },
+          onRx: (chunk) => {
+            logSerialRx("stepper", chunk);
+          },
+          onLine: handleStepperLine,
+          onError: (error) => {
             if (stepperPort === port) {
               console.error(error);
               stepperStatusMessage = "Stepper read error";
               updateStepperUi();
             }
-          } finally {
-            stepperReader = null;
-            reader.releaseLock();
-          }
-          break;
-        }
+          },
+        });
       }
 
       async function openStepperPort(port) {

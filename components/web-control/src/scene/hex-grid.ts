@@ -102,19 +102,14 @@ function hexVertices(centerX: number, centerY: number, size: number) {
   return vertices;
 }
 
-export function buildScene(
+function buildSceneWithGeometry(
   totalRings: number,
-  width: number,
-  height: number,
+  size: number,
+  originX: number,
+  originY: number,
   jetMode: JetMode,
 ): Scene {
   const coords = allCoordinates(totalRings);
-  const maxRadius = Math.max(totalRings - 1, 0);
-  const maxX = 1.5 * maxRadius + 1;
-  const maxY = SQRT3 * (maxRadius + 1);
-  const size = Math.min(width / (2 * maxX), height / (2 * maxY)) * 0.92;
-  const originX = width / 2;
-  const originY = height / 2;
   const nodes: SceneNode[] = [];
   const nodeMap = new Map<string, SceneNode>();
   const jets: Jet[] = [];
@@ -232,6 +227,29 @@ export function buildScene(
     nodes: filteredNodes,
     jets: filteredJets,
   };
+}
+
+export function buildScene(
+  totalRings: number,
+  width: number,
+  height: number,
+  jetMode: JetMode,
+): Scene {
+  const maxRadius = Math.max(totalRings - 1, 0);
+  const maxX = 1.5 * maxRadius + 1;
+  const maxY = SQRT3 * (maxRadius + 1);
+  const size = Math.min(width / (2 * maxX), height / (2 * maxY)) * 0.92;
+  return buildSceneWithGeometry(totalRings, size, width / 2, height / 2, jetMode);
+}
+
+export function buildSceneWithHexRadius(
+  totalRings: number,
+  radius: number,
+  originX = 0,
+  originY = 0,
+  jetMode: JetMode = "all",
+): Scene {
+  return buildSceneWithGeometry(totalRings, radius, originX, originY, jetMode);
 }
 
 export function getCenterNode(currentScene: Scene) {
