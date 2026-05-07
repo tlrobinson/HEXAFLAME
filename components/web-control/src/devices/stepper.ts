@@ -32,8 +32,48 @@ export function buildStepperPositionCommand(percent: number) {
   return `pos ${percent.toFixed(1)}`;
 }
 
+export function buildStepperTimedPositionCommand(
+  percent: number,
+  durationMs: number,
+) {
+  return `pos-time ${percent.toFixed(1)} ${Math.max(1, Math.round(durationMs))}`;
+}
+
 export function buildStepperHomeCommand(rateHz = STEPPER_HOME_RATE_HZ) {
   return `home ${rateHz}`;
+}
+
+export function buildStepperAdsrCommand({
+  attackPercent,
+  attackMs,
+  decayPercent,
+  decayMs,
+  sustainMs = 0,
+  releasePercent,
+  releaseMs,
+}: {
+  attackPercent: number;
+  attackMs: number;
+  decayPercent: number;
+  decayMs: number;
+  sustainMs?: number;
+  releasePercent: number;
+  releaseMs: number;
+}) {
+  return [
+    "adsr",
+    attackPercent.toFixed(1),
+    Math.max(1, Math.round(attackMs)),
+    decayPercent.toFixed(1),
+    Math.max(1, Math.round(decayMs)),
+    Math.max(0, Math.round(sustainMs)),
+    releasePercent.toFixed(1),
+    Math.max(1, Math.round(releaseMs)),
+  ].join(" ");
+}
+
+export function buildStepperReleaseCommand(percent: number, durationMs: number) {
+  return `release ${percent.toFixed(1)} ${Math.max(1, Math.round(durationMs))}`;
 }
 
 export function parseStepperProtocolLine(line: string): StepperProtocolUpdate {

@@ -11,6 +11,7 @@ public:
   enum class MoveUpdate : uint8_t {
     None = 0,
     Completed,
+    HomeAdjusted,
     Failed,
   };
 
@@ -23,6 +24,19 @@ public:
     uint8_t serialPortNodeAddress;
   };
 
+  struct MoveCommandResult {
+    bool accepted = false;
+    bool completedImmediately = false;
+    bool speedClampedHigh = false;
+    bool speedClampedLow = false;
+    uint32_t targetStep = 0;
+    uint32_t moveSteps = 0;
+    uint32_t requestedFrequency = 0;
+    uint32_t actualFrequency = 0;
+    uint32_t requestedDurationMs = 0;
+    uint32_t estimatedDurationMs = 0;
+  };
+
   Stepper(RgbLed &rgbLed, uint32_t maxFrequency = 125000000, bool debug = false);
 
   bool begin();
@@ -31,15 +45,23 @@ public:
   MoveUpdate serviceMove();
   bool moveToPercent(float percent, uint32_t requestedFrequency = 0);
   bool moveToStep(uint32_t targetStep, uint32_t requestedFrequency = 0);
+  MoveCommandResult moveToPercentInTime(float percent, uint32_t durationMs);
+  MoveCommandResult moveToPercentAtFrequency(float percent, uint32_t requestedFrequency);
+  MoveCommandResult moveToStepInTime(uint32_t targetStep, uint32_t durationMs);
+  MoveCommandResult moveToStepAtFrequency(uint32_t targetStep, uint32_t requestedFrequency);
   bool isMoveInProgress() const;
   bool isCalibrated() const;
   uint32_t getTravelSteps() const;
   uint32_t getCurrentPositionSteps() const;
   float getPositionPercent() const;
+  uint32_t getMinMoveFrequency() const;
+  uint32_t getMaxMoveFrequency() const;
   uint8_t getRunCurrent() const;
+  uint8_t getRecoveryRunCurrent() const;
   uint8_t getIdleCurrent() const;
   uint8_t getIdlePowerDownDelay() const;
   bool setRunCurrent(uint8_t current);
+  bool setRecoveryRunCurrent(uint8_t current);
   bool setIdleCurrent(uint8_t current);
   bool setIdlePowerDownDelay(uint8_t delay);
   void stopStepper();
@@ -55,8 +77,17 @@ private:
   bool getFullRev(uint8_t mode, uint32_t &fullRev, uint8_t &sgAdj, uint8_t &serialNode);
   void clearMoveState();
   void updateMoveProgress();
+  uint32_t getMoveCompletedSteps();
+  void resetHomeProbeState();
+  bool shouldProbeEndpoint(uint32_t targetStep, uint32_t moveFrequency, uint32_t moveSteps) const;
+  uint32_t getMaxHomeProbeDeltaSteps() const;
+  bool sampleEndpointHomeProbe();
+  bool handleEndpointHomeProbeStall(uint32_t completedSteps);
+  bool recordEndpointHomeCandidate(bool positiveEnd, int32_t deltaSteps);
   void setDirection(bool clockwise);
   uint32_t clampMoveFrequency(uint32_t requestedFrequency) const;
+  uint32_t minMoveFrequency() const;
+  uint32_t maxMoveFrequency() const;
   uint32_t getStepperValue(uint32_t stepperFrequency) const;
   bool applyCurrentConfig();
   void setPulseCounter(uint32_t pulses);
@@ -86,7 +117,8 @@ private:
   uint32_t travelSteps_ = 0;
   uint32_t currentPositionSteps_ = 0;
   bool calibrated_ = false;
-  uint8_t runCurrent_ = 31;
+  uint8_t runCurrent_ = 24;
+  uint8_t recoveryRunCurrent_ = 31;
   uint8_t idleCurrent_ = 0;
   uint8_t holdDelay_ = 8;
   uint8_t idlePowerDownDelay_ = 1;
@@ -98,6 +130,13 @@ private:
   uint32_t moveFrequency_ = 0;
   uint32_t moveStartMs_ = 0;
   uint32_t moveTimeoutMs_ = 0;
+  bool moveHomeProbeEnabled_ = false;
+  bool moveHomeProbePositiveEnd_ = false;
+  uint8_t moveHomeProbeSamples_ = 0;
+  int32_t moveHomeProbeSgThreshold_ = 0;
+  bool pendingHomeCandidateValid_ = false;
+  bool pendingHomeCandidatePositiveEnd_ = false;
+  int32_t pendingHomeCandidateDeltaSteps_ = 0;
   volatile bool stepperSpinning_ = false;
   volatile bool stallguarded_ = false;
 
@@ -124,4 +163,9 @@ private:
   static constexpr uint32_t kPioVar = 2;
   static constexpr uint32_t kPioFix = 37;
   static constexpr uint8_t kDefaultIdlePowerDownDelay = 1;
+  static constexpr uint32_t kHomeProbeStartupIgnoreMs = 150;
+  static constexpr uint8_t kHomeProbeMinSamples = 3;
+  static constexpr uint32_t kHomeProbeExtraPaddingSteps = 16;
+  static constexpr uint32_t kMinValidTravelSteps = 16;
+  static constexpr uint32_t kMinHomeProbeRepeatToleranceSteps = 8;
 };

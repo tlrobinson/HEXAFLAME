@@ -35,8 +35,10 @@ import {
   STEPPER_ENVELOPE_SEND_DELAY_MS,
   STEPPER_SEND_DELAY_MS,
   STEPPER_SERIAL_BAUD,
+  buildStepperAdsrCommand,
   buildStepperHomeCommand,
-  buildStepperPositionCommand,
+  buildStepperReleaseCommand,
+  buildStepperTimedPositionCommand,
   parseStepperProtocolLine,
   readStepperTextLines,
   writeStepperTextCommand,
@@ -277,6 +279,14 @@ import {
         return stepperPort !== null && stepperHomed;
       }
 
+      function cancelStepperPositionQueue() {
+        if (stepperPositionSendTimerId !== null) {
+          window.clearTimeout(stepperPositionSendTimerId);
+          stepperPositionSendTimerId = null;
+        }
+        stepperQueuedPosition = null;
+      }
+
       function updateStepperHomedReadout() {
         if (stepperPort === null) {
           stepperHomedStateText.textContent = "Unknown";
@@ -512,7 +522,7 @@ import {
         if (result.stopped) {
           stepperEnvelopeFrameId = null;
           applyStepperOutputPosition(stepperEnvelope.originValue, {
-            send: true,
+            send: false,
             save: false,
             sendDelayMs: STEPPER_ENVELOPE_SEND_DELAY_MS,
           });
@@ -521,9 +531,73 @@ import {
           return;
         }
 
-        applyCenterEnvelopeOutput(true, STEPPER_ENVELOPE_SEND_DELAY_MS);
+        applyCenterEnvelopeOutput(false, STEPPER_ENVELOPE_SEND_DELAY_MS);
         updateStepperEnvelopeUi(now);
         stepperEnvelopeFrameId = window.requestAnimationFrame(tickCenterEnvelope);
+      }
+
+      function getCenterEnvelopeOutputForLevel(level) {
+        return (
+          stepperEnvelope.originValue +
+          (stepperEnvelope.targetValue - stepperEnvelope.originValue) *
+            stepperEnvelope.velocityScale *
+            level
+        );
+      }
+
+      async function sendCenterAdsrCommand() {
+        if (!canControlStepperPosition()) {
+          return false;
+        }
+
+        cancelStepperPositionQueue();
+        const command = buildStepperAdsrCommand({
+          attackPercent: getCenterEnvelopeOutputForLevel(1),
+          attackMs: stepperEnvelope.attackMs,
+          decayPercent: getCenterEnvelopeOutputForLevel(
+            stepperEnvelope.sustainLevel,
+          ),
+          decayMs: stepperEnvelope.decayMs,
+          sustainMs: 0,
+          releasePercent: stepperEnvelope.originValue,
+          releaseMs: stepperEnvelope.releaseMs,
+        });
+
+        try {
+          await writeStepperCommand(command);
+          stepperStatusMessage = "Stepper ADSR started";
+          updateStepperUi();
+          return true;
+        } catch (error) {
+          console.error(error);
+          stepperStatusMessage = "Stepper ADSR failed";
+          updateStepperUi();
+          return false;
+        }
+      }
+
+      async function sendCenterReleaseCommand() {
+        if (!canControlStepperPosition()) {
+          return false;
+        }
+
+        cancelStepperPositionQueue();
+        const command = buildStepperReleaseCommand(
+          stepperEnvelope.originValue,
+          stepperEnvelope.releaseMs,
+        );
+
+        try {
+          await writeStepperCommand(command);
+          stepperStatusMessage = "Stepper release started";
+          updateStepperUi();
+          return true;
+        } catch (error) {
+          console.error(error);
+          stepperStatusMessage = "Stepper release failed";
+          updateStepperUi();
+          return false;
+        }
       }
 
       function startCenterEnvelope(velocity = 127) {
@@ -535,7 +609,8 @@ import {
           now,
         });
         updateStepperEnvelopeUi(now);
-        applyCenterEnvelopeOutput(canControlStepperPosition(), STEPPER_ENVELOPE_SEND_DELAY_MS);
+        applyCenterEnvelopeOutput(false, STEPPER_ENVELOPE_SEND_DELAY_MS);
+        void sendCenterAdsrCommand();
         if (stepperEnvelopeFrameId === null) {
           stepperEnvelopeFrameId = window.requestAnimationFrame(
             tickCenterEnvelope,
@@ -552,6 +627,7 @@ import {
         }
 
         updateStepperEnvelopeUi();
+        void sendCenterReleaseCommand();
         midiStatus.textContent = "Center Release";
       }
 
@@ -1224,7 +1300,9 @@ import {
           if (stepperQueuedPosition !== null && stepperPort !== null) {
             const nextPosition = stepperQueuedPosition;
             stepperQueuedPosition = null;
-            await writeStepperCommand(buildStepperPositionCommand(nextPosition));
+            await writeStepperCommand(
+              buildStepperTimedPositionCommand(nextPosition, STEPPER_SEND_DELAY_MS),
+            );
             stepperLastSendAtMs = performance.now();
             stepperStatusMessage = `Stepper connected at ${nextPosition.toFixed(1)}%`;
             updateStepperUi();
