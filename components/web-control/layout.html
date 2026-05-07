@@ -15,27 +15,12 @@
       </header>
 
       <section class="control-card">
-        <h2>Hex Field</h2>
+        <h2>Parameters</h2>
         <label class="range-row" for="hex-radius">
           <span>Hex radius</span>
           <output id="hex-radius-readout" for="hex-radius">220 mm</output>
         </label>
         <input id="hex-radius" type="range" min="100" max="400" step="5" value="220" />
-      </section>
-
-      <section class="control-card">
-        <h2>Manifolds</h2>
-        <label class="range-row" for="manifold-count">
-          <span>Manifolds</span>
-          <output id="manifold-count-readout" for="manifold-count">4</output>
-        </label>
-        <input id="manifold-count" type="range" min="1" max="12" step="1" value="4" />
-
-        <label class="range-row" for="jets-per-manifold">
-          <span>Jets per manifold</span>
-          <output id="jets-per-manifold-readout" for="jets-per-manifold">8</output>
-        </label>
-        <input id="jets-per-manifold" type="range" min="1" max="16" step="1" value="8" />
 
         <label class="range-row" for="manifold-radius">
           <span>Manifold radius</span>
@@ -43,21 +28,49 @@
         </label>
         <input id="manifold-radius" type="range" min="250" max="1400" step="10" value="650" />
 
-        <fieldset class="segmented-control">
-          <legend>Valve outlet side</legend>
-          <label>
-            <input type="radio" name="valve-side" value="inner" />
-            <span>Inner</span>
+        <label class="range-row" for="manifold-count">
+          <span>Manifolds</span>
+          <output id="manifold-count-readout" for="manifold-count">4</output>
+        </label>
+        <input id="manifold-count" type="range" min="1" max="12" step="1" value="4" />
+
+        <details class="advanced-parameters">
+          <summary>More</summary>
+
+          <label class="range-row" for="jets-per-manifold">
+            <span>Jets per manifold</span>
+            <output id="jets-per-manifold-readout" for="jets-per-manifold">8</output>
           </label>
-          <label>
-            <input type="radio" name="valve-side" value="outer" />
-            <span>Outer</span>
+          <input id="jets-per-manifold" type="range" min="1" max="16" step="1" value="8" />
+
+          <label class="range-row" for="valve-length">
+            <span>Valve length</span>
+            <output id="valve-length-readout" for="valve-length">150 mm</output>
           </label>
-          <label>
-            <input type="radio" name="valve-side" value="both" checked />
-            <span>Both</span>
+          <input id="valve-length" type="range" min="25" max="300" step="5" value="150" />
+
+          <label class="range-row" for="min-bend-radius">
+            <span>Min bend radius</span>
+            <output id="min-bend-radius-readout" for="min-bend-radius">25 mm</output>
           </label>
-        </fieldset>
+          <input id="min-bend-radius" type="range" min="5" max="150" step="5" value="25" />
+
+          <fieldset class="segmented-control">
+            <legend>Valve outlet side</legend>
+            <label>
+              <input type="radio" name="valve-side" value="inner" />
+              <span>Inner</span>
+            </label>
+            <label>
+              <input type="radio" name="valve-side" value="outer" />
+              <span>Outer</span>
+            </label>
+            <label>
+              <input type="radio" name="valve-side" value="both" checked />
+              <span>Both</span>
+            </label>
+          </fieldset>
+        </details>
       </section>
 
       <section class="control-card stats-card">
@@ -80,8 +93,16 @@
             <dd id="capacity-status">0 spare</dd>
           </div>
           <div>
+            <dt>Total Width</dt>
+            <dd id="total-width">0 mm</dd>
+          </div>
+          <div>
+            <dt>Total Height</dt>
+            <dd id="total-height">0 mm</dd>
+          </div>
+          <div>
             <dt>Total Tube</dt>
-            <dd id="tube-total">0.00 m</dd>
+            <dd id="tube-total">0 mm</dd>
           </div>
           <div>
             <dt>Std Dev</dt>
