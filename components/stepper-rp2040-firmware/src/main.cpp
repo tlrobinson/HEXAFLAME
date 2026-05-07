@@ -8,7 +8,9 @@ namespace {
 constexpr uint8_t kButtonPin = 9;
 constexpr uint32_t kDebounceMs = 10;
 constexpr uint32_t kStepperFrequencies[2] = {400, 1200};
-constexpr size_t kSerialLineMax = 64;
+constexpr size_t kSerialLineMax = 256;
+constexpr size_t kTmcRawMaxBytes = 32;
+constexpr uint32_t kTmcRawReadTimeoutMs = 50;
 
 RgbLed g_rgbLed;
 Stepper g_stepper(g_rgbLed, 125000000, true);
@@ -27,6 +29,25 @@ bool parseUnsignedLongArg(const String &arg, uint32_t &value) {
     return false;
   }
   value = static_cast<uint32_t>(parsed);
+  return true;
+}
+
+bool parseNumberArg(const String &arg, uint32_t &value) {
+  char *end = nullptr;
+  const unsigned long parsed = std::strtoul(arg.c_str(), &end, 0);
+  if (end == arg.c_str() || *end != '\0') {
+    return false;
+  }
+  value = static_cast<uint32_t>(parsed);
+  return true;
+}
+
+bool parseByteArg(const String &arg, uint8_t &value) {
+  uint32_t parsed = 0;
+  if (!parseNumberArg(arg, parsed) || parsed > 0xFF) {
+    return false;
+  }
+  value = static_cast<uint8_t>(parsed);
   return true;
 }
 
@@ -73,6 +94,51 @@ bool splitCommandArgs(const String &line, String &command, String &arg1, String 
   return command.length() > 0;
 }
 
+String nextToken(const String &line, int &offset) {
+  while (offset < line.length() && (line[offset] == ' ' || line[offset] == '\t' || line[offset] == ',')) {
+    ++offset;
+  }
+
+  const int start = offset;
+  while (offset < line.length() && line[offset] != ' ' && line[offset] != '\t' && line[offset] != ',') {
+    ++offset;
+  }
+
+  return line.substring(start, offset);
+}
+
+size_t parseByteList(const String &line, uint8_t *bytes, size_t maxBytes, bool &ok) {
+  ok = true;
+  size_t count = 0;
+  int offset = 0;
+  while (offset < line.length()) {
+    const String token = nextToken(line, offset);
+    if (token.length() == 0) {
+      continue;
+    }
+    if (count >= maxBytes || !parseByteArg(token, bytes[count])) {
+      ok = false;
+      return count;
+    }
+    ++count;
+  }
+  return count;
+}
+
+void printHexByte(uint8_t value) {
+  if (value < 0x10) {
+    Serial.print('0');
+  }
+  Serial.print(value, HEX);
+}
+
+void printHex32(uint32_t value) {
+  Serial.print("0x");
+  for (int shift = 28; shift >= 0; shift -= 4) {
+    Serial.print((value >> shift) & 0x0F, HEX);
+  }
+}
+
 uint32_t nextDemoFrequency() {
   const int idx = (g_lastIdx == 1) ? 0 : 1;
   g_lastIdx = idx;
@@ -88,8 +154,102 @@ void printSerialHelp() {
   Serial.println("  current status  - print TMC run/idle current settings");
   Serial.println("  current run <0-31>  - set TMC running current scale");
   Serial.println("  current idle <0-31> - set TMC holding current scale");
+  Serial.println("  current idle-delay <0-255> - set delay before holding current");
+  Serial.println("  tmc test        - test TMC2209 UART response");
+  Serial.println("  tmc read <reg>  - read a TMC register, e.g. tmc read 0x6F");
+  Serial.println("  tmc write <reg> <value> [noverify] - write a TMC register");
+  Serial.println("  tmc raw <bytes> - send raw bytes to the TMC UART, e.g. tmc raw 0x55 0 0x06 0xE8");
   Serial.println("  status          - print calibration status");
+  Serial.println("  bootsel         - reboot into BOOTSEL firmware update mode");
   Serial.println("  help            - show this help");
+}
+
+void handleTmcCommand(const String &subcommand, const String &args) {
+  if (subcommand.equalsIgnoreCase("test")) {
+    Serial.print("TMC UART test: ");
+    Serial.println(g_stepper.tmcTest() ? "ok" : "failed");
+    return;
+  }
+
+  if (subcommand.equalsIgnoreCase("read")) {
+    uint8_t reg = 0;
+    if (!parseByteArg(args, reg)) {
+      Serial.println("Usage: tmc read <reg>");
+      return;
+    }
+
+    uint32_t value = 0;
+    if (!g_stepper.readTmcRegister(reg, value)) {
+      Serial.println("TMC read failed");
+      return;
+    }
+
+    Serial.print("TMC[0x");
+    printHexByte(reg);
+    Serial.print("] = ");
+    printHex32(value);
+    Serial.println();
+    return;
+  }
+
+  if (subcommand.equalsIgnoreCase("write")) {
+    int offset = 0;
+    const String regToken = nextToken(args, offset);
+    const String valueToken = nextToken(args, offset);
+    const String verifyToken = nextToken(args, offset);
+
+    uint8_t reg = 0;
+    uint32_t value = 0;
+    if (!parseByteArg(regToken, reg) || !parseNumberArg(valueToken, value)) {
+      Serial.println("Usage: tmc write <reg> <value> [noverify]");
+      return;
+    }
+
+    const bool verify = !verifyToken.equalsIgnoreCase("noverify");
+    if (!g_stepper.writeTmcRegister(reg, value, verify)) {
+      Serial.println("TMC write failed");
+      return;
+    }
+
+    Serial.print("TMC[0x");
+    printHexByte(reg);
+    Serial.print("] <= ");
+    printHex32(value);
+    Serial.println(verify ? " verified" : " sent");
+    return;
+  }
+
+  if (subcommand.equalsIgnoreCase("raw")) {
+    uint8_t txBytes[kTmcRawMaxBytes] = {};
+    uint8_t rxBytes[kTmcRawMaxBytes] = {};
+    bool ok = false;
+    const size_t txCount = parseByteList(args, txBytes, sizeof(txBytes), ok);
+    if (!ok || txCount == 0) {
+      Serial.println("Usage: tmc raw <byte> [byte...]");
+      return;
+    }
+
+    const size_t rxCount = g_stepper.transferTmc(txBytes, txCount, rxBytes, sizeof(rxBytes), kTmcRawReadTimeoutMs);
+    Serial.print("TMC raw tx:");
+    for (size_t i = 0; i < txCount; ++i) {
+      Serial.print(" 0x");
+      printHexByte(txBytes[i]);
+    }
+    Serial.println();
+
+    Serial.print("TMC raw rx:");
+    if (rxCount == 0) {
+      Serial.print(" [none]");
+    }
+    for (size_t i = 0; i < rxCount; ++i) {
+      Serial.print(" 0x");
+      printHexByte(rxBytes[i]);
+    }
+    Serial.println();
+    return;
+  }
+
+  Serial.println("Usage: tmc test | tmc read <reg> | tmc write <reg> <value> [noverify] | tmc raw <bytes>");
 }
 
 void printStatus() {
@@ -97,6 +257,17 @@ void printStatus() {
   Serial.println(g_stepper.getRunCurrent());
   Serial.print("Idle current: ");
   Serial.println(g_stepper.getIdleCurrent());
+  Serial.print("Idle delay: ");
+  Serial.println(g_stepper.getIdlePowerDownDelay());
+  uint32_t drvStatus = 0;
+  if (g_stepper.readTmcRegister(0x6F, drvStatus)) {
+    Serial.print("TMC DRV_STATUS: ");
+    printHex32(drvStatus);
+    Serial.print(" cs_actual=");
+    Serial.print((drvStatus >> 16) & 0x1F);
+    Serial.print(" standstill=");
+    Serial.println((drvStatus & (1UL << 31)) ? "yes" : "no");
+  }
   Serial.print("Calibrated: ");
   Serial.println(g_stepper.isCalibrated() ? "yes" : "no");
   if (g_stepper.isCalibrated()) {
@@ -193,17 +364,34 @@ void handleSerialCommand(const String &rawLine) {
     return;
   }
 
+  if (command.equalsIgnoreCase("tmc")) {
+    handleTmcCommand(arg1, arg2);
+    return;
+  }
+
+  if (command.equalsIgnoreCase("bootsel") || command.equalsIgnoreCase("bootloader")) {
+    Serial.println("Rebooting into BOOTSEL firmware update mode...");
+    Serial.flush();
+    delay(100);
+    rp2040.rebootToBootloader();
+    return;
+  }
+
   if (command.equalsIgnoreCase("current")) {
     if (arg1.equalsIgnoreCase("status") && arg2.length() == 0) {
       Serial.print("Run current: ");
       Serial.println(g_stepper.getRunCurrent());
       Serial.print("Idle current: ");
       Serial.println(g_stepper.getIdleCurrent());
+      Serial.print("Idle delay: ");
+      Serial.println(g_stepper.getIdlePowerDownDelay());
       return;
     }
     uint32_t value = 0;
-    if (!parseUnsignedLongArg(arg2, value) || value > 31) {
-      Serial.println("Usage: current run <0-31> | current idle <0-31> | current status");
+    const bool isIdleDelay = arg1.equalsIgnoreCase("idle-delay");
+    const uint32_t maxValue = isIdleDelay ? 255 : 31;
+    if (!parseUnsignedLongArg(arg2, value) || value > maxValue) {
+      Serial.println("Usage: current run <0-31> | current idle <0-31> | current idle-delay <0-255> | current status");
       return;
     }
     if (arg1.equalsIgnoreCase("run")) {
@@ -224,7 +412,16 @@ void handleSerialCommand(const String &rawLine) {
       }
       return;
     }
-    Serial.println("Usage: current run <0-31> | current idle <0-31> | current status");
+    if (isIdleDelay) {
+      if (g_stepper.setIdlePowerDownDelay(static_cast<uint8_t>(value))) {
+        Serial.print("Idle delay set to ");
+        Serial.println(value);
+      } else {
+        Serial.println("Failed to set idle delay");
+      }
+      return;
+    }
+    Serial.println("Usage: current run <0-31> | current idle <0-31> | current idle-delay <0-255> | current status");
     return;
   }
 

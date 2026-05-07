@@ -38,11 +38,17 @@ public:
   float getPositionPercent() const;
   uint8_t getRunCurrent() const;
   uint8_t getIdleCurrent() const;
+  uint8_t getIdlePowerDownDelay() const;
   bool setRunCurrent(uint8_t current);
   bool setIdleCurrent(uint8_t current);
+  bool setIdlePowerDownDelay(uint8_t delay);
   void stopStepper();
   void setStallguard(uint8_t threshold);
   int32_t readStallguard();
+  bool readTmcRegister(uint8_t reg, uint32_t &value);
+  bool writeTmcRegister(uint8_t reg, uint32_t value, bool verify = true);
+  size_t transferTmc(const uint8_t *txData, size_t txLength, uint8_t *rxData, size_t rxMaxLength,
+                     uint32_t timeoutMs);
 
 private:
   bool microStep(uint8_t mode);
@@ -83,6 +89,7 @@ private:
   uint8_t runCurrent_ = 31;
   uint8_t idleCurrent_ = 0;
   uint8_t holdDelay_ = 8;
+  uint8_t idlePowerDownDelay_ = 1;
   bool moveInProgress_ = false;
   bool moveDirectionPositive_ = true;
   uint32_t moveStartPositionSteps_ = 0;
@@ -116,4 +123,5 @@ private:
   static constexpr uint32_t kStepperSteps = 200;
   static constexpr uint32_t kPioVar = 2;
   static constexpr uint32_t kPioFix = 37;
+  static constexpr uint8_t kDefaultIdlePowerDownDelay = 1;
 };

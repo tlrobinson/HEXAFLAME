@@ -179,7 +179,13 @@ def wait_for_bootsel_volume(volume_path: Path, timeout_s: float = 15.0) -> bool:
     return volume_path.is_dir()
 
 
-def run_serial_command(serial_port: str, command: str, read_timeout_s: float, baud: int = 115200) -> tuple[int, str, list[str]]:
+def run_serial_command(
+    serial_port: str,
+    command: str,
+    read_timeout_s: float,
+    baud: int = 115200,
+    append_newline: bool = True,
+) -> tuple[int, str, list[str]]:
     stty_command = ["stty", "-f", serial_port, str(baud), "raw", "-echo"]
     stty = subprocess.run(
         stty_command,
@@ -210,26 +216,38 @@ def run_serial_command(serial_port: str, command: str, read_timeout_s: float, ba
 
         try:
             os.write(fd, command.encode("utf-8"))
-            if not command.endswith("\n"):
+            if append_newline and not command.endswith("\n"):
                 os.write(fd, b"\n")
         except OSError as exc:
             return 1, output + f"Failed to write to {serial_port}: {exc}\n", ["serial", serial_port, command.rstrip("\n")]
 
         chunks: list[bytes] = []
+        disconnect_message = ""
         deadline = time.monotonic() + read_timeout_s
         while time.monotonic() < deadline:
-            readable, _, _ = select.select([fd], [], [], 0.1)
+            try:
+                readable, _, _ = select.select([fd], [], [], 0.1)
+            except OSError as exc:
+                disconnect_message = f"\nSerial device disconnected while waiting for reply: {exc}\n"
+                break
             if not readable:
                 continue
             try:
                 chunk = os.read(fd, 4096)
             except BlockingIOError:
                 continue
+            except OSError as exc:
+                disconnect_message = f"\nSerial device disconnected while reading reply: {exc}\n"
+                break
             if chunk:
                 chunks.append(chunk)
 
         output += b"".join(chunks).decode("utf-8", errors="replace")
-        return 0, output[-MAX_OUTPUT_BYTES:], ["serial", serial_port, command.rstrip("\n")]
+        output += disconnect_message
+        command_summary = ["serial", serial_port, command.rstrip("\n")]
+        if not append_newline:
+            command_summary.append("--no-newline")
+        return 0, output[-MAX_OUTPUT_BYTES:], command_summary
     finally:
         os.close(fd)
 
@@ -322,7 +340,9 @@ class FlashHandler(BaseHTTPRequestHandler):
                 json_response(self, 400, {"ok": False, "error": "missing serial command"})
                 return
             read_timeout_s = float(payload.get("read_timeout_s") or 5.0)
-            exit_code, output, command = run_serial_command(serial_port, command_text, read_timeout_s)
+            baud = int(payload.get("baud") or 115200)
+            append_newline = bool(payload.get("append_newline", True))
+            exit_code, output, command = run_serial_command(serial_port, command_text, read_timeout_s, baud, append_newline)
             json_response(
                 self,
                 200 if exit_code == 0 else 500,

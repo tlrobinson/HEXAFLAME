@@ -91,15 +91,24 @@ bool Tmc2209Uart::readReg(uint8_t reg, uint8_t *outData, size_t outLength) {
 }
 
 int32_t Tmc2209Uart::readInt(uint8_t reg) {
+  uint32_t value = 0;
+  if (readRegister(reg, value)) {
+    return static_cast<int32_t>(value);
+  }
+
+  return 0;
+}
+
+bool Tmc2209Uart::readRegister(uint8_t reg, uint32_t &value) {
   uint8_t bytes[4] = {};
 
   for (int tries = 0; tries < 10; ++tries) {
     if (readReg(reg, bytes, sizeof(bytes))) {
-      const uint32_t value = (static_cast<uint32_t>(bytes[0]) << 24U) |
-                             (static_cast<uint32_t>(bytes[1]) << 16U) |
-                             (static_cast<uint32_t>(bytes[2]) << 8U) |
-                             static_cast<uint32_t>(bytes[3]);
-      return static_cast<int32_t>(value);
+      value = (static_cast<uint32_t>(bytes[0]) << 24U) |
+              (static_cast<uint32_t>(bytes[1]) << 16U) |
+              (static_cast<uint32_t>(bytes[2]) << 8U) |
+              static_cast<uint32_t>(bytes[3]);
+      return true;
     }
 
     if (tries == 0) {
@@ -108,7 +117,7 @@ int32_t Tmc2209Uart::readInt(uint8_t reg) {
   }
 
   Serial.println("TMC2209: after 10 tries not valid answer. Is stepper power on?");
-  return 0;
+  return false;
 }
 
 bool Tmc2209Uart::writeReg(uint8_t reg, uint32_t value) {
@@ -142,6 +151,35 @@ bool Tmc2209Uart::writeRegCheck(uint8_t reg, uint32_t value) {
   const int32_t ifcnt2 = readInt(kIfcntReg);
   const int32_t ifcnt3 = readInt(kIfcntReg);
   return ifcnt2 > ifcnt1 || ifcnt3 > ifcnt1;
+}
+
+bool Tmc2209Uart::writeRegister(uint8_t reg, uint32_t value, bool verify) {
+  return verify ? writeRegCheck(reg, value) : writeReg(reg, value);
+}
+
+size_t Tmc2209Uart::transfer(const uint8_t *txData, size_t txLength, uint8_t *rxData, size_t rxMaxLength,
+                             uint32_t timeoutMs) {
+  while (serial_.available() > 0) {
+    serial_.read();
+  }
+
+  if (txData != nullptr && txLength > 0) {
+    serial_.write(txData, txLength);
+    serial_.flush();
+    delayMicroseconds(communicationPauseUs_);
+  }
+
+  const uint32_t startMs = millis();
+  size_t count = 0;
+  while ((millis() - startMs) < timeoutMs && count < rxMaxLength) {
+    if (serial_.available() > 0) {
+      rxData[count++] = static_cast<uint8_t>(serial_.read());
+    } else {
+      delay(1);
+    }
+  }
+
+  return count;
 }
 
 bool Tmc2209Uart::test() {

@@ -34,6 +34,8 @@ def parse_args() -> argparse.Namespace:
         default=os.environ.get("HEXAFLAME_FLASH_HEALTH_URL", DEFAULT_HEALTH_URL),
     )
     parser.add_argument("--serial-port", default=os.environ.get("HEXAFLAME_FLASH_SERIAL"))
+    parser.add_argument("--serial-baud", type=int, default=115200, help="Baud rate for --serial-command.")
+    parser.add_argument("--no-newline", action="store_true", help="Do not append a newline to --serial-command.")
     parser.add_argument("--bootsel", action="store_true", help="Flash a board already in BOOTSEL mode via UF2 copy.")
     parser.add_argument("--uf2", action="store_true", help="Build and copy firmware.uf2 to a mounted BOOTSEL volume.")
     parser.add_argument("--auto", action="store_true", help="Ask running firmware to enter BOOTSEL, then copy UF2.")
@@ -59,9 +61,11 @@ def main() -> int:
             return 1
 
     if args.serial_command:
-        payload: dict[str, str | float] = {
+        payload: dict[str, str | float | int | bool] = {
             "command": args.serial_command,
             "read_timeout_s": args.read_timeout,
+            "baud": args.serial_baud,
+            "append_newline": not args.no_newline,
         }
         if args.serial_port:
             payload["serial_port"] = args.serial_port

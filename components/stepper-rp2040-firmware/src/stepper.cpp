@@ -139,10 +139,12 @@ bool Stepper::begin() {
   tmc_.setMotorId(serialNode_);
 
   if (tmc_.test()) {
+    tmc_.enableUartMode();
     const int32_t currentConfig = tmc_.readRegister(0x10);
     if (currentConfig >= 0) {
       holdDelay_ = static_cast<uint8_t>((currentConfig >> 16) & 0x0F);
     }
+    idlePowerDownDelay_ = kDefaultIdlePowerDownDelay;
     applyCurrentConfig();
     setStallguard(0);
   }
@@ -212,7 +214,9 @@ bool Stepper::applyCurrentConfig() {
   const uint32_t value = (static_cast<uint32_t>(holdDelay_ & 0x0F) << 16) |
                          (static_cast<uint32_t>(runCurrent_ & 0x1F) << 8) |
                          static_cast<uint32_t>(idleCurrent_ & 0x1F);
-  return tmc_.writeRegister(0x10, value);
+  const bool currentOk = tmc_.writeRegister(0x10, value);
+  const bool idleDelayOk = tmc_.setIdlePowerDownDelay(idlePowerDownDelay_);
+  return currentOk && idleDelayOk;
 }
 
 void Stepper::execInstructionPair(PIO pio, uint sm, uint instrA, uint instrB) {
@@ -298,6 +302,19 @@ int32_t Stepper::readStallguard() {
   return tmc_.getStallguardResult();
 }
 
+bool Stepper::readTmcRegister(uint8_t reg, uint32_t &value) {
+  return tmc_.readRegister(reg, value);
+}
+
+bool Stepper::writeTmcRegister(uint8_t reg, uint32_t value, bool verify) {
+  return tmc_.writeRegister(reg, value, verify);
+}
+
+size_t Stepper::transferTmc(const uint8_t *txData, size_t txLength, uint8_t *rxData, size_t rxMaxLength,
+                            uint32_t timeoutMs) {
+  return tmc_.transfer(txData, txLength, rxData, rxMaxLength, timeoutMs);
+}
+
 bool Stepper::tmcTest() {
   return tmc_.test();
 }
@@ -334,6 +351,10 @@ uint8_t Stepper::getIdleCurrent() const {
   return idleCurrent_;
 }
 
+uint8_t Stepper::getIdlePowerDownDelay() const {
+  return idlePowerDownDelay_;
+}
+
 bool Stepper::setRunCurrent(uint8_t current) {
   runCurrent_ = min<uint8_t>(current, 31);
   return applyCurrentConfig();
@@ -341,6 +362,11 @@ bool Stepper::setRunCurrent(uint8_t current) {
 
 bool Stepper::setIdleCurrent(uint8_t current) {
   idleCurrent_ = min<uint8_t>(current, 31);
+  return applyCurrentConfig();
+}
+
+bool Stepper::setIdlePowerDownDelay(uint8_t delay) {
+  idlePowerDownDelay_ = delay;
   return applyCurrentConfig();
 }
 

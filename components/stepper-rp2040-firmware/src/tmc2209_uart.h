@@ -9,8 +9,11 @@ public:
 
   bool begin();
   bool test();
+  bool readRegister(uint8_t reg, uint32_t &value);
   int32_t readInt(uint8_t reg);
+  bool writeRegister(uint8_t reg, uint32_t value, bool verify = true);
   bool writeRegCheck(uint8_t reg, uint32_t value);
+  size_t transfer(const uint8_t *txData, size_t txLength, uint8_t *rxData, size_t rxMaxLength, uint32_t timeoutMs);
   void setMotorId(uint8_t mtrId) { mtrId_ = mtrId; }
 
 private:
