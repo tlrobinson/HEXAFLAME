@@ -9,11 +9,14 @@ the PlatformIO upload command.
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import json
 import os
+import py_compile
 import select
 import shutil
 import subprocess
+import sys
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -29,6 +32,13 @@ DEFAULT_BOOTSEL_VOLUME = "/Volumes/RPI-RP2"
 DEFAULT_BOOTSEL_COMMAND = "bootsel\n"
 MAX_BODY_BYTES = 4096
 MAX_OUTPUT_BYTES = 60_000
+MAX_LOG_TEXT_BYTES = 60_000
+COLOR_RESET = "\033[0m"
+COLOR_KEY = "\033[36m"
+COLOR_STRING = "\033[32m"
+COLOR_NUMBER = "\033[33m"
+COLOR_LITERAL = "\033[35m"
+COLOR_PUNCT = "\033[2m"
 
 
 class FlashState:
@@ -70,6 +80,101 @@ def request_is_authorized(handler: BaseHTTPRequestHandler, token: str | None) ->
     auth = handler.headers.get("Authorization", "")
     header_token = handler.headers.get("X-Flash-Token", "")
     return auth == f"Bearer {token}" or header_token == token
+
+
+def log_bridge_event(message: str) -> None:
+    timestamp = dt.datetime.now(dt.UTC).isoformat(timespec="seconds")
+    print(f"[{timestamp}] {message}", flush=True)
+
+
+def colorize_json_text(text: str) -> str:
+    try:
+        parsed = json.loads(text)
+    except json.JSONDecodeError:
+        return text
+
+    if isinstance(parsed, dict) and parsed.get("jsonrpc") == "2.0":
+        parsed = {key: value for key, value in parsed.items() if key != "jsonrpc"}
+
+    compact = json.dumps(parsed, separators=(",", ":"), sort_keys=True)
+    output: list[str] = []
+    index = 0
+    length = len(compact)
+    while index < length:
+        char = compact[index]
+        if char == '"':
+            start = index
+            index += 1
+            escaped = False
+            while index < length:
+                current = compact[index]
+                index += 1
+                if escaped:
+                    escaped = False
+                elif current == "\\":
+                    escaped = True
+                elif current == '"':
+                    break
+            token = compact[start:index]
+            lookahead = index
+            while lookahead < length and compact[lookahead].isspace():
+                lookahead += 1
+            color = COLOR_KEY if lookahead < length and compact[lookahead] == ":" else COLOR_STRING
+            output.append(f"{color}{token}{COLOR_RESET}")
+            continue
+        if char in "{}[]:,":
+            output.append(f"{COLOR_PUNCT}{char}{COLOR_RESET}")
+            index += 1
+            continue
+        if char.isdigit() or char == "-":
+            start = index
+            index += 1
+            while index < length and compact[index] in "0123456789.eE+-":
+                index += 1
+            output.append(f"{COLOR_NUMBER}{compact[start:index]}{COLOR_RESET}")
+            continue
+        if compact.startswith("true", index) or compact.startswith("null", index):
+            token = compact[index:index + 4]
+            output.append(f"{COLOR_LITERAL}{token}{COLOR_RESET}")
+            index += 4
+            continue
+        if compact.startswith("false", index):
+            output.append(f"{COLOR_LITERAL}false{COLOR_RESET}")
+            index += 5
+            continue
+        output.append(char)
+        index += 1
+
+    return "".join(output)
+
+
+def log_json_traffic(direction: str, text: str) -> None:
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if line:
+            log_bridge_event(f"{direction} {colorize_json_text(line)}")
+
+
+def restart_bridge_after_response(delay_s: float = 0.25) -> None:
+    def restart() -> None:
+        time.sleep(delay_s)
+        log_bridge_event("RESTART")
+        os.execv(sys.executable, [sys.executable, *sys.argv])
+
+    thread = threading.Thread(target=restart, daemon=True)
+    thread.start()
+
+
+def format_log_block(text: str) -> str:
+    if not text:
+        return "[empty]"
+
+    encoded = text.encode("utf-8", errors="replace")
+    if len(encoded) > MAX_LOG_TEXT_BYTES:
+        encoded = encoded[-MAX_LOG_TEXT_BYTES:]
+        text = "[truncated to last " + str(MAX_LOG_TEXT_BYTES) + " bytes]\n" + encoded.decode("utf-8", errors="replace")
+
+    return text.rstrip("\n") or "[empty]"
 
 
 def run_flash(state: FlashState, serial_port: str | None) -> tuple[int, str, list[str]]:
@@ -204,16 +309,6 @@ def run_serial_command(
         return 1, output + f"Failed to open {serial_port}: {exc}\n", ["serial", serial_port, command.rstrip("\n")]
 
     try:
-        drain_deadline = time.monotonic() + 0.25
-        try:
-            while time.monotonic() < drain_deadline:
-                readable, _, _ = select.select([fd], [], [], 0.02)
-                if not readable:
-                    continue
-                os.read(fd, 4096)
-        except BlockingIOError:
-            pass
-
         try:
             os.write(fd, command.encode("utf-8"))
             if append_newline and not command.endswith("\n"):
@@ -221,35 +316,112 @@ def run_serial_command(
         except OSError as exc:
             return 1, output + f"Failed to write to {serial_port}: {exc}\n", ["serial", serial_port, command.rstrip("\n")]
 
-        chunks: list[bytes] = []
-        disconnect_message = ""
-        deadline = time.monotonic() + read_timeout_s
-        while time.monotonic() < deadline:
-            try:
-                readable, _, _ = select.select([fd], [], [], 0.1)
-            except OSError as exc:
-                disconnect_message = f"\nSerial device disconnected while waiting for reply: {exc}\n"
-                break
-            if not readable:
-                continue
-            try:
-                chunk = os.read(fd, 4096)
-            except BlockingIOError:
-                continue
-            except OSError as exc:
-                disconnect_message = f"\nSerial device disconnected while reading reply: {exc}\n"
-                break
-            if chunk:
-                chunks.append(chunk)
+        def on_line(line: str) -> None:
+            nonlocal output
+            output += line + "\n"
 
-        output += b"".join(chunks).decode("utf-8", errors="replace")
-        output += disconnect_message
+        def on_error(message: str) -> None:
+            nonlocal output
+            output += message
+
+        _, read_output = read_serial_lines(fd, read_timeout_s, on_line, on_error)
+        if not output:
+            output = read_output
         command_summary = ["serial", serial_port, command.rstrip("\n")]
         if not append_newline:
             command_summary.append("--no-newline")
         return 0, output[-MAX_OUTPUT_BYTES:], command_summary
     finally:
         os.close(fd)
+
+
+def prepare_serial_port(serial_port: str, baud: int) -> tuple[int, str]:
+    stty_command = ["stty", "-f", serial_port, str(baud), "raw", "-echo"]
+    stty = subprocess.run(
+        stty_command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        check=False,
+    )
+    if stty.returncode != 0:
+        return stty.returncode, f"stty failed ({stty.returncode}): {stty.stdout}\n"
+    return 0, ""
+
+
+def open_serial_fd(serial_port: str) -> tuple[int | None, str]:
+    try:
+        return os.open(serial_port, os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK), ""
+    except OSError as exc:
+        return None, f"Failed to open {serial_port}: {exc}\n"
+
+
+def drain_serial_fd(fd: int, duration_s: float = 0.25) -> None:
+    drain_deadline = time.monotonic() + duration_s
+    while time.monotonic() < drain_deadline:
+        readable, _, _ = select.select([fd], [], [], 0.02)
+        if not readable:
+            continue
+        os.read(fd, 4096)
+
+
+def read_serial_lines(
+    fd: int,
+    read_timeout_s: float,
+    on_line: Any,
+    on_error: Any,
+) -> tuple[int, str]:
+    chunks: list[str] = []
+    receive_buffer = ""
+    exit_code = 0
+    deadline = time.monotonic() + read_timeout_s
+    while time.monotonic() < deadline:
+        try:
+            readable, _, _ = select.select([fd], [], [], 0.1)
+        except OSError as exc:
+            message = f"Serial device disconnected while waiting for reply: {exc}\n"
+            chunks.append(message)
+            on_error(message)
+            break
+        if not readable:
+            continue
+        try:
+            chunk = os.read(fd, 4096)
+        except BlockingIOError:
+            continue
+        except OSError as exc:
+            message = f"Serial device disconnected while reading reply: {exc}\n"
+            chunks.append(message)
+            on_error(message)
+            break
+        if not chunk:
+            continue
+
+        text = chunk.decode("utf-8", errors="replace")
+        chunks.append(text)
+        receive_buffer += text
+        while "\n" in receive_buffer:
+            line, receive_buffer = receive_buffer.split("\n", 1)
+            line = line.rstrip("\r")
+            if line:
+                on_line(line)
+
+    if receive_buffer.strip():
+        line = receive_buffer.strip()
+        chunks.append("\n")
+        on_line(line)
+
+    return exit_code, "".join(chunks)[-MAX_OUTPUT_BYTES:]
+
+
+def write_serial_command(fd: int, command: str, append_newline: bool) -> str:
+    try:
+        os.write(fd, command.encode("utf-8"))
+        if append_newline and not command.endswith("\n"):
+            os.write(fd, b"\n")
+    except OSError as exc:
+        return f"Failed to write to serial port: {exc}\n"
+    return ""
 
 
 def run_auto_flash(state: FlashState, serial_port: str, volume: str | None) -> tuple[int, str, list[str]]:
@@ -314,7 +486,7 @@ class FlashHandler(BaseHTTPRequestHandler):
         )
 
     def do_POST(self) -> None:
-        if self.path not in {"/flash", "/serial"}:
+        if self.path not in {"/flash", "/serial", "/serial-stream", "/restart"}:
             json_response(self, 404, {"ok": False, "error": "not found"})
             return
 
@@ -329,7 +501,25 @@ class FlashHandler(BaseHTTPRequestHandler):
             json_response(self, 400, {"ok": False, "error": str(exc)})
             return
 
-        if self.path == "/serial":
+        if self.path == "/restart":
+            acquired = state.lock.acquire(blocking=False)
+            if not acquired:
+                json_response(self, 409, {"ok": False, "error": "flash already in progress"})
+                return
+            try:
+                try:
+                    py_compile.compile(__file__, doraise=True)
+                except py_compile.PyCompileError as exc:
+                    json_response(self, 500, {"ok": False, "error": "restart compile check failed", "details": str(exc)})
+                    return
+            finally:
+                state.lock.release()
+
+            json_response(self, 200, {"ok": True, "restarting": True})
+            restart_bridge_after_response()
+            return
+
+        if self.path in {"/serial", "/serial-stream"}:
             serial_port = str(
                 payload.get("serial_port")
                 or os.environ.get("HEXAFLAME_FLASH_SERIAL")
@@ -342,7 +532,13 @@ class FlashHandler(BaseHTTPRequestHandler):
             read_timeout_s = float(payload.get("read_timeout_s") or 5.0)
             baud = int(payload.get("baud") or 115200)
             append_newline = bool(payload.get("append_newline", True))
+            if self.path == "/serial-stream":
+                self.handle_serial_stream(serial_port, command_text, read_timeout_s, baud, append_newline)
+                return
+
+            log_json_traffic("->", command_text)
             exit_code, output, command = run_serial_command(serial_port, command_text, read_timeout_s, baud, append_newline)
+            log_json_traffic("<-", output)
             json_response(
                 self,
                 200 if exit_code == 0 else 500,
@@ -370,6 +566,7 @@ class FlashHandler(BaseHTTPRequestHandler):
             return
 
         try:
+            log_bridge_event("FLASH")
             if payload.get("auto") is True:
                 volume = payload.get("volume")
                 exit_code, output, command = run_auto_flash(state, serial_port or DEFAULT_SERIAL_PORT, str(volume) if volume else None)
@@ -414,8 +611,75 @@ class FlashHandler(BaseHTTPRequestHandler):
             },
         )
 
+    def write_stream_event(self, payload: dict[str, Any]) -> None:
+        self.wfile.write(json.dumps(payload).encode("utf-8") + b"\n")
+        self.wfile.flush()
+
+    def handle_serial_stream(
+        self,
+        serial_port: str,
+        command_text: str,
+        read_timeout_s: float,
+        baud: int,
+        append_newline: bool,
+    ) -> None:
+        command_summary = ["serial", serial_port, command_text.rstrip("\n")]
+        if not append_newline:
+            command_summary.append("--no-newline")
+
+        self.send_response(200)
+        self.send_header("Content-Type", "application/x-ndjson")
+        self.send_header("Cache-Control", "no-cache")
+        self.end_headers()
+
+        log_json_traffic("->", command_text)
+        self.write_stream_event({"type": "start", "command": command_summary})
+
+        stty_code, stty_output = prepare_serial_port(serial_port, baud)
+        if stty_output:
+            self.write_stream_event({"type": "output", "data": stty_output})
+        if stty_code != 0:
+            self.write_stream_event({"type": "end", "ok": False, "exit_code": 1, "command": command_summary})
+            return
+
+        fd, open_error = open_serial_fd(serial_port)
+        if fd is None:
+            self.write_stream_event({"type": "output", "data": open_error})
+            self.write_stream_event({"type": "end", "ok": False, "exit_code": 1, "command": command_summary})
+            return
+
+        exit_code = 0
+        try:
+            write_error = write_serial_command(fd, command_text, append_newline)
+            if write_error:
+                self.write_stream_event({"type": "output", "data": write_error})
+                exit_code = 1
+            else:
+                def on_line(line: str) -> None:
+                    log_json_traffic("<-", line)
+                    self.write_stream_event({"type": "output", "data": line + "\n"})
+
+                def on_error(message: str) -> None:
+                    self.write_stream_event({"type": "output", "data": message})
+
+                exit_code, _ = read_serial_lines(fd, read_timeout_s, on_line, on_error)
+        except BrokenPipeError:
+            exit_code = 1
+            return
+        finally:
+            os.close(fd)
+
+        self.write_stream_event(
+            {
+                "type": "end",
+                "ok": exit_code == 0,
+                "exit_code": exit_code,
+                "command": command_summary,
+            }
+        )
+
     def log_message(self, format: str, *args: Any) -> None:
-        print(f"{self.address_string()} - {format % args}")
+        log_bridge_event(format % args)
 
 
 def parse_args() -> argparse.Namespace:
@@ -435,10 +699,10 @@ def main() -> int:
     server = ThreadingHTTPServer((args.host, args.port), FlashHandler)
     server.flash_state = state  # type: ignore[attr-defined]
 
-    print(f"Flash bridge listening on http://{args.host}:{args.port}")
-    print(f"Project: {state.project_dir}")
-    print(f"Environment: {state.env_name}")
-    print("Token auth: enabled" if state.token else "Token auth: disabled")
+    log_bridge_event(f"Flash bridge listening on http://{args.host}:{args.port}")
+    log_bridge_event(f"Project: {state.project_dir}")
+    log_bridge_event(f"Environment: {state.env_name}")
+    log_bridge_event("Token auth: enabled" if state.token else "Token auth: disabled")
     server.serve_forever()
     return 0
 

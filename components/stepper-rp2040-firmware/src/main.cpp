@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <cctype>
 #include <cstdlib>
 
 #include "rgb_led.h"
@@ -22,8 +23,23 @@ bool g_lastButtonLevel = true;
 uint32_t g_lastDebounceMs = 0;
 int g_lastIdx = 1;
 String g_serialLine;
+String g_currentRequestId = "";
+bool g_currentRequestHasId = false;
+
+enum class MotionState : uint8_t {
+  Idle = 0,
+  Homing,
+  Jogging,
+  Moving,
+  Envelope,
+  SpeedTesting,
+  Fault,
+};
+
+MotionState g_motionState = MotionState::Idle;
 
 String nextToken(const String &line, int &offset);
+void clearEnvelope();
 
 struct EnvelopePhase {
   const char *name = "";
@@ -154,18 +170,469 @@ size_t parseByteList(const String &line, uint8_t *bytes, size_t maxBytes, bool &
   return count;
 }
 
-void printHexByte(uint8_t value) {
-  if (value < 0x10) {
-    Serial.print('0');
+int findJsonKey(const String &json, const char *key) {
+  String needle = "\"";
+  needle += key;
+  needle += "\"";
+  int pos = 0;
+  while ((pos = json.indexOf(needle, pos)) >= 0) {
+    int cursor = pos + needle.length();
+    while (cursor < json.length() && isspace(json[cursor])) {
+      ++cursor;
+    }
+    if (cursor < json.length() && json[cursor] == ':') {
+      return cursor + 1;
+    }
+    pos += needle.length();
   }
-  Serial.print(value, HEX);
+  return -1;
 }
 
-void printHex32(uint32_t value) {
-  Serial.print("0x");
-  for (int shift = 28; shift >= 0; shift -= 4) {
-    Serial.print((value >> shift) & 0x0F, HEX);
+String trimJsonValue(const String &raw) {
+  String value = raw;
+  value.trim();
+  return value;
+}
+
+bool extractJsonValue(const String &json, const char *key, String &value) {
+  int cursor = findJsonKey(json, key);
+  if (cursor < 0) {
+    return false;
   }
+  while (cursor < json.length() && isspace(json[cursor])) {
+    ++cursor;
+  }
+  if (cursor >= json.length()) {
+    return false;
+  }
+
+  const int start = cursor;
+  if (json[cursor] == '"') {
+    ++cursor;
+    bool escaped = false;
+    while (cursor < json.length()) {
+      const char ch = json[cursor++];
+      if (escaped) {
+        escaped = false;
+      } else if (ch == '\\') {
+        escaped = true;
+      } else if (ch == '"') {
+        value = json.substring(start, cursor);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  if (json[cursor] == '{' || json[cursor] == '[') {
+    const char open = json[cursor];
+    const char close = open == '{' ? '}' : ']';
+    int depth = 0;
+    bool inString = false;
+    bool escaped = false;
+    while (cursor < json.length()) {
+      const char ch = json[cursor++];
+      if (inString) {
+        if (escaped) {
+          escaped = false;
+        } else if (ch == '\\') {
+          escaped = true;
+        } else if (ch == '"') {
+          inString = false;
+        }
+        continue;
+      }
+      if (ch == '"') {
+        inString = true;
+      } else if (ch == open) {
+        ++depth;
+      } else if (ch == close) {
+        --depth;
+        if (depth == 0) {
+          value = json.substring(start, cursor);
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  while (cursor < json.length() && json[cursor] != ',' && json[cursor] != '}' && json[cursor] != ']') {
+    ++cursor;
+  }
+  value = trimJsonValue(json.substring(start, cursor));
+  return value.length() > 0;
+}
+
+bool decodeJsonString(const String &raw, String &value) {
+  String input = trimJsonValue(raw);
+  if (input.length() < 2 || input[0] != '"' || input[input.length() - 1] != '"') {
+    return false;
+  }
+  value = "";
+  for (int i = 1; i < input.length() - 1; ++i) {
+    char ch = input[i];
+    if (ch != '\\') {
+      value += ch;
+      continue;
+    }
+    if (++i >= input.length() - 1) {
+      return false;
+    }
+    ch = input[i];
+    switch (ch) {
+    case '"':
+    case '\\':
+    case '/':
+      value += ch;
+      break;
+    case 'b':
+      value += '\b';
+      break;
+    case 'f':
+      value += '\f';
+      break;
+    case 'n':
+      value += '\n';
+      break;
+    case 'r':
+      value += '\r';
+      break;
+    case 't':
+      value += '\t';
+      break;
+    default:
+      return false;
+    }
+  }
+  return true;
+}
+
+bool jsonStringField(const String &json, const char *key, String &value) {
+  String raw;
+  return extractJsonValue(json, key, raw) && decodeJsonString(raw, value);
+}
+
+bool jsonUintField(const String &json, const char *key, uint32_t &value) {
+  String raw;
+  if (!extractJsonValue(json, key, raw)) {
+    return false;
+  }
+  raw.trim();
+  return parseUnsignedLongArg(raw, value);
+}
+
+bool jsonFloatField(const String &json, const char *key, float &value) {
+  String raw;
+  if (!extractJsonValue(json, key, raw)) {
+    return false;
+  }
+  raw.trim();
+  return parseFloatArg(raw, value);
+}
+
+bool jsonBoolField(const String &json, const char *key, bool &value) {
+  String raw;
+  if (!extractJsonValue(json, key, raw)) {
+    return false;
+  }
+  raw.trim();
+  if (raw == "true") {
+    value = true;
+    return true;
+  }
+  if (raw == "false") {
+    value = false;
+    return true;
+  }
+  return false;
+}
+
+bool parseJsonRpcRequest(const String &line, String &method, String &params, String &idRaw, bool &hasId) {
+  String trimmed = line;
+  trimmed.trim();
+  if (!trimmed.startsWith("{") || !trimmed.endsWith("}")) {
+    return false;
+  }
+  if (!jsonStringField(trimmed, "method", method) || method.length() == 0) {
+    return false;
+  }
+  if (!extractJsonValue(trimmed, "params", params)) {
+    params = "{}";
+  }
+  hasId = extractJsonValue(trimmed, "id", idRaw);
+  if (!hasId) {
+    idRaw = "null";
+  }
+  return true;
+}
+
+String hexByte(uint8_t value) {
+  String out;
+  if (value < 0x10) {
+    out += "0";
+  }
+  out += String(value, HEX);
+  out.toUpperCase();
+  return out;
+}
+
+String hex32(uint32_t value) {
+  String out = "0x";
+  for (int shift = 28; shift >= 0; shift -= 4) {
+    out += String((value >> shift) & 0x0F, HEX);
+  }
+  out.toUpperCase();
+  return out;
+}
+
+const char *motionStateName(MotionState state) {
+  switch (state) {
+  case MotionState::Idle:
+    return "Idle";
+  case MotionState::Homing:
+    return "Homing";
+  case MotionState::Jogging:
+    return "Jogging";
+  case MotionState::Moving:
+    return "Moving";
+  case MotionState::Envelope:
+    return "Envelope";
+  case MotionState::SpeedTesting:
+    return "SpeedTesting";
+  case MotionState::Fault:
+    return "Fault";
+  }
+  return "Unknown";
+}
+
+void appendJsonString(String &out, const String &value) {
+  out += "\"";
+  for (size_t i = 0; i < value.length(); ++i) {
+    const char ch = value[i];
+    switch (ch) {
+    case '"':
+      out += "\\\"";
+      break;
+    case '\\':
+      out += "\\\\";
+      break;
+    case '\b':
+      out += "\\b";
+      break;
+    case '\f':
+      out += "\\f";
+      break;
+    case '\n':
+      out += "\\n";
+      break;
+    case '\r':
+      out += "\\r";
+      break;
+    case '\t':
+      out += "\\t";
+      break;
+    default:
+      if (static_cast<uint8_t>(ch) < 0x20) {
+        out += "\\u00";
+        if (static_cast<uint8_t>(ch) < 0x10) {
+          out += "0";
+        }
+        out += String(static_cast<uint8_t>(ch), HEX);
+      } else {
+        out += ch;
+      }
+      break;
+    }
+  }
+  out += "\"";
+}
+
+String jsonPair(const char *key, const String &value) {
+  String out = "\"";
+  out += key;
+  out += "\":";
+  appendJsonString(out, value);
+  return out;
+}
+
+String jsonPair(const char *key, const char *value) {
+  return jsonPair(key, String(value));
+}
+
+String jsonPair(const char *key, uint32_t value) {
+  String out = "\"";
+  out += key;
+  out += "\":";
+  out += value;
+  return out;
+}
+
+String jsonPair(const char *key, int32_t value) {
+  String out = "\"";
+  out += key;
+  out += "\":";
+  out += value;
+  return out;
+}
+
+String jsonPair(const char *key, bool value) {
+  String out = "\"";
+  out += key;
+  out += "\":";
+  out += value ? "true" : "false";
+  return out;
+}
+
+String jsonPairFloat(const char *key, float value, uint8_t digits = 1) {
+  String out = "\"";
+  out += key;
+  out += "\":";
+  out += String(value, digits);
+  return out;
+}
+
+void writeJsonLine(const String &line) {
+  Serial.println(line);
+}
+
+void emitNotification(const char *method, const String &paramsJson) {
+  String line = "{\"jsonrpc\":\"2.0\",\"method\":";
+  appendJsonString(line, method);
+  line += ",\"params\":";
+  line += paramsJson.length() > 0 ? paramsJson : "{}";
+  line += "}";
+  writeJsonLine(line);
+}
+
+void logLine(const char *level, const String &message) {
+  String params = "{";
+  params += jsonPair("level", level);
+  params += ",";
+  params += jsonPair("message", message);
+  params += "}";
+  emitNotification("log", params);
+}
+
+void emitEvent(const char *event, const String &dataJson = "{}") {
+  String params = "{";
+  params += jsonPair("event", event);
+  params += ",\"data\":";
+  params += dataJson.length() > 0 ? dataJson : "{}";
+  params += "}";
+  emitNotification("event", params);
+}
+
+void emitRpcResult(const String &resultJson) {
+  if (!g_currentRequestHasId) {
+    return;
+  }
+  String line = "{\"jsonrpc\":\"2.0\",\"id\":";
+  line += g_currentRequestId;
+  line += ",\"result\":";
+  line += resultJson.length() > 0 ? resultJson : "{}";
+  line += "}";
+  writeJsonLine(line);
+}
+
+void emitRpcError(int code, const String &message) {
+  if (!g_currentRequestHasId) {
+    String params = "{";
+    params += jsonPair("level", "ERROR");
+    params += ",";
+    params += jsonPair("message", message);
+    params += ",";
+    params += jsonPair("code", static_cast<int32_t>(code));
+    params += "}";
+    emitNotification("log", params);
+    return;
+  }
+  String line = "{\"jsonrpc\":\"2.0\",\"id\":";
+  line += g_currentRequestId;
+  line += ",\"error\":{\"code\":";
+  line += code;
+  line += ",\"message\":";
+  appendJsonString(line, message);
+  line += "}}";
+  writeJsonLine(line);
+}
+
+void rspLine(const char *status, const String &message) {
+  String data = "{";
+  data += jsonPair("ok", String(status).equalsIgnoreCase("OK"));
+  data += ",";
+  data += jsonPair("status", status);
+  data += ",";
+  data += jsonPair("message", message);
+  data += "}";
+  emitEvent("response", data);
+}
+
+void setMotionState(MotionState state, const char *reason) {
+  if (g_motionState == state) {
+    return;
+  }
+  String message = "state ";
+  message += motionStateName(g_motionState);
+  message += " -> ";
+  message += motionStateName(state);
+  if (reason != nullptr && reason[0] != '\0') {
+    message += " reason=";
+    message += reason;
+  }
+  logLine("INFO", message);
+  g_motionState = state;
+}
+
+bool isMotionIdle() {
+  return g_motionState == MotionState::Idle && !g_motionInProgress && !g_stepper.isMoveInProgress() && !g_envelopeActive;
+}
+
+bool requireIdleForCommand(const char *commandName) {
+  if (isMotionIdle()) {
+    return true;
+  }
+  String message = "busy state=";
+  message += motionStateName(g_motionState);
+  message += " rejected=";
+  message += commandName;
+  rspLine("ERR", message);
+  return false;
+}
+
+bool requireCalibratedForCommand(const char *commandName) {
+  if (g_stepper.isCalibrated()) {
+    return true;
+  }
+  String message = "uncalibrated rejected=";
+  message += commandName;
+  message += " run home first";
+  rspLine("ERR", message);
+  return false;
+}
+
+void drainPendingSerialInput() {
+  size_t drained = 0;
+  while (Serial.available() > 0) {
+    Serial.read();
+    ++drained;
+  }
+  g_serialLine = "";
+  if (drained > 0) {
+    String message = "discarded ";
+    message += drained;
+    message += " queued serial bytes after blocking motion";
+    logLine("WARN", message);
+  }
+}
+
+void stopAllMotion(const char *reason) {
+  clearEnvelope();
+  g_stepper.stopStepper();
+  g_motionInProgress = false;
+  setMotionState(MotionState::Idle, reason);
+  drainPendingSerialInput();
+  rspLine("OK", "motion stopped");
 }
 
 void clearEnvelope() {
@@ -179,59 +646,65 @@ void clearEnvelope() {
 
 void printMoveResult(const Stepper::MoveCommandResult &result) {
   if (!result.accepted) {
-    Serial.println("Move rejected");
+    rspLine("ERR", "move rejected");
     return;
   }
 
   if (result.speedClampedHigh) {
-    Serial.print("WARNING: requested speed is faster than supported; clamped to ");
-    Serial.print(result.actualFrequency);
-    Serial.println("Hz");
+    String message = "requested speed is faster than supported; clamped_hz=";
+    message += result.actualFrequency;
+    logLine("WARN", message);
   } else if (result.speedClampedLow) {
-    Serial.print("WARNING: requested speed is slower than supported; clamped to ");
-    Serial.print(result.actualFrequency);
-    Serial.println("Hz");
+    String message = "requested speed is slower than supported; clamped_hz=";
+    message += result.actualFrequency;
+    logLine("WARN", message);
   }
 
   if (result.completedImmediately) {
-    Serial.println("Already at target");
+    rspLine("OK", "already at target");
     return;
   }
 
-  Serial.print("Moving to step ");
-  Serial.print(result.targetStep);
-  Serial.print(" at ");
-  Serial.print(result.actualFrequency);
-  Serial.print("Hz");
+  String data = "{";
+  data += jsonPair("target_step", result.targetStep);
+  data += ",";
+  data += jsonPair("actual_frequency_hz", result.actualFrequency);
   if (result.estimatedDurationMs > 0) {
-    Serial.print(" (~");
-    Serial.print(result.estimatedDurationMs);
-    Serial.print("ms)");
+    data += ",";
+    data += jsonPair("estimated_duration_ms", result.estimatedDurationMs);
   }
-  Serial.println();
+  data += "}";
+  emitEvent("move-started", data);
 }
 
 bool startEnvelopePhase(const EnvelopePhase &phase) {
   if (phase.isHold) {
+    String data = "{";
+    data += jsonPair("phase", phase.name);
+    data += ",";
+    data += jsonPair("hold_ms", phase.holdMs);
+    data += "}";
+    emitEvent("envelope-hold", data);
     if (phase.holdMs == 0) {
-      Serial.println("Envelope sustain hold until release");
+      logLine("INFO", "envelope sustain hold until release");
     } else {
-      Serial.print("Envelope hold ");
-      Serial.print(phase.holdMs);
-      Serial.println("ms");
+      String message = "envelope hold_ms=";
+      message += phase.holdMs;
+      logLine("INFO", message);
     }
     g_envelopeHolding = true;
     g_envelopeHoldUntilMs = millis() + phase.holdMs;
     return true;
   }
 
-  Serial.print("Envelope ");
-  Serial.print(phase.name);
-  Serial.print(": ");
-  Serial.print(phase.targetPercent, 1);
-  Serial.print("% in ");
-  Serial.print(phase.durationMs);
-  Serial.println("ms");
+  String data = "{";
+  data += jsonPair("phase", phase.name);
+  data += ",";
+  data += jsonPairFloat("target_percent", phase.targetPercent);
+  data += ",";
+  data += jsonPair("duration_ms", phase.durationMs);
+  data += "}";
+  emitEvent("envelope-phase", data);
 
   Stepper::MoveCommandResult result = g_stepper.moveToPercentInTime(phase.targetPercent, phase.durationMs);
   printMoveResult(result);
@@ -258,7 +731,8 @@ void startNextEnvelopePhase() {
   }
 
   if (g_envelopeActive) {
-    Serial.println("Envelope complete");
+    rspLine("OK", "envelope complete");
+    setMotionState(MotionState::Idle, "envelope complete");
   }
   clearEnvelope();
 }
@@ -273,7 +747,8 @@ void serviceEnvelope(Stepper::MoveUpdate moveUpdate) {
       return;
     }
     if (moveUpdate == Stepper::MoveUpdate::Failed) {
-      Serial.println("Envelope stopped: move failed");
+      rspLine("ERR", "envelope stopped: move failed");
+      setMotionState(MotionState::Fault, "envelope move failed");
       clearEnvelope();
       return;
     }
@@ -302,57 +777,38 @@ uint32_t nextDemoFrequency() {
 }
 
 void printSerialHelp() {
-  Serial.println("Serial commands:");
-  Serial.println("  home            - run homing at alternating demo speed");
-  Serial.println("  home <hz>       - run homing at a specific frequency (e.g. 400 or 1200)");
-  Serial.println("  pos <percent> [hz] - move to a calibrated position from 0 to 100 (default 1200Hz)");
-  Serial.println("  step <n> [hz]   - move to an absolute step from 0 to total travel (default 1200Hz)");
-  Serial.println("  pos-time <percent> <ms> - move to a position by a target time");
-  Serial.println("  pos-speed <percent> <hz> - move to a position at a target speed");
-  Serial.println("  step-time <n> <ms> - move to an absolute step by a target time");
-  Serial.println("  step-speed <n> <hz> - move to an absolute step at a target speed");
-  Serial.println("  adsr <attack%> <attack_ms> <decay%> <decay_ms> <sustain_ms> <release%> <release_ms>");
-  Serial.println("  release <percent> <ms> - preempt current envelope/move with release segment");
-  Serial.println("  current status  - print TMC run/idle current settings");
-  Serial.println("  current run <0-31>  - set normal TMC running current scale");
-  Serial.println("  current normal <0-31> - alias for current run");
-  Serial.println("  current recovery <0-31> - set homing/recovery current scale");
-  Serial.println("  current idle <0-31> - set TMC holding current scale");
-  Serial.println("  current idle-delay <0-255> - set delay before holding current");
-  Serial.println("  tmc test        - test TMC2209 UART response");
-  Serial.println("  tmc read <reg>  - read a TMC register, e.g. tmc read 0x6F");
-  Serial.println("  tmc write <reg> <value> [noverify] - write a TMC register");
-  Serial.println("  tmc raw <bytes> - send raw bytes to the TMC UART, e.g. tmc raw 0x55 0 0x06 0xE8");
-  Serial.println("  status          - print calibration status");
-  Serial.println("  bootsel         - reboot into BOOTSEL firmware update mode");
-  Serial.println("  help            - show this help");
+  emitRpcResult("{\"methods\":[\"help\",\"status\",\"stop\",\"clear-fault\",\"home\",\"jog\",\"unstick\",\"move-percent\",\"move-step\",\"move-percent-time\",\"move-percent-speed\",\"move-step-time\",\"move-step-speed\",\"adsr\",\"release\",\"current.status\",\"current.set\",\"speed.status\",\"speed.set-max\",\"speed-test\",\"tmc.test\",\"tmc.read\",\"tmc.write\",\"tmc.raw\",\"bootsel\"]}");
 }
 
 void handleTmcCommand(const String &subcommand, const String &args) {
   if (subcommand.equalsIgnoreCase("test")) {
-    Serial.print("TMC UART test: ");
-    Serial.println(g_stepper.tmcTest() ? "ok" : "failed");
+    emitRpcResult(String("{") + jsonPair("ok", g_stepper.tmcTest()) + "}");
     return;
   }
 
   if (subcommand.equalsIgnoreCase("read")) {
     uint8_t reg = 0;
     if (!parseByteArg(args, reg)) {
-      Serial.println("Usage: tmc read <reg>");
+      emitRpcError(-32602, "tmc.read requires reg");
       return;
     }
 
     uint32_t value = 0;
     if (!g_stepper.readTmcRegister(reg, value)) {
-      Serial.println("TMC read failed");
+      emitRpcError(-32010, "TMC read failed");
       return;
     }
 
-    Serial.print("TMC[0x");
-    printHexByte(reg);
-    Serial.print("] = ");
-    printHex32(value);
-    Serial.println();
+    String result = "{";
+    result += jsonPair("reg", static_cast<uint32_t>(reg));
+    result += ",";
+    result += jsonPair("reg_hex", String("0x") + hexByte(reg));
+    result += ",";
+    result += jsonPair("value", value);
+    result += ",";
+    result += jsonPair("value_hex", hex32(value));
+    result += "}";
+    emitRpcResult(result);
     return;
   }
 
@@ -365,21 +821,28 @@ void handleTmcCommand(const String &subcommand, const String &args) {
     uint8_t reg = 0;
     uint32_t value = 0;
     if (!parseByteArg(regToken, reg) || !parseNumberArg(valueToken, value)) {
-      Serial.println("Usage: tmc write <reg> <value> [noverify]");
+      emitRpcError(-32602, "tmc.write requires reg and value");
       return;
     }
 
     const bool verify = !verifyToken.equalsIgnoreCase("noverify");
     if (!g_stepper.writeTmcRegister(reg, value, verify)) {
-      Serial.println("TMC write failed");
+      emitRpcError(-32011, "TMC write failed");
       return;
     }
 
-    Serial.print("TMC[0x");
-    printHexByte(reg);
-    Serial.print("] <= ");
-    printHex32(value);
-    Serial.println(verify ? " verified" : " sent");
+    String result = "{";
+    result += jsonPair("reg", static_cast<uint32_t>(reg));
+    result += ",";
+    result += jsonPair("reg_hex", String("0x") + hexByte(reg));
+    result += ",";
+    result += jsonPair("value", value);
+    result += ",";
+    result += jsonPair("value_hex", hex32(value));
+    result += ",";
+    result += jsonPair("verified", verify);
+    result += "}";
+    emitRpcResult(result);
     return;
   }
 
@@ -389,98 +852,154 @@ void handleTmcCommand(const String &subcommand, const String &args) {
     bool ok = false;
     const size_t txCount = parseByteList(args, txBytes, sizeof(txBytes), ok);
     if (!ok || txCount == 0) {
-      Serial.println("Usage: tmc raw <byte> [byte...]");
+      emitRpcError(-32602, "tmc.raw requires bytes");
       return;
     }
 
     const size_t rxCount = g_stepper.transferTmc(txBytes, txCount, rxBytes, sizeof(rxBytes), kTmcRawReadTimeoutMs);
-    Serial.print("TMC raw tx:");
+    String result = "{\"tx\":[";
     for (size_t i = 0; i < txCount; ++i) {
-      Serial.print(" 0x");
-      printHexByte(txBytes[i]);
+      if (i > 0) {
+        result += ",";
+      }
+      result += static_cast<uint32_t>(txBytes[i]);
     }
-    Serial.println();
 
-    Serial.print("TMC raw rx:");
-    if (rxCount == 0) {
-      Serial.print(" [none]");
-    }
+    result += "],\"rx\":[";
     for (size_t i = 0; i < rxCount; ++i) {
-      Serial.print(" 0x");
-      printHexByte(rxBytes[i]);
+      if (i > 0) {
+        result += ",";
+      }
+      result += static_cast<uint32_t>(rxBytes[i]);
     }
-    Serial.println();
+    result += "]}";
+    emitRpcResult(result);
     return;
   }
 
-  Serial.println("Usage: tmc test | tmc read <reg> | tmc write <reg> <value> [noverify] | tmc raw <bytes>");
+  emitRpcError(-32601, "unknown tmc method");
 }
 
 void printStatus() {
-  Serial.print("Run current: ");
-  Serial.println(g_stepper.getRunCurrent());
-  Serial.print("Recovery current: ");
-  Serial.println(g_stepper.getRecoveryRunCurrent());
+  String result = "{";
+  result += jsonPair("motion_state", motionStateName(g_motionState));
+  result += ",";
+  result += jsonPair("run_current", static_cast<uint32_t>(g_stepper.getRunCurrent()));
+  result += ",";
+  result += jsonPair("recovery_current", static_cast<uint32_t>(g_stepper.getRecoveryRunCurrent()));
   if (g_stepper.getRecoveryRunCurrent() <= g_stepper.getRunCurrent()) {
-    Serial.println("WARNING: recovery current has no headroom above normal run current");
+    logLine("WARN", "recovery current has no headroom above normal run current");
   }
-  Serial.print("Idle current: ");
-  Serial.println(g_stepper.getIdleCurrent());
-  Serial.print("Idle delay: ");
-  Serial.println(g_stepper.getIdlePowerDownDelay());
+  result += ",";
+  result += jsonPair("idle_current", static_cast<uint32_t>(g_stepper.getIdleCurrent()));
+  result += ",";
+  result += jsonPair("idle_delay", static_cast<uint32_t>(g_stepper.getIdlePowerDownDelay()));
   uint32_t drvStatus = 0;
   if (g_stepper.readTmcRegister(0x6F, drvStatus)) {
-    Serial.print("TMC DRV_STATUS: ");
-    printHex32(drvStatus);
-    Serial.print(" cs_actual=");
-    Serial.print((drvStatus >> 16) & 0x1F);
-    Serial.print(" standstill=");
-    Serial.println((drvStatus & (1UL << 31)) ? "yes" : "no");
+    result += ",\"drv_status\":{";
+    result += jsonPair("value", drvStatus);
+    result += ",";
+    result += jsonPair("hex", hex32(drvStatus));
+    result += ",";
+    result += jsonPair("cs_actual", static_cast<uint32_t>((drvStatus >> 16) & 0x1F));
+    result += ",";
+    result += jsonPair("standstill", (drvStatus & (1UL << 31)) != 0);
+    result += "}";
   }
-  Serial.print("Calibrated: ");
-  Serial.println(g_stepper.isCalibrated() ? "yes" : "no");
+  result += ",";
+  result += jsonPair("calibrated", g_stepper.isCalibrated());
   if (g_stepper.isCalibrated()) {
-    Serial.print("Travel steps: ");
-    Serial.println(g_stepper.getTravelSteps());
-    Serial.print("Current step: ");
-    Serial.println(g_stepper.getCurrentPositionSteps());
-    Serial.print("Current position: ");
-    Serial.print(g_stepper.getPositionPercent(), 1);
-    Serial.println("%");
+    result += ",";
+    result += jsonPair("travel_steps", g_stepper.getTravelSteps());
+    result += ",";
+    result += jsonPair("current_step", g_stepper.getCurrentPositionSteps());
+    result += ",";
+    result += jsonPairFloat("current_position_percent", g_stepper.getPositionPercent());
   }
+  result += ",";
+  result += jsonPair("minimum_valid_travel_steps", g_stepper.getMinValidTravelSteps());
+  result += ",";
+  result += jsonPair("min_move_frequency_hz", g_stepper.getMinMoveFrequency());
+  result += ",";
+  result += jsonPair("max_move_frequency_hz", g_stepper.getMaxMoveFrequency());
+  result += ",";
+  result += jsonPair("safe_max_speed_hz", g_stepper.getSafeMaxMoveFrequency());
+  if (g_stepper.getLastMoveMinStallguard() >= 0) {
+    result += ",";
+    result += jsonPair("last_move_min_stallguard", g_stepper.getLastMoveMinStallguard());
+  }
+  result += ",";
+  result += jsonPair("last_move_low_margin", g_stepper.didLastMoveWarnLowMargin());
+  result += "}";
+  emitRpcResult(result);
 }
 
 void runCentering(uint32_t requestedFrequency) {
   clearEnvelope();
   g_motionInProgress = true;
+  setMotionState(MotionState::Homing, "home command");
 
-  Serial.println();
-  Serial.println();
-  Serial.println("##############################################################################");
-  Serial.println("############  Stepper centering via SENSORLESS homing function  ############");
-  Serial.println("##############################################################################");
-  Serial.print("Requested frequency: ");
-  Serial.print(requestedFrequency);
-  Serial.println("Hz");
+  String message = "home requested_hz=";
+  message += requestedFrequency;
+  logLine("INFO", message);
 
   const bool ok = g_stepper.centering(requestedFrequency);
   if (ok) {
-    Serial.println();
-    Serial.println("Stepper is centered");
-    Serial.println();
-    printStatus();
+    setMotionState(MotionState::Idle, "home complete");
+    String result = "{";
+    result += jsonPair("ok", true);
+    result += ",";
+    result += jsonPair("calibrated", g_stepper.isCalibrated());
+    result += ",";
+    result += jsonPair("travel_steps", g_stepper.getTravelSteps());
+    result += ",";
+    result += jsonPair("current_step", g_stepper.getCurrentPositionSteps());
+    result += ",";
+    result += jsonPairFloat("position_percent", g_stepper.getPositionPercent());
+    result += ",";
+    result += jsonPair("min_move_frequency_hz", g_stepper.getMinMoveFrequency());
+    result += ",";
+    result += jsonPair("max_move_frequency_hz", g_stepper.getMaxMoveFrequency());
+    result += "}";
+    emitRpcResult(result);
   } else {
-    Serial.println();
-    Serial.println("Failed to center the stepper");
-    Serial.println();
+    setMotionState(MotionState::Fault, "home failed");
+    emitRpcError(-32020, "home failed");
   }
 
   g_motionInProgress = false;
+  drainPendingSerialInput();
+}
+
+void runJogCommand(bool positiveDirection, uint32_t steps, uint32_t frequency, bool useRecoveryCurrent) {
+  clearEnvelope();
+  g_motionInProgress = true;
+  setMotionState(MotionState::Jogging, "jog command");
+  String message = "jog direction=";
+  message += positiveDirection ? "+" : "-";
+  message += " steps=";
+  message += steps;
+  message += " hz=";
+  message += frequency == 0 ? g_stepper.getMaxMoveFrequency() : frequency;
+  if (useRecoveryCurrent) {
+    message += " recovery_current=yes";
+  }
+  logLine("INFO", message);
+
+  const bool ok = g_stepper.jog(positiveDirection, steps, frequency, useRecoveryCurrent);
+  setMotionState(ok ? MotionState::Idle : MotionState::Fault, ok ? "jog complete" : "jog failed");
+  g_motionInProgress = false;
+  drainPendingSerialInput();
+  if (ok) {
+    emitRpcResult(String("{") + jsonPair("ok", true) + "}");
+  } else {
+    emitRpcError(-32021, "jog failed");
+  }
 }
 
 void runMoveToPercent(float percent, uint32_t requestedFrequency) {
   if (!g_stepper.isCalibrated()) {
-    Serial.println("Move rejected: run 'home' first to calibrate the travel range.");
+    emitRpcError(-32030, "move rejected: run home first");
     return;
   }
 
@@ -488,101 +1007,179 @@ void runMoveToPercent(float percent, uint32_t requestedFrequency) {
   clearEnvelope();
   const Stepper::MoveCommandResult result = g_stepper.moveToPercentAtFrequency(clampedPercent, requestedFrequency);
   if (result.accepted) {
-    Serial.print("Moving to ");
-    Serial.print(clampedPercent, 1);
-    Serial.println("%");
+    setMotionState(MotionState::Moving, "pos command");
     printMoveResult(result);
+    emitRpcResult(String("{") + jsonPair("accepted", true) + "}");
   } else {
-    Serial.println("Move failed");
+    emitRpcError(-32031, "move failed");
   }
 }
 
 void runMoveToStep(uint32_t targetStep, uint32_t requestedFrequency) {
   if (!g_stepper.isCalibrated()) {
-    Serial.println("Move rejected: run 'home' first to calibrate the travel range.");
+    emitRpcError(-32030, "move rejected: run home first");
     return;
   }
 
   clearEnvelope();
   const Stepper::MoveCommandResult result = g_stepper.moveToStepAtFrequency(targetStep, requestedFrequency);
   if (result.accepted) {
-    Serial.print("Moving to step ");
-    Serial.println(targetStep);
+    setMotionState(MotionState::Moving, "step command");
     printMoveResult(result);
+    emitRpcResult(String("{") + jsonPair("accepted", true) + "}");
   } else {
-    Serial.println("Move failed");
+    emitRpcError(-32031, "move failed");
   }
 }
 
 void runMoveToStepInTime(uint32_t targetStep, uint32_t durationMs) {
   if (!g_stepper.isCalibrated()) {
-    Serial.println("Move rejected: run 'home' first to calibrate the travel range.");
+    emitRpcError(-32030, "move rejected: run home first");
     return;
   }
 
   clearEnvelope();
   const Stepper::MoveCommandResult result = g_stepper.moveToStepInTime(targetStep, durationMs);
+  if (result.accepted && !result.completedImmediately) {
+    setMotionState(MotionState::Moving, "step-time command");
+  }
   printMoveResult(result);
+  emitRpcResult(String("{") + jsonPair("accepted", result.accepted) + "}");
 }
 
 void runMoveToStepAtSpeed(uint32_t targetStep, uint32_t frequency) {
   if (!g_stepper.isCalibrated()) {
-    Serial.println("Move rejected: run 'home' first to calibrate the travel range.");
+    emitRpcError(-32030, "move rejected: run home first");
     return;
   }
 
   clearEnvelope();
   const Stepper::MoveCommandResult result = g_stepper.moveToStepAtFrequency(targetStep, frequency);
+  if (result.accepted && !result.completedImmediately) {
+    setMotionState(MotionState::Moving, "step-speed command");
+  }
   printMoveResult(result);
+  emitRpcResult(String("{") + jsonPair("accepted", result.accepted) + "}");
 }
 
 void runMoveToPercentInTime(float percent, uint32_t durationMs) {
   if (!g_stepper.isCalibrated()) {
-    Serial.println("Move rejected: run 'home' first to calibrate the travel range.");
+    emitRpcError(-32030, "move rejected: run home first");
     return;
   }
 
   clearEnvelope();
   const Stepper::MoveCommandResult result = g_stepper.moveToPercentInTime(percent, durationMs);
+  if (result.accepted && !result.completedImmediately) {
+    setMotionState(MotionState::Moving, "pos-time command");
+  }
   printMoveResult(result);
+  emitRpcResult(String("{") + jsonPair("accepted", result.accepted) + "}");
 }
 
 void runMoveToPercentAtSpeed(float percent, uint32_t frequency) {
   if (!g_stepper.isCalibrated()) {
-    Serial.println("Move rejected: run 'home' first to calibrate the travel range.");
+    emitRpcError(-32030, "move rejected: run home first");
     return;
   }
 
   clearEnvelope();
   const Stepper::MoveCommandResult result = g_stepper.moveToPercentAtFrequency(percent, frequency);
+  if (result.accepted && !result.completedImmediately) {
+    setMotionState(MotionState::Moving, "pos-speed command");
+  }
   printMoveResult(result);
+  emitRpcResult(String("{") + jsonPair("accepted", result.accepted) + "}");
 }
 
-void startAdsrEnvelope(const String &args) {
+void printSpeedStatus() {
+  String result = "{";
+  result += jsonPair("min_move_frequency_hz", g_stepper.getMinMoveFrequency());
+  result += ",";
+  result += jsonPair("max_move_frequency_hz", g_stepper.getMaxMoveFrequency());
+  result += ",";
+  result += jsonPair("safe_max_speed_hz", g_stepper.getSafeMaxMoveFrequency());
+  if (g_stepper.getLastMoveMinStallguard() >= 0) {
+    result += ",";
+    result += jsonPair("last_move_min_stallguard", g_stepper.getLastMoveMinStallguard());
+  }
+  result += ",";
+  result += jsonPair("last_move_low_margin", g_stepper.didLastMoveWarnLowMargin());
+  result += "}";
+  emitRpcResult(result);
+}
+
+void runSpeedTestCommand(uint32_t startHz, uint32_t endHz, uint32_t stepHz, uint32_t repeats) {
   if (!g_stepper.isCalibrated()) {
-    Serial.println("Envelope rejected: run 'home' first to calibrate the travel range.");
+    emitRpcError(-32040, "speed-test rejected: run home first");
     return;
   }
 
-  int offset = 0;
-  float attackPercent = 0.0f;
-  uint32_t attackMs = 0;
-  float decayPercent = 0.0f;
-  uint32_t decayMs = 0;
-  uint32_t sustainMs = 0;
-  float releasePercent = 0.0f;
-  uint32_t releaseMs = 0;
-  if (!parseFloatToken(args, offset, attackPercent) || !parseUnsignedLongToken(args, offset, attackMs) ||
-      !parseFloatToken(args, offset, decayPercent) || !parseUnsignedLongToken(args, offset, decayMs) ||
-      !parseUnsignedLongToken(args, offset, sustainMs) || !parseFloatToken(args, offset, releasePercent) ||
-      !parseUnsignedLongToken(args, offset, releaseMs)) {
-    Serial.println("Usage: adsr <attack%> <attack_ms> <decay%> <decay_ms> <sustain_ms> <release%> <release_ms>");
-    Serial.println("Use sustain_ms=0 to hold until a release command.");
+  if (startHz == 0 || endHz == 0 || stepHz == 0) {
+    emitRpcError(-32602, "speed-test requires start_hz, end_hz, and step_hz");
+    return;
+  }
+  repeats = constrain(repeats == 0 ? 2UL : repeats, 1UL, 10UL);
+
+  clearEnvelope();
+  setMotionState(MotionState::SpeedTesting, "speed-test command");
+  String message = "speed-test start_hz=";
+  message += startHz;
+  message += " end_hz=";
+  message += endHz;
+  message += " step_hz=";
+  message += stepHz;
+  message += " repeats=";
+  message += repeats;
+  logLine("INFO", message);
+
+  const Stepper::SpeedTestResult result =
+      g_stepper.runSpeedTest(startHz, endHz, stepHz, static_cast<uint8_t>(repeats));
+  if (!result.accepted) {
+    setMotionState(MotionState::Idle, "speed-test rejected");
+    emitRpcError(-32041, "speed-test rejected");
+    return;
+  }
+
+  String response = "{";
+  response += jsonPair("accepted", true);
+  response += ",";
+  response += jsonPair("tested_count", result.testedCount);
+  response += ",";
+  response += jsonPair("passed_count", result.passedCount);
+  response += ",";
+  response += jsonPair("highest_passed_frequency_hz", result.highestPassedFrequency);
+  response += ",";
+  response += jsonPair("first_failed_frequency_hz", result.firstFailedFrequency);
+  response += ",";
+  response += jsonPair("safe_max_speed_hz", g_stepper.getSafeMaxMoveFrequency());
+  response += "}";
+  if (result.highestPassedFrequency > 0) {
+    String data = "{";
+    data += jsonPair("safe_max_speed_hz", result.highestPassedFrequency);
+    data += "}";
+    emitEvent("safe-max-speed-updated", data);
+  }
+  setMotionState(MotionState::Idle, "speed-test complete");
+  drainPendingSerialInput();
+  emitRpcResult(response);
+}
+
+void startAdsrEnvelope(float attackPercent, uint32_t attackMs, float decayPercent, uint32_t decayMs,
+                       uint32_t sustainMs, float releasePercent, uint32_t releaseMs) {
+  if (!g_stepper.isCalibrated()) {
+    emitRpcError(-32050, "envelope rejected: run home first");
+    return;
+  }
+
+  if (attackMs == 0 || decayMs == 0 || releaseMs == 0) {
+    emitRpcError(-32602, "adsr requires nonzero attack_ms, decay_ms, and release_ms");
     return;
   }
 
   clearEnvelope();
   g_stepper.stopStepper();
+  setMotionState(MotionState::Envelope, "adsr command");
   g_envelopePhases[0] = {"attack", attackPercent, attackMs, 0, false};
   g_envelopePhases[1] = {"decay", decayPercent, decayMs, 0, false};
   g_envelopePhases[2] = {"sustain", decayPercent, 0, sustainMs, true};
@@ -590,242 +1187,270 @@ void startAdsrEnvelope(const String &args) {
   g_envelopePhaseCount = sustainMs == 0 ? 3 : 4;
   g_envelopePhaseIndex = 0;
   g_envelopeActive = true;
-  Serial.println("Envelope started");
+  emitRpcResult(String("{") + jsonPair("accepted", true) + "}");
   startNextEnvelopePhase();
 }
 
-void startReleaseMove(const String &args) {
+void startReleaseMove(float releasePercent, uint32_t releaseMs) {
   if (!g_stepper.isCalibrated()) {
-    Serial.println("Release rejected: run 'home' first to calibrate the travel range.");
+    emitRpcError(-32051, "release rejected: run home first");
     return;
   }
 
-  int offset = 0;
-  float releasePercent = 0.0f;
-  uint32_t releaseMs = 0;
-  if (!parseFloatToken(args, offset, releasePercent) || !parseUnsignedLongToken(args, offset, releaseMs)) {
-    Serial.println("Usage: release <percent> <ms>");
+  if (releaseMs == 0) {
+    emitRpcError(-32602, "release requires percent and ms");
     return;
   }
 
   clearEnvelope();
   const Stepper::MoveCommandResult result = g_stepper.moveToPercentInTime(releasePercent, releaseMs);
-  Serial.println("Release started");
+  if (result.accepted && !result.completedImmediately) {
+    setMotionState(MotionState::Moving, "release command");
+  }
   printMoveResult(result);
+  emitRpcResult(String("{") + jsonPair("accepted", result.accepted) + "}");
 }
 
-void handleSerialCommand(const String &rawLine) {
-  String line = rawLine;
-  line.trim();
-  if (line.length() == 0) {
+bool requireParam(bool condition, const char *message) {
+  if (condition) {
+    return true;
+  }
+  emitRpcError(-32602, message);
+  return false;
+}
+
+void handleJsonRpcCommand(const String &rawLine) {
+  String method;
+  String params;
+  String idRaw;
+  bool hasId = false;
+  if (!parseJsonRpcRequest(rawLine, method, params, idRaw, hasId)) {
+    g_currentRequestId = "null";
+    g_currentRequestHasId = true;
+    emitRpcError(-32700, "expected newline-delimited JSON-RPC request");
+    g_currentRequestHasId = false;
     return;
   }
 
-  String command;
-  String arg1;
-  String arg2;
-  if (!splitCommandArgs(line, command, arg1, arg2)) {
-    return;
-  }
+  g_currentRequestId = idRaw;
+  g_currentRequestHasId = hasId;
+  emitEvent("command-received", String("{") + jsonPair("method", method) + "}");
 
-  if (command.equalsIgnoreCase("help")) {
+  if (method == "help") {
     printSerialHelp();
-    return;
-  }
-
-  if (command.equalsIgnoreCase("status")) {
+  } else if (method == "status") {
     printStatus();
-    return;
-  }
-
-  if (command.equalsIgnoreCase("tmc")) {
-    handleTmcCommand(arg1, arg2);
-    return;
-  }
-
-  if (command.equalsIgnoreCase("bootsel") || command.equalsIgnoreCase("bootloader")) {
-    Serial.println("Rebooting into BOOTSEL firmware update mode...");
+  } else if (method == "stop" || method == "abort") {
+    stopAllMotion(method.c_str());
+    emitRpcResult(String("{") + jsonPair("ok", true) + "}");
+  } else if (method == "clear-fault") {
+    const bool wasFault = g_motionState == MotionState::Fault;
+    if (wasFault) {
+      setMotionState(MotionState::Idle, "clear-fault command");
+    }
+    String result = "{";
+    result += jsonPair("ok", true);
+    result += ",";
+    result += jsonPair("was_fault", wasFault);
+    result += "}";
+    emitRpcResult(result);
+  } else if (method == "bootsel" || method == "bootloader") {
+    emitRpcResult(String("{") + jsonPair("rebooting", true) + "}");
     Serial.flush();
     delay(100);
     rp2040.rebootToBootloader();
-    return;
-  }
-
-  if (command.equalsIgnoreCase("current")) {
-    if (arg1.equalsIgnoreCase("status") && arg2.length() == 0) {
-      Serial.print("Run current: ");
-      Serial.println(g_stepper.getRunCurrent());
-      Serial.print("Recovery current: ");
-      Serial.println(g_stepper.getRecoveryRunCurrent());
-      if (g_stepper.getRecoveryRunCurrent() <= g_stepper.getRunCurrent()) {
-        Serial.println("WARNING: recovery current has no headroom above normal run current");
-      }
-      Serial.print("Idle current: ");
-      Serial.println(g_stepper.getIdleCurrent());
-      Serial.print("Idle delay: ");
-      Serial.println(g_stepper.getIdlePowerDownDelay());
-      return;
+  } else if (method == "tmc.test") {
+    emitRpcResult(String("{") + jsonPair("ok", g_stepper.tmcTest()) + "}");
+  } else if (method == "tmc.read") {
+    uint32_t regValue = 0;
+    if (requireParam(jsonUintField(params, "reg", regValue) && regValue <= 0xFF, "tmc.read requires reg 0-255")) {
+      handleTmcCommand("read", String(regValue));
     }
+  } else if (method == "tmc.write") {
+    uint32_t regValue = 0;
     uint32_t value = 0;
-    const bool isIdleDelay = arg1.equalsIgnoreCase("idle-delay");
-    const uint32_t maxValue = isIdleDelay ? 255 : 31;
-    if (!parseUnsignedLongArg(arg2, value) || value > maxValue) {
-      Serial.println("Usage: current run|normal <0-31> | current recovery <0-31> | current idle <0-31> | current idle-delay <0-255> | current status");
+    bool verify = true;
+    (void)jsonBoolField(params, "verify", verify);
+    if (requireParam(jsonUintField(params, "reg", regValue) && regValue <= 0xFF && jsonUintField(params, "value", value),
+                     "tmc.write requires reg 0-255 and value")) {
+      String args = String(regValue) + " " + String(value) + (verify ? "" : " noverify");
+      handleTmcCommand("write", args);
+    }
+  } else if (method == "tmc.raw") {
+    String bytes;
+    if (requireParam(extractJsonValue(params, "bytes", bytes), "tmc.raw requires bytes")) {
+      bytes.replace("[", "");
+      bytes.replace("]", "");
+      handleTmcCommand("raw", bytes);
+    }
+  } else if (method == "current.status") {
+    String result = "{";
+    result += jsonPair("run", static_cast<uint32_t>(g_stepper.getRunCurrent()));
+    result += ",";
+    result += jsonPair("recovery", static_cast<uint32_t>(g_stepper.getRecoveryRunCurrent()));
+    result += ",";
+    result += jsonPair("idle", static_cast<uint32_t>(g_stepper.getIdleCurrent()));
+    result += ",";
+    result += jsonPair("idle_delay", static_cast<uint32_t>(g_stepper.getIdlePowerDownDelay()));
+    result += "}";
+    emitRpcResult(result);
+  } else if (method == "current.set") {
+    String which;
+    uint32_t value = 0;
+    if (!requireParam(jsonStringField(params, "which", which) && jsonUintField(params, "value", value),
+                      "current.set requires which and value")) {
+      g_currentRequestHasId = false;
       return;
     }
-    if (arg1.equalsIgnoreCase("run") || arg1.equalsIgnoreCase("normal")) {
-      if (g_stepper.setRunCurrent(static_cast<uint8_t>(value))) {
-        Serial.print("Run current set to ");
-        Serial.println(value);
+    bool ok = false;
+    if ((which == "run" || which == "normal") && value <= 31) {
+      ok = g_stepper.setRunCurrent(static_cast<uint8_t>(value));
+    } else if (which == "recovery" && value <= 31) {
+      ok = g_stepper.setRecoveryRunCurrent(static_cast<uint8_t>(value));
+    } else if (which == "idle" && value <= 31) {
+      ok = g_stepper.setIdleCurrent(static_cast<uint8_t>(value));
+    } else if (which == "idle-delay" && value <= 255) {
+      ok = g_stepper.setIdlePowerDownDelay(static_cast<uint8_t>(value));
+    } else {
+      emitRpcError(-32602, "invalid current field or value");
+      g_currentRequestHasId = false;
+      return;
+    }
+    if (ok) {
+      emitRpcResult(String("{") + jsonPair("ok", true) + "}");
+    } else {
+      emitRpcError(-32060, "failed to set current configuration");
+    }
+  } else if (method == "speed.status") {
+    printSpeedStatus();
+  } else if (method == "speed.set-max") {
+    uint32_t value = 0;
+    if (requireParam(jsonUintField(params, "hz", value), "speed.set-max requires hz")) {
+      if (g_stepper.setSafeMaxMoveFrequency(value)) {
+        emitRpcResult(String("{") + jsonPair("safe_max_speed_hz", g_stepper.getSafeMaxMoveFrequency()) + "}");
       } else {
-        Serial.println("Failed to set run current");
+        emitRpcError(-32602, "invalid safe max speed");
       }
-      return;
     }
-    if (arg1.equalsIgnoreCase("recovery")) {
-      if (g_stepper.setRecoveryRunCurrent(static_cast<uint8_t>(value))) {
-        Serial.print("Recovery current set to ");
-        Serial.println(value);
-        if (value <= g_stepper.getRunCurrent()) {
-          Serial.println("WARNING: recovery current has no headroom above normal run current");
-        }
-      } else {
-        Serial.println("Failed to set recovery current");
-      }
-      return;
+  } else if (method == "speed-test") {
+    uint32_t startHz = 0;
+    uint32_t endHz = 0;
+    uint32_t stepHz = 0;
+    uint32_t repeats = 2;
+    if (requireIdleForCommand("speed-test") &&
+        requireParam(jsonUintField(params, "start_hz", startHz) && jsonUintField(params, "end_hz", endHz) &&
+                         jsonUintField(params, "step_hz", stepHz),
+                     "speed-test requires start_hz, end_hz, and step_hz")) {
+      (void)jsonUintField(params, "repeats", repeats);
+      runSpeedTestCommand(startHz, endHz, stepHz, repeats);
     }
-    if (arg1.equalsIgnoreCase("idle")) {
-      if (g_stepper.setIdleCurrent(static_cast<uint8_t>(value))) {
-        Serial.print("Idle current set to ");
-        Serial.println(value);
-      } else {
-        Serial.println("Failed to set idle current");
-      }
-      return;
-    }
-    if (isIdleDelay) {
-      if (g_stepper.setIdlePowerDownDelay(static_cast<uint8_t>(value))) {
-        Serial.print("Idle delay set to ");
-        Serial.println(value);
-      } else {
-        Serial.println("Failed to set idle delay");
-      }
-      return;
-    }
-    Serial.println("Usage: current run|normal <0-31> | current recovery <0-31> | current idle <0-31> | current idle-delay <0-255> | current status");
-    return;
-  }
-
-  if (command.equalsIgnoreCase("adsr") || command.equalsIgnoreCase("asdr")) {
-    startAdsrEnvelope(line.substring(command.length()));
-    return;
-  }
-
-  if (command.equalsIgnoreCase("release")) {
-    startReleaseMove(line.substring(command.length()));
-    return;
-  }
-
-  if (command.equalsIgnoreCase("home") && arg1.length() == 0) {
-    if (g_motionInProgress || g_stepper.isMoveInProgress()) {
-      Serial.println("Busy");
-      return;
-    }
-    runCentering(nextDemoFrequency());
-    return;
-  }
-
-  if (command.equalsIgnoreCase("home")) {
-    if (g_motionInProgress || g_stepper.isMoveInProgress()) {
-      Serial.println("Busy");
-      return;
-    }
+  } else if (method == "home") {
     uint32_t frequency = 0;
-    if (!parseUnsignedLongArg(arg1, frequency) || frequency == 0 || arg2.length() != 0) {
-      Serial.println("Invalid frequency. Example: home 1200");
-      return;
+    (void)jsonUintField(params, "hz", frequency);
+    if (requireIdleForCommand("home")) {
+      runCentering(frequency == 0 ? nextDemoFrequency() : frequency);
     }
-    runCentering(frequency);
-    return;
-  }
-
-  if (command.equalsIgnoreCase("pos") || command.equalsIgnoreCase("move")) {
+  } else if (method == "jog") {
+    String direction;
+    uint32_t steps = 0;
+    uint32_t frequency = 0;
+    bool recovery = false;
+    (void)jsonUintField(params, "hz", frequency);
+    (void)jsonBoolField(params, "recovery", recovery);
+    if (requireIdleForCommand("jog") &&
+        requireParam(jsonStringField(params, "direction", direction) && jsonUintField(params, "steps", steps) && steps > 0,
+                     "jog requires direction and steps")) {
+      const bool positive = direction == "+" || direction == "pos" || direction == "positive";
+      const bool negative = direction == "-" || direction == "neg" || direction == "negative";
+      if (requireParam(positive || negative, "jog direction must be + or -")) {
+        runJogCommand(positive, steps, frequency, recovery);
+      }
+    }
+  } else if (method == "unstick") {
+    uint32_t steps = 500;
+    uint32_t frequency = 400;
+    (void)jsonUintField(params, "steps", steps);
+    (void)jsonUintField(params, "hz", frequency);
+    if (requireIdleForCommand("unstick")) {
+      runJogCommand(true, steps, frequency, true);
+    }
+  } else if (method == "move-percent") {
     float percent = 0.0f;
     uint32_t frequency = 0;
-    if (!parseFloatArg(arg1, percent)) {
-      Serial.println("Invalid position. Example: pos 50  or  pos 50 1200");
-      return;
+    (void)jsonUintField(params, "hz", frequency);
+    if (requireIdleForCommand("move-percent") && requireCalibratedForCommand("move-percent") &&
+        requireParam(jsonFloatField(params, "percent", percent), "move-percent requires percent")) {
+      runMoveToPercent(percent, frequency);
     }
-    if (arg2.length() > 0 && !parseUnsignedLongArg(arg2, frequency)) {
-      Serial.println("Invalid frequency. Example: pos 50 1200");
-      return;
+  } else if (method == "move-step") {
+    uint32_t step = 0;
+    uint32_t frequency = 0;
+    (void)jsonUintField(params, "hz", frequency);
+    if (requireIdleForCommand("move-step") && requireCalibratedForCommand("move-step") &&
+        requireParam(jsonUintField(params, "step", step), "move-step requires step")) {
+      runMoveToStep(step, frequency);
     }
-    runMoveToPercent(percent, frequency);
-    return;
-  }
-
-  if (command.equalsIgnoreCase("pos-time") || command.equalsIgnoreCase("move-time")) {
+  } else if (method == "move-percent-time") {
     float percent = 0.0f;
     uint32_t durationMs = 0;
-    if (!parseFloatArg(arg1, percent) || !parseUnsignedLongArg(arg2, durationMs) || durationMs == 0) {
-      Serial.println("Invalid timed move. Example: pos-time 75 250");
-      return;
+    if (requireIdleForCommand("move-percent-time") && requireCalibratedForCommand("move-percent-time") &&
+        requireParam(jsonFloatField(params, "percent", percent) && jsonUintField(params, "duration_ms", durationMs) && durationMs > 0,
+                     "move-percent-time requires percent and duration_ms")) {
+      runMoveToPercentInTime(percent, durationMs);
     }
-    runMoveToPercentInTime(percent, durationMs);
-    return;
-  }
-
-  if (command.equalsIgnoreCase("pos-speed") || command.equalsIgnoreCase("move-speed")) {
+  } else if (method == "move-percent-speed") {
     float percent = 0.0f;
     uint32_t frequency = 0;
-    if (!parseFloatArg(arg1, percent) || !parseUnsignedLongArg(arg2, frequency) || frequency == 0) {
-      Serial.println("Invalid speed move. Example: pos-speed 75 900");
-      return;
+    if (requireIdleForCommand("move-percent-speed") && requireCalibratedForCommand("move-percent-speed") &&
+        requireParam(jsonFloatField(params, "percent", percent) && jsonUintField(params, "hz", frequency) && frequency > 0,
+                     "move-percent-speed requires percent and hz")) {
+      runMoveToPercentAtSpeed(percent, frequency);
     }
-    runMoveToPercentAtSpeed(percent, frequency);
-    return;
-  }
-
-  if (command.equalsIgnoreCase("step")) {
-    uint32_t targetStep = 0;
-    uint32_t frequency = 0;
-    if (!parseUnsignedLongArg(arg1, targetStep)) {
-      Serial.println("Invalid step value. Example: step 1000  or  step 1000 1200");
-      return;
-    }
-    if (arg2.length() > 0 && !parseUnsignedLongArg(arg2, frequency)) {
-      Serial.println("Invalid frequency. Example: step 1000 1200");
-      return;
-    }
-    runMoveToStep(targetStep, frequency);
-    return;
-  }
-
-  if (command.equalsIgnoreCase("step-time")) {
-    uint32_t targetStep = 0;
+  } else if (method == "move-step-time") {
+    uint32_t step = 0;
     uint32_t durationMs = 0;
-    if (!parseUnsignedLongArg(arg1, targetStep) || !parseUnsignedLongArg(arg2, durationMs) || durationMs == 0) {
-      Serial.println("Invalid timed step move. Example: step-time 1000 250");
-      return;
+    if (requireIdleForCommand("move-step-time") && requireCalibratedForCommand("move-step-time") &&
+        requireParam(jsonUintField(params, "step", step) && jsonUintField(params, "duration_ms", durationMs) && durationMs > 0,
+                     "move-step-time requires step and duration_ms")) {
+      runMoveToStepInTime(step, durationMs);
     }
-    runMoveToStepInTime(targetStep, durationMs);
-    return;
-  }
-
-  if (command.equalsIgnoreCase("step-speed")) {
-    uint32_t targetStep = 0;
+  } else if (method == "move-step-speed") {
+    uint32_t step = 0;
     uint32_t frequency = 0;
-    if (!parseUnsignedLongArg(arg1, targetStep) || !parseUnsignedLongArg(arg2, frequency) || frequency == 0) {
-      Serial.println("Invalid speed step move. Example: step-speed 1000 900");
-      return;
+    if (requireIdleForCommand("move-step-speed") && requireCalibratedForCommand("move-step-speed") &&
+        requireParam(jsonUintField(params, "step", step) && jsonUintField(params, "hz", frequency) && frequency > 0,
+                     "move-step-speed requires step and hz")) {
+      runMoveToStepAtSpeed(step, frequency);
     }
-    runMoveToStepAtSpeed(targetStep, frequency);
-    return;
+  } else if (method == "adsr") {
+    float attackPercent = 0.0f;
+    float decayPercent = 0.0f;
+    float releasePercent = 0.0f;
+    uint32_t attackMs = 0;
+    uint32_t decayMs = 0;
+    uint32_t sustainMs = 0;
+    uint32_t releaseMs = 0;
+    if (requireIdleForCommand("adsr") && requireCalibratedForCommand("adsr") &&
+        requireParam(jsonFloatField(params, "attack_percent", attackPercent) && jsonUintField(params, "attack_ms", attackMs) &&
+                         jsonFloatField(params, "decay_percent", decayPercent) && jsonUintField(params, "decay_ms", decayMs) &&
+                         jsonUintField(params, "sustain_ms", sustainMs) && jsonFloatField(params, "release_percent", releasePercent) &&
+                         jsonUintField(params, "release_ms", releaseMs),
+                     "adsr requires attack_percent, attack_ms, decay_percent, decay_ms, sustain_ms, release_percent, release_ms")) {
+      startAdsrEnvelope(attackPercent, attackMs, decayPercent, decayMs, sustainMs, releasePercent, releaseMs);
+    }
+  } else if (method == "release") {
+    float percent = 0.0f;
+    uint32_t durationMs = 0;
+    if (requireIdleForCommand("release") && requireCalibratedForCommand("release") &&
+        requireParam(jsonFloatField(params, "percent", percent) && jsonUintField(params, "duration_ms", durationMs),
+                     "release requires percent and duration_ms")) {
+      startReleaseMove(percent, durationMs);
+    }
+  } else {
+    emitRpcError(-32601, "method not found");
   }
 
-  Serial.print("Unknown command: ");
-  Serial.println(line);
-  printSerialHelp();
+  g_currentRequestHasId = false;
 }
 
 void processSerialInput() {
@@ -836,11 +1461,7 @@ void processSerialInput() {
     }
 
     if (ch == '\n') {
-      if (g_serialLine.length() > 0) {
-        Serial.print("> ");
-        Serial.println(g_serialLine);
-      }
-      handleSerialCommand(g_serialLine);
+      handleJsonRpcCommand(g_serialLine);
       g_serialLine = "";
       continue;
     }
@@ -858,26 +1479,19 @@ void setup() {
 
   pinMode(kButtonPin, INPUT_PULLUP);
 
-  Serial.println("waiting time to eventually stop the code before further imports ...");
+  g_stepper.setLogCallback(logLine);
+  logLine("INFO", "startup delay before stepper initialization");
   g_rgbLed.heartBeat(10, 1000);
 
   if (!g_stepper.begin()) {
-    Serial.println("Failed to initialize stepper");
+    logLine("ERROR", "failed to initialize stepper");
     return;
   }
 
   if (g_stepper.tmcTest()) {
-    Serial.println();
-    Serial.println("Code running on RP2040 (Arduino/PlatformIO)");
-    Serial.println("Sensorless homing example");
-    Serial.println();
-    Serial.println("Press the push button for SENSORLESS homing demo");
-    printSerialHelp();
+    emitEvent("ready", "{\"protocol\":\"json-rpc\",\"transport\":\"newline-delimited-json\",\"firmware\":\"stepper-rp2040\"}");
   } else {
-    Serial.println();
-    Serial.println("###################################################################");
-    Serial.println("#   The TMC driver UART does not react: IS THE DRIVER POWERED ?   #");
-    Serial.println("###################################################################");
+    logLine("ERROR", "TMC driver UART did not respond; check stepper power");
   }
 }
 
@@ -886,16 +1500,18 @@ void loop() {
 
   const Stepper::MoveUpdate moveUpdate = g_stepper.serviceMove();
   if (moveUpdate == Stepper::MoveUpdate::Completed || moveUpdate == Stepper::MoveUpdate::HomeAdjusted) {
-    Serial.print("Moved to step ");
-    Serial.println(g_stepper.getCurrentPositionSteps());
-    Serial.print("Moved to ");
-    Serial.print(g_stepper.getPositionPercent(), 1);
-    Serial.println("%");
+    String message = "move complete step=";
+    message += g_stepper.getCurrentPositionSteps();
+    message += " percent=";
+    message += String(g_stepper.getPositionPercent(), 1);
+    rspLine("OK", message);
+    setMotionState(MotionState::Idle, "move complete");
     if (moveUpdate == Stepper::MoveUpdate::HomeAdjusted) {
       printStatus();
     }
   } else if (moveUpdate == Stepper::MoveUpdate::Failed) {
-    Serial.println("Move failed");
+    rspLine("ERR", "move failed");
+    setMotionState(MotionState::Fault, "move failed");
   }
   serviceEnvelope(moveUpdate);
 
@@ -907,7 +1523,7 @@ void loop() {
     g_lastButtonLevel = buttonLevel;
   }
 
-  if (!g_motionInProgress && !g_stepper.isMoveInProgress() && !buttonLevel &&
+  if (isMotionIdle() && !buttonLevel &&
       (now - g_lastDebounceMs) >= kDebounceMs) {
     g_homingRequested = true;
   }

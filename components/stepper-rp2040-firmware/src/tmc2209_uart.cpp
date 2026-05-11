@@ -111,12 +111,7 @@ bool Tmc2209Uart::readRegister(uint8_t reg, uint32_t &value) {
       return true;
     }
 
-    if (tries == 0) {
-      Serial.println("TMC2209: did not get the expected 4 data bytes.");
-    }
   }
-
-  Serial.println("TMC2209: after 10 tries not valid answer. Is stepper power on?");
   return false;
 }
 

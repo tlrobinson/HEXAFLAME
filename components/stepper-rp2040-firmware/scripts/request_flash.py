@@ -16,22 +16,34 @@ import urllib.request
 DEFAULT_BASE_URL = "http://host.docker.internal:8765"
 DEFAULT_FLASH_URL = f"{DEFAULT_BASE_URL}/flash"
 DEFAULT_HEALTH_URL = f"{DEFAULT_BASE_URL}/health"
+DEFAULT_RESTART_URL = f"{DEFAULT_BASE_URL}/restart"
 DEFAULT_SERIAL_URL = f"{DEFAULT_BASE_URL}/serial"
+DEFAULT_SERIAL_STREAM_URL = f"{DEFAULT_BASE_URL}/serial-stream"
 URL_OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Request a firmware flash from the host bridge.")
     parser.add_argument("--health", action="store_true", help="Only verify bridge reachability.")
+    parser.add_argument("--restart-bridge", action="store_true", help="Ask the bridge to restart itself with current code.")
     parser.add_argument("--serial-command", help="Send a command to the board serial port through the bridge.")
+    parser.add_argument("--stream", action="store_true", help="Stream serial command output as it arrives.")
     parser.add_argument("--url", default=os.environ.get("HEXAFLAME_FLASH_URL"))
     parser.add_argument(
         "--serial-url",
         default=os.environ.get("HEXAFLAME_FLASH_SERIAL_URL", DEFAULT_SERIAL_URL),
     )
     parser.add_argument(
+        "--serial-stream-url",
+        default=os.environ.get("HEXAFLAME_FLASH_SERIAL_STREAM_URL", DEFAULT_SERIAL_STREAM_URL),
+    )
+    parser.add_argument(
         "--health-url",
         default=os.environ.get("HEXAFLAME_FLASH_HEALTH_URL", DEFAULT_HEALTH_URL),
+    )
+    parser.add_argument(
+        "--restart-url",
+        default=os.environ.get("HEXAFLAME_FLASH_RESTART_URL", DEFAULT_RESTART_URL),
     )
     parser.add_argument("--serial-port", default=os.environ.get("HEXAFLAME_FLASH_SERIAL"))
     parser.add_argument("--serial-baud", type=int, default=115200, help="Baud rate for --serial-command.")
@@ -60,6 +72,29 @@ def main() -> int:
             print(f"flash bridge health check failed: {exc}", file=sys.stderr)
             return 1
 
+    if args.restart_bridge:
+        request = urllib.request.Request(
+            args.restart_url,
+            data=b"{}",
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        if args.token:
+            request.add_header("Authorization", f"Bearer {args.token}")
+
+        try:
+            with URL_OPENER.open(request, timeout=args.timeout) as response:
+                response_body = response.read().decode("utf-8", errors="replace")
+                print(response_body)
+                data = json.loads(response_body)
+                return 0 if data.get("ok") else 1
+        except urllib.error.HTTPError as exc:
+            print(exc.read().decode("utf-8", errors="replace"), file=sys.stderr)
+            return 1
+        except (TimeoutError, socket.timeout, http.client.RemoteDisconnected, urllib.error.URLError) as exc:
+            print(f"flash bridge restart request failed: {exc}", file=sys.stderr)
+            return 1
+
     if args.serial_command:
         payload: dict[str, str | float | int | bool] = {
             "command": args.serial_command,
@@ -71,7 +106,7 @@ def main() -> int:
             payload["serial_port"] = args.serial_port
 
         request = urllib.request.Request(
-            args.serial_url,
+            args.serial_stream_url if args.stream else args.serial_url,
             data=json.dumps(payload).encode("utf-8"),
             headers={"Content-Type": "application/json"},
             method="POST",
@@ -81,6 +116,29 @@ def main() -> int:
 
         try:
             with URL_OPENER.open(request, timeout=max(args.timeout, args.read_timeout + 5.0)) as response:
+                if args.stream:
+                    ok = False
+                    output_buffer = ""
+                    for raw_line in response:
+                        if not raw_line:
+                            continue
+                        try:
+                            event = json.loads(raw_line.decode("utf-8", errors="replace"))
+                        except json.JSONDecodeError:
+                            print(raw_line.decode("utf-8", errors="replace"), end="")
+                            continue
+                        event_type = event.get("type")
+                        if event_type == "output":
+                            output_buffer += str(event.get("data", ""))
+                            while "\n" in output_buffer:
+                                line, output_buffer = output_buffer.split("\n", 1)
+                                print(line, flush=True)
+                        elif event_type == "end":
+                            ok = bool(event.get("ok"))
+                    if output_buffer.strip():
+                        print(output_buffer.strip(), flush=True)
+                    return 0 if ok else 1
+
                 response_body = response.read().decode("utf-8", errors="replace")
                 print(response_body)
                 data = json.loads(response_body)

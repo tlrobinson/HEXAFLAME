@@ -1,6 +1,11 @@
 # Stepper motor SENSORLESS homing & centering.
 This sensorless feature is based on the StallGuard function of Trinamic TMC2209's stepper driver.<br>
 
+## HEXAFLAME operational notes
+
+- The valve usually gets stuck at the lower limit. Recovery commands should assume that common failure mode and bias the first jog away from the lower limit before trying normal homing again.
+- Serial command/control is newline-delimited JSON-RPC 2.0. Do not write unstructured text to USB serial; diagnostics should be emitted as `log` or `event` notifications.
+
 The TMC2209 integrates a UART interface, to which the RP2040 is connected.<br>
 Via the UART, the StallGuard settings are applied, and its real time value can be accessed.<br>
 When the torque on the motor increases, the StallGuard value decreases. This value can then be compared to an expected threshold.<br>

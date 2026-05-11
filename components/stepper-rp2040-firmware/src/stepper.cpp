@@ -72,9 +72,18 @@ Stepper *Stepper::instance_ = nullptr;
 Stepper::Stepper(RgbLed &rgbLed, uint32_t maxFrequency, bool debug)
     : rgbLed_(rgbLed), debug_(debug), maxFrequency_(maxFrequency), tmc_(Serial1, kUartRxPin, kUartTxPin, 0, 230400) {}
 
+void Stepper::setLogCallback(LogCallback callback) {
+  logCallback_ = callback;
+}
+
+void Stepper::log(const char *level, const String &message) const {
+  if (logCallback_ != nullptr) {
+    logCallback_(level, message);
+  }
+}
+
 bool Stepper::begin() {
-  Serial.println();
-  Serial.println("Uploading stepper_controller ...");
+  log("INFO", "uploading stepper_controller");
 
   instance_ = this;
 
@@ -156,21 +165,22 @@ bool Stepper::begin() {
 
 bool Stepper::microStep(uint8_t mode) {
   if (mode >= (sizeof(kMicrostepMap) / sizeof(kMicrostepMap[0]))) {
-    Serial.println("Wrong parameter for micro_step");
+    log("ERROR", "wrong parameter for micro_step");
     return false;
   }
 
   const MicrostepSetting &settings = kMicrostepMap[mode];
   digitalWrite(kMs1Pin, settings.ms1);
   digitalWrite(kMs2Pin, settings.ms2);
-  Serial.print("Microstepping set to ");
-  Serial.println(settings.label);
+  String message = "microstepping set to ";
+  message += settings.label;
+  log("INFO", message);
   return true;
 }
 
 bool Stepper::getFullRev(uint8_t mode, uint32_t &fullRev, uint8_t &sgAdj, uint8_t &serialNode) {
   if (mode >= (sizeof(kMicrostepMap) / sizeof(kMicrostepMap[0]))) {
-    Serial.println("Wrong parameter for full revolution");
+    log("ERROR", "wrong parameter for full revolution");
     return false;
   }
 
@@ -178,9 +188,9 @@ bool Stepper::getFullRev(uint8_t mode, uint32_t &fullRev, uint8_t &sgAdj, uint8_
   fullRev = static_cast<uint32_t>(kStepperSteps / settings.reduction);
   sgAdj = settings.sgAdjustment;
   serialNode = settings.serialPortNodeAddress;
-  Serial.print("Full revolution takes ");
-  Serial.print(fullRev);
-  Serial.println(" steps");
+  String message = "full revolution steps=";
+  message += fullRev;
+  log("INFO", message);
   return true;
 }
 
@@ -196,7 +206,7 @@ uint32_t Stepper::minMoveFrequency() const {
 }
 
 uint32_t Stepper::maxMoveFrequency() const {
-  return 1200UL * max<uint8_t>(sgAdj_, 1);
+  return safeMaxMoveFrequency_ * max<uint8_t>(sgAdj_, 1);
 }
 
 void Stepper::setDirection(bool clockwise) {
@@ -265,10 +275,22 @@ void Stepper::clearMoveState() {
   moveDirectionPositive_ = true;
   moveStartPositionSteps_ = currentPositionSteps_;
   moveTargetPositionSteps_ = currentPositionSteps_;
+  moveCommandedSteps_ = 0;
   movePlannedSteps_ = 0;
   moveFrequency_ = 0;
+  moveRampStartFrequency_ = 0;
+  moveRampTargetFrequency_ = 0;
+  moveRampStartMs_ = 0;
+  moveRampDurationMs_ = 0;
   moveStartMs_ = 0;
   moveTimeoutMs_ = 0;
+  lastMoveMinStallguard_ = moveMinStallguard_;
+  lastMoveLowMargin_ = moveLowMarginWarned_;
+  moveLastSgSampleMs_ = 0;
+  moveSgWarningThreshold_ = 0;
+  moveMinStallguard_ = -1;
+  moveLowMarginSamples_ = 0;
+  moveLowMarginWarned_ = false;
   resetHomeProbeState();
 }
 
@@ -369,17 +391,17 @@ bool Stepper::handleEndpointHomeProbeStall(uint32_t completedSteps) {
   currentPositionSteps_ = moveHomeProbePositiveEnd_ ? travelSteps_ : 0;
 
   if (absDeltaSteps == 0) {
-    Serial.println("WARNING: endpoint stall detected at expected home; calibration unchanged");
+    log("WARN", "endpoint stall detected at expected home; calibration unchanged");
     pendingHomeCandidateValid_ = false;
     return false;
   }
 
   if (static_cast<uint32_t>(absDeltaSteps) > maxDeltaSteps) {
-    Serial.print("WARNING: endpoint stall ignored; detected ");
-    Serial.print(deltaSteps);
-    Serial.print(" steps from expected ");
-    Serial.print(moveHomeProbePositiveEnd_ ? "upper" : "lower");
-    Serial.println(" home");
+    String message = "endpoint stall ignored delta_steps=";
+    message += deltaSteps;
+    message += " expected_home=";
+    message += moveHomeProbePositiveEnd_ ? "upper" : "lower";
+    log("WARN", message);
     return false;
   }
 
@@ -395,11 +417,12 @@ bool Stepper::recordEndpointHomeCandidate(bool positiveEnd, int32_t deltaSteps) 
     pendingHomeCandidateValid_ = true;
     pendingHomeCandidatePositiveEnd_ = positiveEnd;
     pendingHomeCandidateDeltaSteps_ = deltaSteps;
-    Serial.print("WARNING: endpoint home candidate at ");
-    Serial.print(positiveEnd ? "upper" : "lower");
-    Serial.print(" limit: ");
-    Serial.print(deltaSteps);
-    Serial.println(" steps from expected home; waiting for repeat");
+    String message = "endpoint home candidate limit=";
+    message += positiveEnd ? "upper" : "lower";
+    message += " delta_steps=";
+    message += deltaSteps;
+    message += " waiting_for_repeat=true";
+    log("WARN", message);
     return false;
   }
 
@@ -417,20 +440,120 @@ bool Stepper::recordEndpointHomeCandidate(bool positiveEnd, int32_t deltaSteps) 
     travelSteps_ = 0;
     currentPositionSteps_ = 0;
     calibrated_ = false;
-    Serial.println("WARNING: repeated endpoint stalls invalidated calibration; run home again");
+    log("WARN", "repeated endpoint stalls invalidated calibration; run home again");
     return true;
   }
 
   travelSteps_ = static_cast<uint32_t>(newTravelSteps);
   currentPositionSteps_ = positiveEnd ? travelSteps_ : 0;
   calibrated_ = true;
-  Serial.print("WARNING: endpoint home adjusted at ");
-  Serial.print(positiveEnd ? "upper" : "lower");
-  Serial.print(" limit by ");
-  Serial.print(averageDelta);
-  Serial.print(" steps. New travel: ");
-  Serial.println(travelSteps_);
+  String message = "endpoint home adjusted limit=";
+  message += positiveEnd ? "upper" : "lower";
+  message += " delta_steps=";
+  message += averageDelta;
+  message += " travel_steps=";
+  message += travelSteps_;
+  log("WARN", message);
   return true;
+}
+
+void Stepper::configureMoveStallguardMonitor(uint32_t moveFrequency) {
+  const int32_t minExpectedSg =
+      static_cast<int32_t>(0.15f * static_cast<float>(moveFrequency) / static_cast<float>(max<uint8_t>(sgAdj_, 1)));
+  moveSgWarningThreshold_ = static_cast<int32_t>(0.8f * static_cast<float>(minExpectedSg));
+  moveMinStallguard_ = -1;
+  moveLowMarginSamples_ = 0;
+  moveLowMarginWarned_ = false;
+  moveLastSgSampleMs_ = 0;
+}
+
+void Stepper::sampleMoveStallguardMargin() {
+  if (!moveInProgress_ || !stepperSpinning_) {
+    return;
+  }
+
+  if ((millis() - moveStartMs_) < kHomeProbeStartupIgnoreMs) {
+    return;
+  }
+
+  if (moveHomeProbeEnabled_ && getMoveCompletedSteps() + kHomeProbeExtraPaddingSteps >= moveCommandedSteps_) {
+    return;
+  }
+
+  const uint32_t now = millis();
+  if (moveLastSgSampleMs_ != 0 && (now - moveLastSgSampleMs_) < kMoveSgSampleIntervalMs) {
+    return;
+  }
+  moveLastSgSampleMs_ = now;
+
+  const int32_t sg = readStallguard();
+  if (sg < 0) {
+    return;
+  }
+
+  if (moveMinStallguard_ < 0 || sg < moveMinStallguard_) {
+    moveMinStallguard_ = sg;
+  }
+
+  if (sg >= moveSgWarningThreshold_) {
+    moveLowMarginSamples_ = 0;
+    return;
+  }
+
+  if (moveLowMarginSamples_ < 255) {
+    ++moveLowMarginSamples_;
+  }
+
+  if (!moveLowMarginWarned_ && moveLowMarginSamples_ >= kMoveLowMarginMinSamples) {
+    moveLowMarginWarned_ = true;
+    String message = "low StallGuard margin during move sg_result=";
+    message += sg;
+    message += " threshold=";
+    message += moveSgWarningThreshold_;
+    log("WARN", message);
+  }
+}
+
+void Stepper::serviceMoveRamp() {
+  if (!moveInProgress_ || !stepperSpinning_ || moveRampDurationMs_ == 0 ||
+      moveRampStartFrequency_ >= moveRampTargetFrequency_) {
+    return;
+  }
+
+  const uint32_t elapsedMs = millis() - moveRampStartMs_;
+  uint32_t nextFrequency = moveRampTargetFrequency_;
+  if (elapsedMs < moveRampDurationMs_) {
+    nextFrequency = moveRampStartFrequency_ +
+                    ((moveRampTargetFrequency_ - moveRampStartFrequency_) * elapsedMs) / moveRampDurationMs_;
+  }
+
+  nextFrequency = constrain(nextFrequency, moveRampStartFrequency_, moveRampTargetFrequency_);
+  if (nextFrequency == 0 || nextFrequency == moveFrequency_) {
+    return;
+  }
+
+  if (!pio_sm_is_tx_fifo_full(pio_, smStep_)) {
+    pio_sm_put(pio_, smStep_, getStepperValue(nextFrequency));
+    moveFrequency_ = nextFrequency;
+  }
+}
+
+bool Stepper::waitForBlockingMove(uint32_t timeoutMs) {
+  const uint32_t startMs = millis();
+  while (millis() - startMs <= timeoutMs) {
+    const MoveUpdate update = serviceMove();
+    if (update == MoveUpdate::Completed || update == MoveUpdate::HomeAdjusted) {
+      return true;
+    }
+    if (update == MoveUpdate::Failed) {
+      return false;
+    }
+    delay(5);
+  }
+
+  stopStepper();
+  clearMoveState();
+  return false;
 }
 
 void Stepper::setStallguard(uint8_t threshold) {
@@ -439,8 +562,9 @@ void Stepper::setStallguard(uint8_t threshold) {
   tmc_.setCoolStepThreshold();
 
   if (debug_) {
-    Serial.print("Setting StallGuard (irq to GPIO 11) to ");
-    Serial.println(clamped);
+    String message = "setting StallGuard irq_gpio=11 threshold=";
+    message += clamped;
+    log("DEBUG", message);
   }
 }
 
@@ -467,6 +591,10 @@ bool Stepper::tmcTest() {
 
 bool Stepper::isCalibrated() const {
   return calibrated_;
+}
+
+uint32_t Stepper::getMinValidTravelSteps() const {
+  return kMinValidTravelSteps;
 }
 
 bool Stepper::isMoveInProgress() const {
@@ -537,7 +665,7 @@ bool Stepper::retract(uint32_t stepperValue, uint32_t startupLoops, uint32_t &re
   startStepper();
 
   if (debug_) {
-    Serial.println("Retract the stepper prior the first home search");
+    log("DEBUG", "retracting stepper before first home search");
   }
 
   const uint32_t startMs = millis();
@@ -569,10 +697,11 @@ bool Stepper::homing(uint32_t stepperValue, uint32_t stepperFrequency, uint32_t 
   const int32_t sgThresholdDiag = static_cast<int32_t>(0.45f * static_cast<float>(minExpectedSg));
 
   if (debug_) {
-    Serial.print("Homing with stepper speed of ");
-    Serial.print(stepperFrequency);
-    Serial.print("Hz and UART StallGuard threshold of ");
-    Serial.println(sgThreshold);
+    String message = "homing frequency_hz=";
+    message += stepperFrequency;
+    message += " sg_threshold=";
+    message += sgThreshold;
+    log("DEBUG", message);
   }
 
   const uint32_t startMs = millis();
@@ -612,13 +741,13 @@ bool Stepper::homing(uint32_t stepperValue, uint32_t stepperFrequency, uint32_t 
 
           if (debug_) {
             if (diagTriggered) {
-              Serial.println("StallGuard detection via DIAG pin");
+              log("DEBUG", "StallGuard detection via DIAG pin");
             }
-            Serial.print("Homing reached after ");
-            Serial.print(loops);
-            Serial.print(" iterations in ");
-            Serial.print(millis() - startMs);
-            Serial.println(" ms");
+            String message = "homing reached loops=";
+            message += loops;
+            message += " elapsed_ms=";
+            message += millis() - startMs;
+            log("DEBUG", message);
           }
           return true;
         }
@@ -628,7 +757,7 @@ bool Stepper::homing(uint32_t stepperValue, uint32_t stepperFrequency, uint32_t 
 
   setStallguard(0);
   stopStepper();
-  Serial.println("Failed homing");
+  log("ERROR", "homing failed");
   return false;
 }
 
@@ -642,15 +771,56 @@ bool Stepper::centering(uint32_t requestedFrequency) {
   const uint8_t recoveryRunCurrent = max<uint8_t>(normalRunCurrent, recoveryRunCurrent_);
   if (recoveryRunCurrent > normalRunCurrent) {
     setRunCurrent(recoveryRunCurrent);
-    Serial.print("WARNING: using recovery current ");
-    Serial.print(recoveryRunCurrent);
-    Serial.println(" during homing");
+    String message = "using recovery current during homing current=";
+    message += recoveryRunCurrent;
+    log("WARN", message);
   }
 
   const uint32_t stepperFrequency = clampMoveFrequency(requestedFrequency);
   const uint32_t stepperValue = getStepperValue(stepperFrequency);
   const uint32_t startupLoops = 10;
 
+  bool ok = false;
+  for (uint8_t attempt = 0; attempt <= kHomeRecoveryRetries; ++attempt) {
+    bool stuckDetected = false;
+    if (attempt > 0) {
+      String message = "retrying homing after recovery jog attempt=";
+      message += attempt + 1;
+      message += " max_attempts=";
+      message += kHomeRecoveryRetries + 1;
+      log("WARN", message);
+    }
+
+    ok = centeringAttempt(stepperFrequency, stepperValue, startupLoops, stuckDetected);
+    if (ok) {
+      break;
+    }
+
+    if (!stuckDetected || attempt >= kHomeRecoveryRetries) {
+      break;
+    }
+
+    String message = "running automatic lower-limit recovery jog direction=+ steps=";
+    message += kHomeRecoveryJogSteps;
+    message += " frequency_hz=";
+    message += stepperFrequency;
+    log("WARN", message);
+    if (!jog(true, kHomeRecoveryJogSteps, stepperFrequency, true)) {
+      log("ERROR", "automatic recovery jog failed");
+      break;
+    }
+  }
+
+  setRunCurrent(normalRunCurrent);
+  if (!ok) {
+    rgbLed_.flashColor("blue", 0.1f, 10, 50);
+  }
+  return ok;
+}
+
+bool Stepper::centeringAttempt(uint32_t stepperFrequency, uint32_t stepperValue, uint32_t startupLoops,
+                               bool &stuckDetected) {
+  stuckDetected = false;
   uint32_t retractTimeMs = 0;
   int32_t retractSteps = 0;
 
@@ -663,8 +833,6 @@ bool Stepper::centering(uint32_t requestedFrequency) {
     travelSteps_ = 0;
     currentPositionSteps_ = 0;
     calibrated_ = false;
-    rgbLed_.flashColor("blue", 0.1f, 10, 50);
-    setRunCurrent(normalRunCurrent);
     return false;
   }
 
@@ -674,8 +842,6 @@ bool Stepper::centering(uint32_t requestedFrequency) {
     travelSteps_ = 0;
     currentPositionSteps_ = 0;
     calibrated_ = false;
-    rgbLed_.flashColor("blue", 0.1f, 10, 50);
-    setRunCurrent(normalRunCurrent);
     return false;
   }
 
@@ -683,6 +849,22 @@ bool Stepper::centering(uint32_t requestedFrequency) {
   if (stepsRange < 0) {
     stepsRange = 0;
   }
+
+  if (stepsRange < static_cast<int32_t>(kMinValidTravelSteps)) {
+    stopStepper();
+    travelSteps_ = 0;
+    currentPositionSteps_ = 0;
+    calibrated_ = false;
+    stuckDetected = true;
+    String message = "measured travel below minimum valid travel measured_steps=";
+    message += stepsRange;
+    message += " minimum_steps=";
+    message += kMinValidTravelSteps;
+    message += " valve_may_be_stuck=true";
+    log("WARN", message);
+    return false;
+  }
+
   const uint32_t halfRange = static_cast<uint32_t>(stepsRange / 2);
 
   setDirection(true);
@@ -692,12 +874,11 @@ bool Stepper::centering(uint32_t requestedFrequency) {
 
   const uint32_t centeringTimeMs = 100UL + (halfRange * 1000UL) / max<uint32_t>(1, stepperFrequency);
   if (debug_) {
-    Serial.print("Counted ");
-    Serial.print(stepsRange);
-    Serial.println(" steps between homes");
-    Serial.print("Positioning the stepper at ");
-    Serial.print(halfRange);
-    Serial.println(" from the last detected home");
+    String message = "centering counted_steps=";
+    message += stepsRange;
+    message += " half_range_steps=";
+    message += halfRange;
+    log("DEBUG", message);
   }
 
   delay(centeringTimeMs);
@@ -707,14 +888,51 @@ bool Stepper::centering(uint32_t requestedFrequency) {
     lastMoveFrequency_ = stepperFrequency;
     calibrated_ = true;
     rgbLed_.flashColor("green", 0.2f, 3, 50);
-    setRunCurrent(normalRunCurrent);
     return true;
   }
 
   stopStepper();
   calibrated_ = false;
-  setRunCurrent(normalRunCurrent);
   return false;
+}
+
+bool Stepper::jog(bool positiveDirection, uint32_t steps, uint32_t requestedFrequency, bool useRecoveryCurrent) {
+  if (steps == 0) {
+    return false;
+  }
+
+  if (moveInProgress_) {
+    stopStepper();
+  }
+  clearMoveState();
+
+  const uint8_t normalRunCurrent = runCurrent_;
+  if (useRecoveryCurrent && recoveryRunCurrent_ > runCurrent_) {
+    setRunCurrent(recoveryRunCurrent_);
+  }
+
+  const uint32_t moveFrequency = clampMoveFrequency(requestedFrequency);
+  const uint32_t stepperValue = getStepperValue(moveFrequency);
+  stopStepper();
+  setPulseCounter(0);
+  setDirection(positiveDirection);
+  setPulsesToDo(steps);
+  pio_sm_put_blocking(pio_, smStep_, stepperValue);
+  startStepper();
+
+  const uint32_t timeoutMs = 250UL + (steps * 1000UL) / max<uint32_t>(1, moveFrequency);
+  const uint32_t startMs = millis();
+  while (stepperSpinning_ && (millis() - startMs) <= timeoutMs) {
+    delay(5);
+  }
+  const bool completed = !stepperSpinning_;
+  stopStepper();
+
+  if (useRecoveryCurrent && recoveryRunCurrent_ > normalRunCurrent) {
+    setRunCurrent(normalRunCurrent);
+  }
+
+  return completed;
 }
 
 Stepper::MoveUpdate Stepper::serviceMove() {
@@ -722,7 +940,9 @@ Stepper::MoveUpdate Stepper::serviceMove() {
     return MoveUpdate::None;
   }
 
+  serviceMoveRamp();
   updateMoveProgress();
+  sampleMoveStallguardMargin();
   if (sampleEndpointHomeProbe()) {
     const uint32_t completedSteps = getMoveCompletedSteps();
     stopStepper();
@@ -840,14 +1060,15 @@ Stepper::MoveCommandResult Stepper::moveToStepAtFrequency(uint32_t targetStep, u
   }
 
   const uint32_t moveFrequency = clampMoveFrequency(requestedFrequency);
-  const uint32_t stepperValue = getStepperValue(moveFrequency);
   const uint32_t commandedMoveSteps = static_cast<uint32_t>(abs(refreshedDelta));
   const uint32_t requestedInternalFrequency = requestedFrequency * max<uint8_t>(sgAdj_, 1);
   const bool homeProbeEnabled = shouldProbeEndpoint(targetStep, moveFrequency, commandedMoveSteps);
   const uint32_t homeProbeExtraSteps =
       homeProbeEnabled ? getMaxHomeProbeDeltaSteps() + kHomeProbeExtraPaddingSteps : 0;
   const uint32_t moveSteps = commandedMoveSteps + homeProbeExtraSteps;
-  const uint32_t moveTimeMs = 100UL + (moveSteps * 1000UL) / max<uint32_t>(1, moveFrequency);
+  const uint32_t moveTimeMs = 100UL + kMoveRampDurationMs + (moveSteps * 1000UL) / max<uint32_t>(1, moveFrequency);
+  const uint32_t rampStartFrequency = min<uint32_t>(moveFrequency, minMoveFrequency());
+  const uint32_t stepperValue = getStepperValue(rampStartFrequency);
 
   result.accepted = true;
   result.moveSteps = commandedMoveSteps;
@@ -865,8 +1086,13 @@ Stepper::MoveCommandResult Stepper::moveToStepAtFrequency(uint32_t targetStep, u
   moveDirectionPositive_ = refreshedDelta > 0;
   moveStartPositionSteps_ = currentPositionSteps_;
   moveTargetPositionSteps_ = targetStep;
+  moveCommandedSteps_ = commandedMoveSteps;
   movePlannedSteps_ = moveSteps;
-  moveFrequency_ = moveFrequency;
+  moveFrequency_ = rampStartFrequency;
+  moveRampStartFrequency_ = rampStartFrequency;
+  moveRampTargetFrequency_ = moveFrequency;
+  moveRampStartMs_ = millis();
+  moveRampDurationMs_ = kMoveRampDurationMs;
   moveStartMs_ = millis();
   moveTimeoutMs_ = moveTimeMs;
   moveHomeProbeEnabled_ = homeProbeEnabled;
@@ -875,24 +1101,102 @@ Stepper::MoveCommandResult Stepper::moveToStepAtFrequency(uint32_t targetStep, u
   const int32_t minExpectedSg =
       static_cast<int32_t>(0.15f * static_cast<float>(moveFrequency) / static_cast<float>(max<uint8_t>(sgAdj_, 1)));
   moveHomeProbeSgThreshold_ = static_cast<int32_t>(0.8f * static_cast<float>(minExpectedSg));
+  configureMoveStallguardMonitor(moveFrequency);
   startStepper();
 
   if (debug_) {
-    Serial.print("Moving to step ");
-    Serial.print(targetStep);
-    Serial.print(" at ");
-    Serial.print(moveFrequency / max<uint8_t>(sgAdj_, 1));
-    Serial.print("Hz (");
-    Serial.print(moveSteps);
-    Serial.print(" steps");
+    String message = "moving target_step=";
+    message += targetStep;
+    message += " frequency_hz=";
+    message += moveFrequency / max<uint8_t>(sgAdj_, 1);
+    message += " planned_steps=";
+    message += moveSteps;
     if (homeProbeEnabled) {
-      Serial.print(", endpoint probe +");
-      Serial.print(homeProbeExtraSteps);
-      Serial.print(" steps");
+      message += " endpoint_probe_extra_steps=";
+      message += homeProbeExtraSteps;
     }
-    Serial.println(")");
+    log("DEBUG", message);
   }
 
+  return result;
+}
+
+Stepper::SpeedTestResult Stepper::runSpeedTest(uint32_t startFrequency, uint32_t endFrequency, uint32_t stepFrequency,
+                                               uint8_t repeats) {
+  SpeedTestResult result;
+  if (!calibrated_ || travelSteps_ == 0 || startFrequency == 0 || endFrequency == 0 || stepFrequency == 0 ||
+      repeats == 0) {
+    return result;
+  }
+
+  result.accepted = true;
+  const uint32_t originalSafeMax = safeMaxMoveFrequency_;
+  const uint32_t clampedStart = constrain(startFrequency, getMinMoveFrequency(), kMaxAllowedMoveFrequency);
+  const uint32_t clampedEnd = constrain(endFrequency, getMinMoveFrequency(), kMaxAllowedMoveFrequency);
+  const bool ascending = clampedEnd >= clampedStart;
+  const uint32_t testStep = max<uint32_t>(1, stepFrequency);
+
+  uint32_t frequency = clampedStart;
+  bool stop = false;
+  while (!stop) {
+    ++result.testedCount;
+    safeMaxMoveFrequency_ = frequency;
+    bool passed = true;
+
+    for (uint8_t repeat = 0; repeat < repeats && passed; ++repeat) {
+      const uint32_t targetStep = (repeat % 2 == 0) ? travelSteps_ : 0;
+      const MoveCommandResult move = moveToStepAtFrequency(targetStep, frequency);
+      if (!move.accepted) {
+        passed = false;
+        break;
+      }
+
+      const uint32_t timeoutMs = max<uint32_t>(1000, move.estimatedDurationMs + 750);
+      if (!waitForBlockingMove(timeoutMs) || didLastMoveWarnLowMargin()) {
+        passed = false;
+        break;
+      }
+    }
+
+    String message = "speed-test frequency_hz=";
+    message += frequency;
+    message += " passed=";
+    message += passed ? "true" : "false";
+    if (getLastMoveMinStallguard() >= 0) {
+      message += " min_sg=";
+      message += getLastMoveMinStallguard();
+    }
+    log(passed ? "INFO" : "WARN", message);
+
+    if (!passed) {
+      result.firstFailedFrequency = frequency;
+      break;
+    }
+
+    ++result.passedCount;
+    result.highestPassedFrequency = frequency;
+
+    if (frequency == clampedEnd) {
+      break;
+    }
+
+    if (ascending) {
+      if (frequency + testStep >= clampedEnd) {
+        frequency = clampedEnd;
+      } else {
+        frequency += testStep;
+      }
+    } else {
+      if (frequency <= clampedEnd + testStep) {
+        frequency = clampedEnd;
+      } else {
+        frequency -= testStep;
+      }
+    }
+    stop = false;
+  }
+
+  safeMaxMoveFrequency_ = result.highestPassedFrequency > 0 ? result.highestPassedFrequency : originalSafeMax;
   return result;
 }
 
@@ -902,6 +1206,27 @@ uint32_t Stepper::getMinMoveFrequency() const {
 
 uint32_t Stepper::getMaxMoveFrequency() const {
   return maxMoveFrequency() / max<uint8_t>(sgAdj_, 1);
+}
+
+uint32_t Stepper::getSafeMaxMoveFrequency() const {
+  return safeMaxMoveFrequency_;
+}
+
+bool Stepper::setSafeMaxMoveFrequency(uint32_t frequency) {
+  if (frequency < getMinMoveFrequency() || frequency > kMaxAllowedMoveFrequency) {
+    return false;
+  }
+
+  safeMaxMoveFrequency_ = frequency;
+  return true;
+}
+
+int32_t Stepper::getLastMoveMinStallguard() const {
+  return lastMoveMinStallguard_;
+}
+
+bool Stepper::didLastMoveWarnLowMargin() const {
+  return lastMoveLowMargin_;
 }
 
 void Stepper::pioIrqHandler() {
