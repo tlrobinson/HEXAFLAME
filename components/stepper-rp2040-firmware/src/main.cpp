@@ -13,6 +13,7 @@ constexpr size_t kSerialLineMax = 256;
 constexpr size_t kTmcRawMaxBytes = 32;
 constexpr size_t kEnvelopeMaxPhases = 4;
 constexpr uint32_t kTmcRawReadTimeoutMs = 50;
+constexpr size_t kSerialOutputQueueSize = 32;
 
 RgbLed g_rgbLed;
 Stepper g_stepper(g_rgbLed, 125000000, true);
@@ -25,6 +26,19 @@ int g_lastIdx = 1;
 String g_serialLine;
 String g_currentRequestId = "";
 bool g_currentRequestHasId = false;
+String g_serialOutputQueue[kSerialOutputQueueSize];
+size_t g_serialOutputHead = 0;
+size_t g_serialOutputTail = 0;
+size_t g_serialOutputCount = 0;
+uint32_t g_serialOutputDropped = 0;
+bool g_serialOutputDraining = false;
+
+struct CharacterizeEventContext {
+  String requestId;
+  uint32_t frequencyHz = 0;
+  uint32_t stallguardThreshold = 0;
+  uint32_t endpointToleranceSteps = 0;
+};
 
 enum class MotionState : uint8_t {
   Idle = 0,
@@ -492,8 +506,66 @@ String jsonPairFloat(const char *key, float value, uint8_t digits = 1) {
   return out;
 }
 
+bool enqueueJsonLine(const String &line) {
+  if (g_serialOutputCount >= kSerialOutputQueueSize) {
+    ++g_serialOutputDropped;
+    return false;
+  }
+  g_serialOutputQueue[g_serialOutputTail] = line;
+  g_serialOutputTail = (g_serialOutputTail + 1) % kSerialOutputQueueSize;
+  ++g_serialOutputCount;
+  return true;
+}
+
+void writeSerialByteBlocking(uint8_t value) {
+  while (true) {
+    while (Serial.availableForWrite() <= 0) {
+      delay(1);
+    }
+    if (Serial.write(value) == 1) {
+      return;
+    }
+    delay(1);
+  }
+}
+
+void writeSerialLineBlocking(const String &line) {
+  for (size_t i = 0; i < line.length(); ++i) {
+    writeSerialByteBlocking(static_cast<uint8_t>(line[i]));
+  }
+  writeSerialByteBlocking('\n');
+}
+
+void serviceSerialOutput() {
+  if (g_serialOutputDraining) {
+    return;
+  }
+  g_serialOutputDraining = true;
+
+  if (g_serialOutputDropped > 0 && g_serialOutputCount < kSerialOutputQueueSize) {
+    const uint32_t dropped = g_serialOutputDropped;
+    g_serialOutputDropped = 0;
+    String line = "{\"jsonrpc\":\"2.0\",\"method\":\"log\",\"params\":{\"level\":\"WARN\",\"message\":\"serial output queue dropped messages\",\"dropped\":";
+    line += dropped;
+    line += "}}";
+    enqueueJsonLine(line);
+  }
+
+  if (g_serialOutputCount == 0) {
+    g_serialOutputDraining = false;
+    return;
+  }
+  String line = g_serialOutputQueue[g_serialOutputHead];
+  g_serialOutputQueue[g_serialOutputHead] = "";
+  g_serialOutputHead = (g_serialOutputHead + 1) % kSerialOutputQueueSize;
+  --g_serialOutputCount;
+  writeSerialLineBlocking(line);
+  Serial.flush();
+  g_serialOutputDraining = false;
+}
+
 void writeJsonLine(const String &line) {
-  Serial.println(line);
+  enqueueJsonLine(line);
 }
 
 void emitNotification(const char *method, const String &paramsJson) {
@@ -777,7 +849,7 @@ uint32_t nextDemoFrequency() {
 }
 
 void printSerialHelp() {
-  emitRpcResult("{\"methods\":[\"help\",\"status\",\"stop\",\"clear-fault\",\"home\",\"jog\",\"unstick\",\"move-percent\",\"move-step\",\"move-percent-time\",\"move-percent-speed\",\"move-step-time\",\"move-step-speed\",\"adsr\",\"release\",\"current.status\",\"current.set\",\"speed.status\",\"speed.set-max\",\"speed-test\",\"tmc.test\",\"tmc.read\",\"tmc.write\",\"tmc.raw\",\"bootsel\"]}");
+  emitRpcResult("{\"methods\":[\"help\",\"status\",\"stop\",\"clear-fault\",\"home\",\"jog\",\"unstick\",\"move-percent\",\"move-step\",\"move-percent-time\",\"move-percent-speed\",\"move-step-time\",\"move-step-speed\",\"adsr\",\"release\",\"current.status\",\"current.set\",\"speed.status\",\"speed.set-max\",\"ramp.status\",\"ramp.set\",\"speed-test\",\"stallguard.status\",\"stallguard.set-threshold\",\"characterize.move-check\",\"tmc.test\",\"tmc.read\",\"tmc.write\",\"tmc.raw\",\"bootsel\"]}");
 }
 
 void handleTmcCommand(const String &subcommand, const String &args) {
@@ -924,6 +996,8 @@ void printStatus() {
   result += jsonPair("max_move_frequency_hz", g_stepper.getMaxMoveFrequency());
   result += ",";
   result += jsonPair("safe_max_speed_hz", g_stepper.getSafeMaxMoveFrequency());
+  result += ",";
+  result += jsonPair("move_ramp_duration_ms", g_stepper.getMoveRampDurationMs());
   if (g_stepper.getLastMoveMinStallguard() >= 0) {
     result += ",";
     result += jsonPair("last_move_min_stallguard", g_stepper.getLastMoveMinStallguard());
@@ -1099,6 +1173,8 @@ void printSpeedStatus() {
   result += jsonPair("max_move_frequency_hz", g_stepper.getMaxMoveFrequency());
   result += ",";
   result += jsonPair("safe_max_speed_hz", g_stepper.getSafeMaxMoveFrequency());
+  result += ",";
+  result += jsonPair("move_ramp_duration_ms", g_stepper.getMoveRampDurationMs());
   if (g_stepper.getLastMoveMinStallguard() >= 0) {
     result += ",";
     result += jsonPair("last_move_min_stallguard", g_stepper.getLastMoveMinStallguard());
@@ -1162,6 +1238,103 @@ void runSpeedTestCommand(uint32_t startHz, uint32_t endHz, uint32_t stepHz, uint
   }
   setMotionState(MotionState::Idle, "speed-test complete");
   drainPendingSerialInput();
+  emitRpcResult(response);
+}
+
+void emitCharacterizeCycle(const Stepper::CharacterizeCycle &cycle, void *context) {
+  CharacterizeEventContext *eventContext = static_cast<CharacterizeEventContext *>(context);
+  String data = "{";
+  if (eventContext != nullptr) {
+    data += jsonPair("request_id", eventContext->requestId);
+    data += ",";
+  }
+  data += jsonPair("cycle", cycle.cycle);
+  data += ",";
+  data += jsonPair("frequency_hz", cycle.frequencyHz);
+  data += ",";
+  data += jsonPair("stallguard_threshold", static_cast<uint32_t>(cycle.stallguardThreshold));
+  data += ",";
+  data += jsonPair("endpoint_tolerance_steps", cycle.endpointToleranceSteps);
+  data += ",";
+  data += jsonPair("target_step", cycle.targetStep);
+  data += ",";
+  data += jsonPair("move_accepted", cycle.moveAccepted);
+  data += ",";
+  data += jsonPair("move_completed", cycle.moveCompleted);
+  data += ",";
+  data += jsonPair("home_accepted", cycle.homeAccepted);
+  data += ",";
+  data += jsonPair("home_completed", cycle.homeCompleted);
+  data += ",";
+  data += jsonPair("passed", cycle.passed);
+  data += ",";
+  data += jsonPair("low_margin", cycle.lowMargin);
+  data += ",";
+  data += jsonPair("threshold_failed", cycle.thresholdFailed);
+  data += ",";
+  data += jsonPair("move_min_stallguard", cycle.moveMinStallguard);
+  data += ",";
+  data += jsonPair("home_min_stallguard", cycle.homeMinStallguard);
+  data += ",";
+  data += jsonPair("endpoint_delta_steps", cycle.endpointDeltaSteps);
+  data += "}";
+  emitEvent("characterize-cycle", data);
+}
+
+void runCharacterizeMoveCheck(uint32_t frequency, uint32_t threshold, uint32_t cycles, float travelPercent,
+                              uint32_t endpointToleranceSteps) {
+  if (!g_stepper.isCalibrated()) {
+    emitRpcError(-32070, "characterize.move-check rejected: run home first");
+    return;
+  }
+  if (frequency == 0 || threshold > 255 || cycles == 0) {
+    emitRpcError(-32602, "characterize.move-check requires hz, threshold 0-255, and cycles");
+    return;
+  }
+
+  clearEnvelope();
+  setMotionState(MotionState::SpeedTesting, "characterize.move-check command");
+  CharacterizeEventContext eventContext;
+  eventContext.requestId = g_currentRequestId;
+  eventContext.frequencyHz = frequency;
+  eventContext.stallguardThreshold = threshold;
+  eventContext.endpointToleranceSteps = endpointToleranceSteps;
+  Stepper::CharacterizeResult result =
+      g_stepper.runCharacterization(frequency, static_cast<uint8_t>(threshold), cycles, travelPercent,
+                                    endpointToleranceSteps, emitCharacterizeCycle, &eventContext);
+  setMotionState(MotionState::Idle, "characterize.move-check complete");
+  drainPendingSerialInput();
+
+  if (!result.accepted) {
+    emitRpcError(-32071, "characterize.move-check rejected");
+    return;
+  }
+
+  String response = "{";
+  response += jsonPair("accepted", true);
+  response += ",";
+  response += jsonPair("frequency_hz", result.frequencyHz);
+  response += ",";
+  response += jsonPair("stallguard_threshold", static_cast<uint32_t>(result.stallguardThreshold));
+  response += ",";
+  response += jsonPair("cycles_requested", result.cyclesRequested);
+  response += ",";
+  response += jsonPair("cycles_completed", result.cyclesCompleted);
+  response += ",";
+  response += jsonPair("cycles_passed", result.cyclesPassed);
+  response += ",";
+  response += jsonPair("min_stallguard", result.minStallguard);
+  response += ",";
+  response += jsonPair("max_abs_endpoint_delta_steps", result.maxAbsEndpointDeltaSteps);
+  response += ",";
+  response += jsonPair("low_margin_failures", result.lowMarginFailures);
+  response += ",";
+  response += jsonPair("threshold_failures", result.thresholdFailures);
+  response += ",";
+  response += jsonPair("endpoint_failures", result.endpointFailures);
+  response += ",";
+  response += jsonPair("motion_failures", result.motionFailures);
+  response += "}";
   emitRpcResult(response);
 }
 
@@ -1332,6 +1505,30 @@ void handleJsonRpcCommand(const String &rawLine) {
         emitRpcError(-32602, "invalid safe max speed");
       }
     }
+  } else if (method == "ramp.status") {
+    emitRpcResult(String("{") + jsonPair("duration_ms", g_stepper.getMoveRampDurationMs()) + "}");
+  } else if (method == "ramp.set") {
+    uint32_t value = 0;
+    if (requireParam(jsonUintField(params, "duration_ms", value), "ramp.set requires duration_ms")) {
+      if (g_stepper.setMoveRampDurationMs(value)) {
+        emitRpcResult(String("{") + jsonPair("duration_ms", g_stepper.getMoveRampDurationMs()) + "}");
+      } else {
+        emitRpcError(-32602, "invalid ramp duration");
+      }
+    }
+  } else if (method == "stallguard.status") {
+    int32_t sg = g_stepper.readStallguard();
+    String result = "{";
+    result += jsonPair("sg_result", sg);
+    result += "}";
+    emitRpcResult(result);
+  } else if (method == "stallguard.set-threshold") {
+    uint32_t threshold = 0;
+    if (requireParam(jsonUintField(params, "threshold", threshold) && threshold <= 255,
+                     "stallguard.set-threshold requires threshold 0-255")) {
+      g_stepper.setStallguard(static_cast<uint8_t>(threshold));
+      emitRpcResult(String("{") + jsonPair("threshold", threshold) + "}");
+    }
   } else if (method == "speed-test") {
     uint32_t startHz = 0;
     uint32_t endHz = 0;
@@ -1343,6 +1540,20 @@ void handleJsonRpcCommand(const String &rawLine) {
                      "speed-test requires start_hz, end_hz, and step_hz")) {
       (void)jsonUintField(params, "repeats", repeats);
       runSpeedTestCommand(startHz, endHz, stepHz, repeats);
+    }
+  } else if (method == "characterize.move-check") {
+    uint32_t frequency = 0;
+    uint32_t threshold = 0;
+    uint32_t cycles = 0;
+    uint32_t endpointToleranceSteps = 8;
+    float travelPercent = 100.0f;
+    (void)jsonUintField(params, "endpoint_tolerance_steps", endpointToleranceSteps);
+    (void)jsonFloatField(params, "travel_percent", travelPercent);
+    if (requireIdleForCommand("characterize.move-check") &&
+        requireParam(jsonUintField(params, "hz", frequency) && jsonUintField(params, "threshold", threshold) &&
+                         jsonUintField(params, "cycles", cycles),
+                     "characterize.move-check requires hz, threshold, and cycles")) {
+      runCharacterizeMoveCheck(frequency, threshold, cycles, travelPercent, endpointToleranceSteps);
     }
   } else if (method == "home") {
     uint32_t frequency = 0;
@@ -1480,6 +1691,7 @@ void setup() {
   pinMode(kButtonPin, INPUT_PULLUP);
 
   g_stepper.setLogCallback(logLine);
+  g_stepper.setServiceCallback(serviceSerialOutput);
   logLine("INFO", "startup delay before stepper initialization");
   g_rgbLed.heartBeat(10, 1000);
 
@@ -1496,6 +1708,7 @@ void setup() {
 }
 
 void loop() {
+  serviceSerialOutput();
   processSerialInput();
 
   const Stepper::MoveUpdate moveUpdate = g_stepper.serviceMove();

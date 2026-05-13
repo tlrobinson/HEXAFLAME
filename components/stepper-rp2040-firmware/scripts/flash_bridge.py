@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Host-side firmware flash bridge for Docker-based workflows.
+"""Firmware flash and serial bridge for Docker or remote-host workflows.
 
-Run this on macOS, where the RP2040 serial device is visible. A Docker
-container can then POST to /flash via host.docker.internal to make the host run
-the PlatformIO upload command.
+Run this on whichever machine can see the RP2040 serial/BOOTSEL device. A
+Docker container or another machine can then POST to /serial, /serial-stream, or
+/flash to control and flash the board through this bridge.
 """
 
 from __future__ import annotations
@@ -13,8 +13,8 @@ import datetime as dt
 import json
 import os
 import py_compile
+import queue
 import select
-import shutil
 import subprocess
 import sys
 import threading
@@ -24,13 +24,10 @@ from pathlib import Path
 from typing import Any
 
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-FIRMWARE_DIR = SCRIPT_DIR.parent
-DEFAULT_ENV = "rp2040_v3_codex"
 DEFAULT_SERIAL_PORT = "/dev/cu.usbmodem2101"
-DEFAULT_BOOTSEL_VOLUME = "/Volumes/RPI-RP2"
-DEFAULT_BOOTSEL_COMMAND = "bootsel\n"
-MAX_BODY_BYTES = 4096
+DEFAULT_BOOTSEL_VOLUME_NAME = "RPI-RP2"
+MAX_JSON_BODY_BYTES = 4096
+MAX_UF2_BODY_BYTES = 8 * 1024 * 1024
 MAX_OUTPUT_BYTES = 60_000
 MAX_LOG_TEXT_BYTES = 60_000
 COLOR_RESET = "\033[0m"
@@ -39,15 +36,284 @@ COLOR_STRING = "\033[32m"
 COLOR_NUMBER = "\033[33m"
 COLOR_LITERAL = "\033[35m"
 COLOR_PUNCT = "\033[2m"
+SERIAL_GLOBS = (
+    "/dev/serial/by-id/*Raspberry*",
+    "/dev/serial/by-id/*Pico*",
+    "/dev/serial/by-id/*RP2040*",
+    "/dev/serial/by-id/*usbmodem*",
+    "/dev/serial/by-id/*",
+    "/dev/ttyACM*",
+    "/dev/ttyUSB*",
+    "/dev/cu.usbmodem*",
+    "/dev/cu.usbserial*",
+    "/dev/tty.usbmodem*",
+    "/dev/tty.usbserial*",
+)
 
 
 class FlashState:
-    def __init__(self, project_dir: Path, env_name: str, pio: str, token: str | None):
-        self.project_dir = project_dir
-        self.env_name = env_name
-        self.pio = pio
+    def __init__(self, token: str | None):
         self.token = token
         self.lock = threading.Lock()
+        self.serial_manager = SerialManager()
+
+
+class SerialCommandRequest:
+    def __init__(self, command: str, read_timeout_s: float, append_newline: bool):
+        self.command = command
+        self.read_timeout_s = read_timeout_s
+        self.append_newline = append_newline
+        self.events: queue.Queue[dict[str, Any]] = queue.Queue()
+        self.done = threading.Event()
+        self.output: list[str] = []
+        self.exit_code = 0
+
+        try:
+            parsed = json.loads(command)
+        except json.JSONDecodeError:
+            parsed = None
+        self.request_id = parsed.get("id") if isinstance(parsed, dict) else None
+
+    def emit_output(self, line: str) -> None:
+        data = line + "\n"
+        self.output.append(data)
+        self.events.put({"type": "output", "data": data})
+
+    def emit_error(self, message: str) -> None:
+        self.output.append(message)
+        self.events.put({"type": "output", "data": message})
+        self.exit_code = 1
+
+    def finish(self) -> None:
+        self.events.put({"type": "end", "ok": self.exit_code == 0, "exit_code": self.exit_code})
+        self.done.set()
+
+
+class SerialWorker:
+    def __init__(self, serial_port: str, baud: int):
+        self.serial_port = serial_port
+        self.baud = baud
+        self.requests: queue.Queue[SerialCommandRequest | None] = queue.Queue()
+        self.stop_event = threading.Event()
+        self.fd: int | None = None
+        self.receive_buffer = ""
+        self.thread = threading.Thread(target=self._run, name=f"serial-worker-{serial_port}", daemon=True)
+        self.thread.start()
+
+    def submit(self, request: SerialCommandRequest) -> SerialCommandRequest:
+        self.requests.put(request)
+        return request
+
+    def close(self) -> None:
+        self.stop_event.set()
+        self.requests.put(None)
+        self.thread.join(timeout=2.0)
+        self._close_fd()
+
+    def _close_fd(self) -> None:
+        if self.fd is None:
+            return
+        try:
+            os.close(self.fd)
+        except OSError:
+            pass
+        self.fd = None
+
+    def _open_fd(self) -> str:
+        if self.fd is not None:
+            return ""
+
+        code, output = prepare_serial_port(self.serial_port, self.baud)
+        if code != 0:
+            return output
+        fd, open_error = open_serial_fd(self.serial_port)
+        if fd is None:
+            return open_error
+        self.fd = fd
+        self.receive_buffer = ""
+        return ""
+
+    def _read_available_lines(self) -> list[str]:
+        if self.fd is None:
+            return []
+        try:
+            readable, _, _ = select.select([self.fd], [], [], 0)
+        except OSError as exc:
+            self._close_fd()
+            raise OSError(f"Serial device disconnected while waiting for reply: {exc}") from exc
+        if not readable:
+            return []
+        try:
+            chunk = os.read(self.fd, 4096)
+        except BlockingIOError:
+            return []
+        except OSError as exc:
+            self._close_fd()
+            raise OSError(f"Serial device disconnected while reading reply: {exc}") from exc
+        if not chunk:
+            return []
+
+        self.receive_buffer += chunk.decode("utf-8", errors="replace")
+        lines: list[str] = []
+        while "\n" in self.receive_buffer:
+            line, self.receive_buffer = self.receive_buffer.split("\n", 1)
+            line = line.rstrip("\r")
+            if line:
+                lines.append(line)
+        return lines
+
+    def _read_idle_lines(self, duration_s: float = 0.2) -> None:
+        deadline = time.monotonic() + duration_s
+        while time.monotonic() < deadline and not self.stop_event.is_set():
+            try:
+                lines = self._read_available_lines()
+            except OSError as exc:
+                log_bridge_event(str(exc))
+                return
+            for line in lines:
+                log_json_traffic("<-", line)
+            time.sleep(0.02)
+
+    def _line_matches_request(self, request: SerialCommandRequest, line: str) -> bool:
+        if request.request_id is None:
+            return False
+        try:
+            message = json.loads(line)
+        except json.JSONDecodeError:
+            return False
+        return isinstance(message, dict) and message.get("id") == request.request_id
+
+    def _run_request(self, request: SerialCommandRequest) -> None:
+        open_error = self._open_fd()
+        if open_error:
+            request.emit_error(open_error)
+            request.finish()
+            return
+
+        assert self.fd is not None
+        self._read_idle_lines()
+        if self.receive_buffer.strip():
+            log_bridge_event(f"Dropped stale partial serial line before command: {self.receive_buffer.strip()}")
+            self.receive_buffer = ""
+        try:
+            os.write(self.fd, request.command.encode("utf-8"))
+            if request.append_newline and not request.command.endswith("\n"):
+                os.write(self.fd, b"\n")
+        except OSError as exc:
+            self._close_fd()
+            request.emit_error(f"Failed to write to serial port: {exc}\n")
+            request.finish()
+            return
+
+        log_json_traffic("->", request.command)
+        deadline = time.monotonic() + request.read_timeout_s
+        while time.monotonic() < deadline and not self.stop_event.is_set():
+            try:
+                lines = self._read_available_lines()
+            except OSError as exc:
+                request.emit_error(str(exc) + "\n")
+                break
+            for line in lines:
+                log_json_traffic("<-", line)
+                request.emit_output(line)
+                if self._line_matches_request(request, line):
+                    request.finish()
+                    return
+            time.sleep(0.02)
+
+        if self.receive_buffer.strip():
+            line = self.receive_buffer.strip()
+            self.receive_buffer = ""
+            log_json_traffic("<-", line)
+            request.emit_output(line)
+        request.finish()
+
+    def _run(self) -> None:
+        while not self.stop_event.is_set():
+            request = self.requests.get()
+            if request is None:
+                break
+            self._run_request(request)
+
+
+class SerialManager:
+    def __init__(self) -> None:
+        self.lock = threading.Lock()
+        self.workers: dict[tuple[str, int], SerialWorker] = {}
+
+    def submit(self, serial_port: str, baud: int, request: SerialCommandRequest) -> SerialCommandRequest:
+        key = (serial_port, baud)
+        with self.lock:
+            worker = self.workers.get(key)
+            if worker is None or not worker.thread.is_alive():
+                worker = SerialWorker(serial_port, baud)
+                self.workers[key] = worker
+            worker.submit(request)
+        return request
+
+    def close_all(self) -> None:
+        with self.lock:
+            workers = list(self.workers.values())
+            self.workers.clear()
+        for worker in workers:
+            worker.close()
+
+
+def discover_serial_ports() -> list[str]:
+    ports: list[str] = []
+    for pattern in SERIAL_GLOBS:
+        for path in sorted(Path("/").glob(pattern.lstrip("/"))):
+            port = str(path)
+            if port not in ports:
+                ports.append(port)
+    return ports
+
+
+def default_serial_port() -> str:
+    env_port = os.environ.get("HEXAFLAME_FLASH_SERIAL")
+    if env_port:
+        return env_port
+    ports = discover_serial_ports()
+    return ports[0] if ports else DEFAULT_SERIAL_PORT
+
+
+def stty_command(serial_port: str, baud: int | str, *extra: str) -> list[str]:
+    flag = "-f" if sys.platform == "darwin" else "-F"
+    return ["stty", flag, serial_port, str(baud), *extra]
+
+
+def bootsel_volume_candidates(volume: str | None = None) -> list[Path]:
+    if volume:
+        return [Path(volume)]
+    env_volume = os.environ.get("HEXAFLAME_BOOTSEL_VOLUME")
+    if env_volume:
+        return [Path(env_volume)]
+
+    name = os.environ.get("HEXAFLAME_BOOTSEL_VOLUME_NAME", DEFAULT_BOOTSEL_VOLUME_NAME)
+    candidates = [Path("/Volumes") / name]
+    for base_pattern in ("/media/*", "/run/media/*", "/mnt"):
+        for base in sorted(Path("/").glob(base_pattern.lstrip("/"))):
+            candidates.append(base / name)
+    return candidates
+
+
+def find_bootsel_volume(volume: str | None = None) -> Path | None:
+    for candidate in bootsel_volume_candidates(volume):
+        if candidate.is_dir():
+            return candidate
+    return None
+
+
+def mounted_volume_summary() -> str:
+    volumes: list[str] = []
+    for base in (Path("/Volumes"), Path("/media"), Path("/run/media"), Path("/mnt")):
+        if not base.is_dir():
+            continue
+        for path in sorted(base.glob("*")):
+            volumes.append(str(path))
+        for path in sorted(base.glob("*/*")):
+            volumes.append(str(path))
+    return ", ".join(volumes) if volumes else "[none]"
 
 
 def json_response(handler: BaseHTTPRequestHandler, status: int, payload: dict[str, Any]) -> None:
@@ -61,7 +327,7 @@ def json_response(handler: BaseHTTPRequestHandler, status: int, payload: dict[st
 
 def read_json_body(handler: BaseHTTPRequestHandler) -> dict[str, Any]:
     length = int(handler.headers.get("Content-Length", "0"))
-    if length > MAX_BODY_BYTES:
+    if length > MAX_JSON_BODY_BYTES:
         raise ValueError("request body is too large")
     if length == 0:
         return {}
@@ -72,6 +338,18 @@ def read_json_body(handler: BaseHTTPRequestHandler) -> dict[str, Any]:
     if not isinstance(data, dict):
         raise ValueError("request body must be a JSON object")
     return data
+
+
+def read_binary_body(handler: BaseHTTPRequestHandler, max_bytes: int) -> bytes:
+    length = int(handler.headers.get("Content-Length", "0"))
+    if length <= 0:
+        raise ValueError("request body is empty")
+    if length > max_bytes:
+        raise ValueError(f"request body is too large: {length} > {max_bytes}")
+    body = handler.rfile.read(length)
+    if len(body) != length:
+        raise ValueError("request body was truncated")
+    return body
 
 
 def request_is_authorized(handler: BaseHTTPRequestHandler, token: str | None) -> bool:
@@ -177,69 +455,9 @@ def format_log_block(text: str) -> str:
     return text.rstrip("\n") or "[empty]"
 
 
-def run_flash(state: FlashState, serial_port: str | None) -> tuple[int, str, list[str]]:
-    command = [
-        state.pio,
-        "run",
-        "-e",
-        state.env_name,
-        "-t",
-        "upload",
-    ]
-    if serial_port:
-        command.extend(["--upload-port", serial_port])
-    proc = subprocess.run(
-        command,
-        cwd=state.project_dir,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        timeout=180,
-        check=False,
-    )
-    output = proc.stdout[-MAX_OUTPUT_BYTES:]
-    return proc.returncode, output, command
-
-
-def run_uf2_flash(state: FlashState, volume: str | None) -> tuple[int, str, list[str]]:
-    build_command = [state.pio, "run", "-e", state.env_name]
-    proc = subprocess.run(
-        build_command,
-        cwd=state.project_dir,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        timeout=180,
-        check=False,
-    )
-    output = proc.stdout
-    if proc.returncode != 0:
-        return proc.returncode, output[-MAX_OUTPUT_BYTES:], build_command
-
-    uf2_path = state.project_dir / ".pio" / "build" / state.env_name / "firmware.uf2"
-    if not uf2_path.is_file():
-        return 1, output + f"\nFirmware UF2 not found: {uf2_path}\n", build_command
-
-    volume_path = Path(volume or os.environ.get("HEXAFLAME_BOOTSEL_VOLUME") or DEFAULT_BOOTSEL_VOLUME)
-    if not volume_path.is_dir():
-        volumes = sorted(str(path) for path in Path("/Volumes").glob("*")) if Path("/Volumes").is_dir() else []
-        return (
-            1,
-            output
-            + f"\nBOOTSEL volume not found: {volume_path}\n"
-            + f"Mounted volumes: {', '.join(volumes) if volumes else '[none]'}\n",
-            build_command,
-        )
-
-    destination = volume_path / uf2_path.name
-    shutil.copyfile(uf2_path, destination)
-    return 0, output + f"\nCopied {uf2_path} to {destination}\n", build_command + ["&&", "cp", str(uf2_path), str(destination)]
-
-
-def send_bootsel_command(serial_port: str) -> str:
-    stty_command = ["stty", "-f", serial_port, "115200", "raw", "-echo"]
+def send_bootsel_json_rpc(serial_port: str) -> str:
     stty = subprocess.run(
-        stty_command,
+        stty_command(serial_port, 115200, "raw", "-echo"),
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
@@ -249,15 +467,53 @@ def send_bootsel_command(serial_port: str) -> str:
     if stty.returncode != 0:
         output += f"stty failed ({stty.returncode}): {stty.stdout}\n"
 
-    with open(serial_port, "wb", buffering=0) as serial:
-        serial.write(DEFAULT_BOOTSEL_COMMAND.encode("ascii"))
-    return output + f"Sent BOOTSEL command to {serial_port}\n"
+    request_id = "bridge-bootloader"
+    command = json.dumps(
+        {"jsonrpc": "2.0", "id": request_id, "method": "bootloader", "params": {}},
+        separators=(",", ":"),
+    )
+
+    try:
+        fd = os.open(serial_port, os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK)
+    except OSError as exc:
+        return output + f"Failed to open {serial_port} for JSON-RPC bootloader request: {exc}\n"
+
+    saw_response = False
+    try:
+        drain_serial_fd(fd, 0.25)
+        write_error = write_serial_command(fd, command, True)
+        output += f"Sent JSON-RPC bootloader request to {serial_port}\n"
+        if write_error:
+            return output + write_error
+
+        def on_line(line: str) -> None:
+            nonlocal output, saw_response
+            output += line + "\n"
+            try:
+                message = json.loads(line)
+            except json.JSONDecodeError:
+                return
+            if isinstance(message, dict) and message.get("id") == request_id:
+                saw_response = True
+
+        def on_error(message: str) -> None:
+            nonlocal output
+            output += message
+
+        read_serial_lines(fd, 1.5, on_line, on_error)
+    finally:
+        os.close(fd)
+
+    if saw_response:
+        output += "Firmware acknowledged JSON-RPC bootloader request\n"
+    else:
+        output += "No JSON-RPC bootloader acknowledgement before disconnect/timeout\n"
+    return output
 
 
 def touch_serial_bootloader(serial_port: str) -> str:
-    stty_command = ["stty", "-f", serial_port, "1200"]
     stty = subprocess.run(
-        stty_command,
+        stty_command(serial_port, 1200),
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
@@ -284,6 +540,16 @@ def wait_for_bootsel_volume(volume_path: Path, timeout_s: float = 15.0) -> bool:
     return volume_path.is_dir()
 
 
+def wait_for_any_bootsel_volume(volume: str | None = None, timeout_s: float = 15.0) -> Path | None:
+    deadline = time.monotonic() + timeout_s
+    while time.monotonic() < deadline:
+        found = find_bootsel_volume(volume)
+        if found is not None:
+            return found
+        time.sleep(0.25)
+    return find_bootsel_volume(volume)
+
+
 def run_serial_command(
     serial_port: str,
     command: str,
@@ -291,9 +557,8 @@ def run_serial_command(
     baud: int = 115200,
     append_newline: bool = True,
 ) -> tuple[int, str, list[str]]:
-    stty_command = ["stty", "-f", serial_port, str(baud), "raw", "-echo"]
     stty = subprocess.run(
-        stty_command,
+        stty_command(serial_port, baud, "raw", "-echo"),
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
@@ -309,6 +574,7 @@ def run_serial_command(
         return 1, output + f"Failed to open {serial_port}: {exc}\n", ["serial", serial_port, command.rstrip("\n")]
 
     try:
+        drain_serial_fd(fd, 0.35)
         try:
             os.write(fd, command.encode("utf-8"))
             if append_newline and not command.endswith("\n"):
@@ -336,9 +602,8 @@ def run_serial_command(
 
 
 def prepare_serial_port(serial_port: str, baud: int) -> tuple[int, str]:
-    stty_command = ["stty", "-f", serial_port, str(baud), "raw", "-echo"]
     stty = subprocess.run(
-        stty_command,
+        stty_command(serial_port, baud, "raw", "-echo"),
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
@@ -424,47 +689,56 @@ def write_serial_command(fd: int, command: str, append_newline: bool) -> str:
     return ""
 
 
-def run_auto_flash(state: FlashState, serial_port: str, volume: str | None) -> tuple[int, str, list[str]]:
-    build_command = [state.pio, "run", "-e", state.env_name]
-    proc = subprocess.run(
-        build_command,
-        cwd=state.project_dir,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        timeout=180,
-        check=False,
-    )
-    output = proc.stdout
-    if proc.returncode != 0:
-        return proc.returncode, output[-MAX_OUTPUT_BYTES:], build_command
+def serial_command_summary(serial_port: str, command_text: str, append_newline: bool) -> list[str]:
+    command_summary = ["serial", serial_port, command_text.rstrip("\n")]
+    if not append_newline:
+        command_summary.append("--no-newline")
+    return command_summary
 
-    uf2_path = state.project_dir / ".pio" / "build" / state.env_name / "firmware.uf2"
-    if not uf2_path.is_file():
-        return 1, output + f"\nFirmware UF2 not found: {uf2_path}\n", build_command
 
-    volume_path = Path(volume or os.environ.get("HEXAFLAME_BOOTSEL_VOLUME") or DEFAULT_BOOTSEL_VOLUME)
-    try:
-      output += "\n" + send_bootsel_command(serial_port)
-    except OSError as exc:
-      output += f"\nFailed to send BOOTSEL command to {serial_port}: {exc}\n"
+def flash_uploaded_uf2(
+    uf2_data: bytes,
+    *,
+    serial_port: str,
+    volume: str | None,
+    filename: str = "firmware.uf2",
+) -> tuple[int, str, list[str]]:
+    output = f"Received UF2 upload: {len(uf2_data)} bytes\n"
+    if not uf2_data.startswith(b"UF2\n"):
+        output += "Warning: UF2 file does not start with literal UF2 header; continuing anyway\n"
 
-    if not wait_for_bootsel_volume(volume_path):
+    volume_path = find_bootsel_volume(volume)
+    if volume_path is None and serial_port:
+        try:
+            output += "\n" + send_bootsel_json_rpc(serial_port)
+        except OSError as exc:
+            output += f"\nFailed to send JSON-RPC bootloader request to {serial_port}: {exc}\n"
+        volume_path = wait_for_any_bootsel_volume(volume, 15.0)
+
+    if volume_path is None and serial_port:
         output += touch_serial_bootloader(serial_port)
+        volume_path = wait_for_any_bootsel_volume(volume, 15.0)
 
-    if not wait_for_bootsel_volume(volume_path):
-        volumes = sorted(str(path) for path in Path("/Volumes").glob("*")) if Path("/Volumes").is_dir() else []
+    if volume_path is None:
+        expected = ", ".join(str(item) for item in bootsel_volume_candidates(volume))
         return (
             1,
             output
-            + f"\nTimed out waiting for BOOTSEL volume: {volume_path}\n"
-            + f"Mounted volumes: {', '.join(volumes) if volumes else '[none]'}\n",
-            build_command,
+            + f"\nTimed out waiting for BOOTSEL volume. Expected one of: {expected}\n"
+            + f"Mounted volumes: {mounted_volume_summary()}\n",
+            ["upload-uf2", filename],
         )
 
-    destination = volume_path / uf2_path.name
-    shutil.copyfile(uf2_path, destination)
-    return 0, output + f"\nCopied {uf2_path} to {destination}\n", build_command + ["&&", "bootsel", "&&", "cp", str(uf2_path), str(destination)]
+    safe_name = Path(filename).name or "firmware.uf2"
+    if not safe_name.lower().endswith(".uf2"):
+        safe_name += ".uf2"
+    destination = volume_path / safe_name
+    destination.write_bytes(uf2_data)
+    return (
+        0,
+        output + f"\nCopied uploaded UF2 to {destination}\n",
+        ["upload-uf2", str(destination)],
+    )
 
 
 class FlashHandler(BaseHTTPRequestHandler):
@@ -480,13 +754,18 @@ class FlashHandler(BaseHTTPRequestHandler):
             200,
             {
                 "ok": True,
-                "project_dir": str(state.project_dir),
-                "env": state.env_name,
+                "platform": sys.platform,
+                "default_serial_port": default_serial_port(),
+                "serial_ports": discover_serial_ports(),
+                "bootsel_volume": str(find_bootsel_volume()) if find_bootsel_volume() else None,
+                "bootsel_volume_candidates": [str(item) for item in bootsel_volume_candidates()],
+                "flash_modes": ["uploaded-uf2"],
             },
         )
 
     def do_POST(self) -> None:
-        if self.path not in {"/flash", "/serial", "/serial-stream", "/restart"}:
+        route = self.path.split("?", 1)[0]
+        if route not in {"/flash-uf2", "/serial", "/serial-stream", "/restart"}:
             json_response(self, 404, {"ok": False, "error": "not found"})
             return
 
@@ -495,13 +774,51 @@ class FlashHandler(BaseHTTPRequestHandler):
             json_response(self, 401, {"ok": False, "error": "unauthorized"})
             return
 
+        if route == "/flash-uf2":
+            serial_port = self.headers.get("X-Serial-Port") or default_serial_port()
+            volume = self.headers.get("X-Bootsel-Volume")
+            filename = self.headers.get("X-Filename") or "firmware.uf2"
+
+            acquired = state.lock.acquire(blocking=False)
+            if not acquired:
+                json_response(self, 409, {"ok": False, "error": "flash already in progress"})
+                return
+
+            try:
+                uf2_data = read_binary_body(self, MAX_UF2_BODY_BYTES)
+                state.serial_manager.close_all()
+                log_bridge_event("FLASH-UF2")
+                exit_code, output, command = flash_uploaded_uf2(
+                    uf2_data,
+                    serial_port=serial_port,
+                    volume=volume,
+                    filename=filename,
+                )
+            except ValueError as exc:
+                json_response(self, 400, {"ok": False, "error": str(exc)})
+                return
+            finally:
+                state.lock.release()
+
+            json_response(
+                self,
+                200 if exit_code == 0 else 500,
+                {
+                    "ok": exit_code == 0,
+                    "exit_code": exit_code,
+                    "command": command,
+                    "output": output,
+                },
+            )
+            return
+
         try:
             payload = read_json_body(self)
         except (json.JSONDecodeError, ValueError) as exc:
             json_response(self, 400, {"ok": False, "error": str(exc)})
             return
 
-        if self.path == "/restart":
+        if route == "/restart":
             acquired = state.lock.acquire(blocking=False)
             if not acquired:
                 json_response(self, 409, {"ok": False, "error": "flash already in progress"})
@@ -515,15 +832,15 @@ class FlashHandler(BaseHTTPRequestHandler):
             finally:
                 state.lock.release()
 
+            state.serial_manager.close_all()
             json_response(self, 200, {"ok": True, "restarting": True})
             restart_bridge_after_response()
             return
 
-        if self.path in {"/serial", "/serial-stream"}:
+        if route in {"/serial", "/serial-stream"}:
             serial_port = str(
                 payload.get("serial_port")
-                or os.environ.get("HEXAFLAME_FLASH_SERIAL")
-                or DEFAULT_SERIAL_PORT
+                or default_serial_port()
             )
             command_text = str(payload.get("command") or "")
             if not command_text:
@@ -532,13 +849,22 @@ class FlashHandler(BaseHTTPRequestHandler):
             read_timeout_s = float(payload.get("read_timeout_s") or 5.0)
             baud = int(payload.get("baud") or 115200)
             append_newline = bool(payload.get("append_newline", True))
-            if self.path == "/serial-stream":
+            if route == "/serial-stream":
                 self.handle_serial_stream(serial_port, command_text, read_timeout_s, baud, append_newline)
                 return
 
-            log_json_traffic("->", command_text)
-            exit_code, output, command = run_serial_command(serial_port, command_text, read_timeout_s, baud, append_newline)
-            log_json_traffic("<-", output)
+            request = state.serial_manager.submit(
+                serial_port,
+                baud,
+                SerialCommandRequest(command_text, read_timeout_s, append_newline),
+            )
+            request.done.wait(timeout=read_timeout_s + 10.0)
+            if not request.done.is_set():
+                request.emit_error("Timed out waiting for queued serial request\n")
+                request.finish()
+            command = serial_command_summary(serial_port, command_text, append_newline)
+            output = "".join(request.output)[-MAX_OUTPUT_BYTES:]
+            exit_code = request.exit_code
             json_response(
                 self,
                 200 if exit_code == 0 else 500,
@@ -551,65 +877,7 @@ class FlashHandler(BaseHTTPRequestHandler):
             )
             return
 
-        if payload.get("bootsel") is True:
-            serial_port = None
-        else:
-            serial_port = str(
-                payload.get("serial_port")
-                or os.environ.get("HEXAFLAME_FLASH_SERIAL")
-                or DEFAULT_SERIAL_PORT
-            )
-
-        acquired = state.lock.acquire(blocking=False)
-        if not acquired:
-            json_response(self, 409, {"ok": False, "error": "flash already in progress"})
-            return
-
-        try:
-            log_bridge_event("FLASH")
-            if payload.get("auto") is True:
-                volume = payload.get("volume")
-                exit_code, output, command = run_auto_flash(state, serial_port or DEFAULT_SERIAL_PORT, str(volume) if volume else None)
-            elif payload.get("uf2") is True or payload.get("bootsel") is True:
-                volume = payload.get("volume")
-                exit_code, output, command = run_uf2_flash(state, str(volume) if volume else None)
-            else:
-                exit_code, output, command = run_flash(state, serial_port)
-        except subprocess.TimeoutExpired as exc:
-            output = (exc.stdout or "") + (exc.stderr or "")
-            json_response(
-                self,
-                504,
-                {
-                    "ok": False,
-                    "error": "flash timed out",
-                    "output": output[-MAX_OUTPUT_BYTES:],
-                },
-            )
-            return
-        except FileNotFoundError:
-            json_response(
-                self,
-                500,
-                {
-                    "ok": False,
-                    "error": f"PlatformIO executable not found: {state.pio}",
-                },
-            )
-            return
-        finally:
-            state.lock.release()
-
-        json_response(
-            self,
-            200 if exit_code == 0 else 500,
-            {
-                "ok": exit_code == 0,
-                "exit_code": exit_code,
-                "command": command,
-                "output": output,
-            },
-        )
+        json_response(self, 404, {"ok": False, "error": "unsupported route"})
 
     def write_stream_event(self, payload: dict[str, Any]) -> None:
         self.wfile.write(json.dumps(payload).encode("utf-8") + b"\n")
@@ -623,85 +891,62 @@ class FlashHandler(BaseHTTPRequestHandler):
         baud: int,
         append_newline: bool,
     ) -> None:
-        command_summary = ["serial", serial_port, command_text.rstrip("\n")]
-        if not append_newline:
-            command_summary.append("--no-newline")
+        state: FlashState = self.server.flash_state  # type: ignore[attr-defined]
+        command_summary = serial_command_summary(serial_port, command_text, append_newline)
 
         self.send_response(200)
         self.send_header("Content-Type", "application/x-ndjson")
         self.send_header("Cache-Control", "no-cache")
         self.end_headers()
 
-        log_json_traffic("->", command_text)
         self.write_stream_event({"type": "start", "command": command_summary})
-
-        stty_code, stty_output = prepare_serial_port(serial_port, baud)
-        if stty_output:
-            self.write_stream_event({"type": "output", "data": stty_output})
-        if stty_code != 0:
-            self.write_stream_event({"type": "end", "ok": False, "exit_code": 1, "command": command_summary})
-            return
-
-        fd, open_error = open_serial_fd(serial_port)
-        if fd is None:
-            self.write_stream_event({"type": "output", "data": open_error})
-            self.write_stream_event({"type": "end", "ok": False, "exit_code": 1, "command": command_summary})
-            return
-
-        exit_code = 0
-        try:
-            write_error = write_serial_command(fd, command_text, append_newline)
-            if write_error:
-                self.write_stream_event({"type": "output", "data": write_error})
-                exit_code = 1
-            else:
-                def on_line(line: str) -> None:
-                    log_json_traffic("<-", line)
-                    self.write_stream_event({"type": "output", "data": line + "\n"})
-
-                def on_error(message: str) -> None:
-                    self.write_stream_event({"type": "output", "data": message})
-
-                exit_code, _ = read_serial_lines(fd, read_timeout_s, on_line, on_error)
-        except BrokenPipeError:
-            exit_code = 1
-            return
-        finally:
-            os.close(fd)
-
-        self.write_stream_event(
-            {
-                "type": "end",
-                "ok": exit_code == 0,
-                "exit_code": exit_code,
-                "command": command_summary,
-            }
+        request = state.serial_manager.submit(
+            serial_port,
+            baud,
+            SerialCommandRequest(command_text, read_timeout_s, append_newline),
         )
+        try:
+            while True:
+                try:
+                    event = request.events.get(timeout=read_timeout_s + 10.0)
+                except queue.Empty:
+                    request.emit_error("Timed out waiting for queued serial request\n")
+                    request.finish()
+                    continue
+                if event.get("type") == "end":
+                    self.write_stream_event(
+                        {
+                            "type": "end",
+                            "ok": event.get("ok"),
+                            "exit_code": event.get("exit_code"),
+                            "command": command_summary,
+                        }
+                    )
+                    return
+                self.write_stream_event(event)
+        except BrokenPipeError:
+            return
 
     def log_message(self, format: str, *args: Any) -> None:
         log_bridge_event(format % args)
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run a macOS host firmware flash bridge.")
+    parser = argparse.ArgumentParser(description="Run a HEXAFLAME firmware flash and serial bridge.")
     parser.add_argument("--host", default=os.environ.get("HEXAFLAME_FLASH_HOST", "0.0.0.0"))
     parser.add_argument("--port", type=int, default=int(os.environ.get("HEXAFLAME_FLASH_PORT", "8765")))
-    parser.add_argument("--project-dir", type=Path, default=FIRMWARE_DIR)
-    parser.add_argument("--env", default=os.environ.get("HEXAFLAME_FLASH_ENV", DEFAULT_ENV))
-    parser.add_argument("--pio", default=os.environ.get("HEXAFLAME_FLASH_PIO", "pio"))
     parser.add_argument("--token", default=os.environ.get("HEXAFLAME_FLASH_TOKEN"))
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
-    state = FlashState(args.project_dir.resolve(), args.env, args.pio, args.token)
+    state = FlashState(args.token)
     server = ThreadingHTTPServer((args.host, args.port), FlashHandler)
     server.flash_state = state  # type: ignore[attr-defined]
 
     log_bridge_event(f"Flash bridge listening on http://{args.host}:{args.port}")
-    log_bridge_event(f"Project: {state.project_dir}")
-    log_bridge_event(f"Environment: {state.env_name}")
+    log_bridge_event("Flash mode: uploaded UF2 only")
     log_bridge_event("Token auth: enabled" if state.token else "Token auth: disabled")
     server.serve_forever()
     return 0

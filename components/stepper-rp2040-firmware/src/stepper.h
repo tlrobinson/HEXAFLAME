@@ -9,6 +9,7 @@
 class Stepper {
 public:
   using LogCallback = void (*)(const char *level, const String &message);
+  using ServiceCallback = void (*)();
 
   enum class MoveUpdate : uint8_t {
     None = 0,
@@ -47,10 +48,46 @@ public:
     uint32_t firstFailedFrequency = 0;
   };
 
+  struct CharacterizeCycle {
+    uint32_t cycle = 0;
+    uint32_t frequencyHz = 0;
+    uint8_t stallguardThreshold = 0;
+    uint32_t endpointToleranceSteps = 0;
+    bool moveAccepted = false;
+    bool moveCompleted = false;
+    bool homeAccepted = false;
+    bool homeCompleted = false;
+    bool passed = false;
+    bool lowMargin = false;
+    bool thresholdFailed = false;
+    int32_t moveMinStallguard = -1;
+    int32_t homeMinStallguard = -1;
+    int32_t endpointDeltaSteps = 0;
+    uint32_t targetStep = 0;
+  };
+
+  struct CharacterizeResult {
+    bool accepted = false;
+    uint32_t cyclesRequested = 0;
+    uint32_t cyclesCompleted = 0;
+    uint32_t cyclesPassed = 0;
+    uint32_t frequencyHz = 0;
+    uint8_t stallguardThreshold = 0;
+    int32_t minStallguard = -1;
+    int32_t maxAbsEndpointDeltaSteps = 0;
+    uint32_t lowMarginFailures = 0;
+    uint32_t thresholdFailures = 0;
+    uint32_t endpointFailures = 0;
+    uint32_t motionFailures = 0;
+  };
+
+  using CharacterizeCycleCallback = void (*)(const CharacterizeCycle &cycle, void *context);
+
   Stepper(RgbLed &rgbLed, uint32_t maxFrequency = 125000000, bool debug = false);
 
   bool begin();
   void setLogCallback(LogCallback callback);
+  void setServiceCallback(ServiceCallback callback);
   bool tmcTest();
   bool centering(uint32_t requestedFrequency);
   bool jog(bool positiveDirection, uint32_t steps, uint32_t requestedFrequency = 0, bool useRecoveryCurrent = false);
@@ -71,10 +108,18 @@ public:
   uint32_t getMaxMoveFrequency() const;
   uint32_t getSafeMaxMoveFrequency() const;
   bool setSafeMaxMoveFrequency(uint32_t frequency);
+  uint32_t getMoveRampDurationMs() const;
+  bool setMoveRampDurationMs(uint32_t durationMs);
   int32_t getLastMoveMinStallguard() const;
   bool didLastMoveWarnLowMargin() const;
   SpeedTestResult runSpeedTest(uint32_t startFrequency, uint32_t endFrequency, uint32_t stepFrequency,
                                uint8_t repeats);
+  CharacterizeResult runCharacterization(uint32_t frequency, uint8_t stallguardThreshold, uint32_t cycles,
+                                         float travelPercent, uint32_t endpointToleranceSteps,
+                                         CharacterizeCycleCallback callback = nullptr, void *callbackContext = nullptr);
+  bool didLastMoveProbeEndpoint() const;
+  bool wasLastEndpointProbeUpper() const;
+  int32_t getLastEndpointDeltaSteps() const;
   uint8_t getRunCurrent() const;
   uint8_t getRecoveryRunCurrent() const;
   uint8_t getIdleCurrent() const;
@@ -129,6 +174,7 @@ private:
 
   RgbLed &rgbLed_;
   LogCallback logCallback_ = nullptr;
+  ServiceCallback serviceCallback_ = nullptr;
   bool debug_;
   uint32_t maxFrequency_;
   uint32_t frequency_ = 5000000;
@@ -162,6 +208,7 @@ private:
   uint32_t moveRampTargetFrequency_ = 0;
   uint32_t moveRampStartMs_ = 0;
   uint32_t moveRampDurationMs_ = 0;
+  uint32_t moveRampDurationMsSetting_ = 80;
   uint32_t moveStartMs_ = 0;
   uint32_t moveTimeoutMs_ = 0;
   bool moveHomeProbeEnabled_ = false;
@@ -176,6 +223,10 @@ private:
   bool pendingHomeCandidateValid_ = false;
   bool pendingHomeCandidatePositiveEnd_ = false;
   int32_t pendingHomeCandidateDeltaSteps_ = 0;
+  bool endpointCalibrationAdjustmentEnabled_ = true;
+  bool lastEndpointProbeValid_ = false;
+  bool lastEndpointProbePositiveEnd_ = false;
+  int32_t lastEndpointDeltaSteps_ = 0;
   volatile bool stepperSpinning_ = false;
   volatile bool stallguarded_ = false;
 
@@ -210,7 +261,8 @@ private:
   static constexpr uint32_t kMaxAllowedMoveFrequency = 8000;
   static constexpr uint8_t kHomeRecoveryRetries = 2;
   static constexpr uint32_t kHomeRecoveryJogSteps = 500;
-  static constexpr uint32_t kMoveRampDurationMs = 80;
+  static constexpr uint32_t kMinMoveRampDurationMs = 0;
+  static constexpr uint32_t kMaxMoveRampDurationMs = 500;
   static constexpr uint32_t kMoveSgSampleIntervalMs = 20;
   static constexpr uint8_t kMoveLowMarginMinSamples = 3;
 };

@@ -76,9 +76,16 @@ void Stepper::setLogCallback(LogCallback callback) {
   logCallback_ = callback;
 }
 
+void Stepper::setServiceCallback(ServiceCallback callback) {
+  serviceCallback_ = callback;
+}
+
 void Stepper::log(const char *level, const String &message) const {
   if (logCallback_ != nullptr) {
     logCallback_(level, message);
+  }
+  if (serviceCallback_ != nullptr) {
+    serviceCallback_();
   }
 }
 
@@ -389,6 +396,19 @@ bool Stepper::handleEndpointHomeProbeStall(uint32_t completedSteps) {
   const uint32_t maxDeltaSteps = getMaxHomeProbeDeltaSteps();
 
   currentPositionSteps_ = moveHomeProbePositiveEnd_ ? travelSteps_ : 0;
+  lastEndpointProbeValid_ = true;
+  lastEndpointProbePositiveEnd_ = moveHomeProbePositiveEnd_;
+  lastEndpointDeltaSteps_ = deltaSteps;
+
+  if (!endpointCalibrationAdjustmentEnabled_) {
+    String message = "endpoint home measured limit=";
+    message += moveHomeProbePositiveEnd_ ? "upper" : "lower";
+    message += " delta_steps=";
+    message += deltaSteps;
+    log(absDeltaSteps == 0 ? "INFO" : "WARN", message);
+    pendingHomeCandidateValid_ = false;
+    return false;
+  }
 
   if (absDeltaSteps == 0) {
     log("WARN", "endpoint stall detected at expected home; calibration unchanged");
@@ -541,6 +561,9 @@ void Stepper::serviceMoveRamp() {
 bool Stepper::waitForBlockingMove(uint32_t timeoutMs) {
   const uint32_t startMs = millis();
   while (millis() - startMs <= timeoutMs) {
+    if (serviceCallback_ != nullptr) {
+      serviceCallback_();
+    }
     const MoveUpdate update = serviceMove();
     if (update == MoveUpdate::Completed || update == MoveUpdate::HomeAdjusted) {
       return true;
@@ -707,6 +730,9 @@ bool Stepper::homing(uint32_t stepperValue, uint32_t stepperFrequency, uint32_t 
   const uint32_t startMs = millis();
   uint32_t loops = 0;
   while (millis() - startMs < maxHomingMs) {
+    if (serviceCallback_ != nullptr) {
+      serviceCallback_();
+    }
     const int32_t sg = readStallguard();
     ++loops;
 
@@ -1066,7 +1092,8 @@ Stepper::MoveCommandResult Stepper::moveToStepAtFrequency(uint32_t targetStep, u
   const uint32_t homeProbeExtraSteps =
       homeProbeEnabled ? getMaxHomeProbeDeltaSteps() + kHomeProbeExtraPaddingSteps : 0;
   const uint32_t moveSteps = commandedMoveSteps + homeProbeExtraSteps;
-  const uint32_t moveTimeMs = 100UL + kMoveRampDurationMs + (moveSteps * 1000UL) / max<uint32_t>(1, moveFrequency);
+  const uint32_t moveTimeMs =
+      100UL + moveRampDurationMsSetting_ + (moveSteps * 1000UL) / max<uint32_t>(1, moveFrequency);
   const uint32_t rampStartFrequency = min<uint32_t>(moveFrequency, minMoveFrequency());
   const uint32_t stepperValue = getStepperValue(rampStartFrequency);
 
@@ -1092,7 +1119,7 @@ Stepper::MoveCommandResult Stepper::moveToStepAtFrequency(uint32_t targetStep, u
   moveRampStartFrequency_ = rampStartFrequency;
   moveRampTargetFrequency_ = moveFrequency;
   moveRampStartMs_ = millis();
-  moveRampDurationMs_ = kMoveRampDurationMs;
+  moveRampDurationMs_ = moveRampDurationMsSetting_;
   moveStartMs_ = millis();
   moveTimeoutMs_ = moveTimeMs;
   moveHomeProbeEnabled_ = homeProbeEnabled;
@@ -1139,6 +1166,9 @@ Stepper::SpeedTestResult Stepper::runSpeedTest(uint32_t startFrequency, uint32_t
   uint32_t frequency = clampedStart;
   bool stop = false;
   while (!stop) {
+    if (serviceCallback_ != nullptr) {
+      serviceCallback_();
+    }
     ++result.testedCount;
     safeMaxMoveFrequency_ = frequency;
     bool passed = true;
@@ -1200,6 +1230,136 @@ Stepper::SpeedTestResult Stepper::runSpeedTest(uint32_t startFrequency, uint32_t
   return result;
 }
 
+Stepper::CharacterizeResult Stepper::runCharacterization(uint32_t frequency, uint8_t stallguardThreshold,
+                                                         uint32_t cycles, float travelPercent,
+                                                         uint32_t endpointToleranceSteps,
+                                                         CharacterizeCycleCallback callback, void *callbackContext) {
+  CharacterizeResult result;
+  result.cyclesRequested = cycles;
+  result.frequencyHz = frequency;
+  result.stallguardThreshold = stallguardThreshold;
+
+  if (!calibrated_ || travelSteps_ == 0 || frequency == 0 || cycles == 0) {
+    return result;
+  }
+
+  result.accepted = true;
+  const uint32_t originalSafeMax = safeMaxMoveFrequency_;
+  const bool originalEndpointAdjustment = endpointCalibrationAdjustmentEnabled_;
+  endpointCalibrationAdjustmentEnabled_ = false;
+  safeMaxMoveFrequency_ = max<uint32_t>(safeMaxMoveFrequency_, min<uint32_t>(frequency, kMaxAllowedMoveFrequency));
+  setStallguard(stallguardThreshold);
+
+  const float clampedPercent = constrain(travelPercent, 1.0f, 100.0f);
+  uint32_t targetStep =
+      static_cast<uint32_t>((static_cast<float>(travelSteps_) * clampedPercent / 100.0f) + 0.5f);
+  targetStep = constrain(targetStep, 1UL, travelSteps_);
+  const uint32_t tolerance = endpointToleranceSteps == 0 ? kMinHomeProbeRepeatToleranceSteps : endpointToleranceSteps;
+
+  for (uint32_t cycleIndex = 0; cycleIndex < cycles; ++cycleIndex) {
+    if (serviceCallback_ != nullptr) {
+      serviceCallback_();
+    }
+    CharacterizeCycle cycle;
+    cycle.cycle = cycleIndex + 1;
+    cycle.frequencyHz = frequency;
+    cycle.stallguardThreshold = stallguardThreshold;
+    cycle.endpointToleranceSteps = tolerance;
+    cycle.targetStep = targetStep;
+
+    MoveCommandResult move = moveToStepAtFrequency(targetStep, frequency);
+    cycle.moveAccepted = move.accepted;
+    if (move.accepted) {
+      const uint32_t timeoutMs = max<uint32_t>(1000, move.estimatedDurationMs + 1000);
+      cycle.moveCompleted = waitForBlockingMove(timeoutMs);
+      cycle.moveMinStallguard = getLastMoveMinStallguard();
+      cycle.lowMargin = didLastMoveWarnLowMargin();
+    }
+
+    if (cycle.moveCompleted) {
+      MoveCommandResult home = moveToStepAtFrequency(0, frequency);
+      cycle.homeAccepted = home.accepted;
+      if (home.accepted) {
+        const uint32_t timeoutMs = max<uint32_t>(1000, home.estimatedDurationMs + 1000);
+        cycle.homeCompleted = waitForBlockingMove(timeoutMs);
+        cycle.homeMinStallguard = getLastMoveMinStallguard();
+        cycle.lowMargin = cycle.lowMargin || didLastMoveWarnLowMargin();
+        if (didLastMoveProbeEndpoint()) {
+          cycle.endpointDeltaSteps = getLastEndpointDeltaSteps();
+        } else {
+          cycle.endpointDeltaSteps = static_cast<int32_t>(tolerance) + 1;
+        }
+      }
+    }
+
+    const int32_t moveSg = cycle.moveMinStallguard;
+    const int32_t homeSg = cycle.homeMinStallguard;
+    int32_t cycleMinSg = -1;
+    if (moveSg >= 0 && homeSg >= 0) {
+      cycleMinSg = min<int32_t>(moveSg, homeSg);
+    } else if (moveSg >= 0) {
+      cycleMinSg = moveSg;
+    } else {
+      cycleMinSg = homeSg;
+    }
+    if (cycleMinSg >= 0 && (result.minStallguard < 0 || cycleMinSg < result.minStallguard)) {
+      result.minStallguard = cycleMinSg;
+    }
+
+    cycle.thresholdFailed = cycleMinSg >= 0 && cycleMinSg < static_cast<int32_t>(stallguardThreshold);
+    const int32_t absDelta = abs(cycle.endpointDeltaSteps);
+    result.maxAbsEndpointDeltaSteps = max<int32_t>(result.maxAbsEndpointDeltaSteps, absDelta);
+    if (cycle.lowMargin) {
+      ++result.lowMarginFailures;
+    }
+    if (cycle.thresholdFailed) {
+      ++result.thresholdFailures;
+    }
+    if (static_cast<uint32_t>(absDelta) > tolerance) {
+      ++result.endpointFailures;
+    }
+    if (!cycle.moveCompleted || !cycle.homeCompleted) {
+      ++result.motionFailures;
+    }
+
+    cycle.passed = cycle.moveAccepted && cycle.moveCompleted && cycle.homeAccepted && cycle.homeCompleted &&
+                   !cycle.lowMargin && !cycle.thresholdFailed && static_cast<uint32_t>(absDelta) <= tolerance;
+    ++result.cyclesCompleted;
+    if (cycle.passed) {
+      ++result.cyclesPassed;
+    }
+
+    if (callback != nullptr) {
+      callback(cycle, callbackContext);
+      if (serviceCallback_ != nullptr) {
+        serviceCallback_();
+      }
+    }
+
+    if (!cycle.moveCompleted || !cycle.homeCompleted) {
+      break;
+    }
+  }
+
+  setStallguard(0);
+  safeMaxMoveFrequency_ = originalSafeMax;
+  endpointCalibrationAdjustmentEnabled_ = originalEndpointAdjustment;
+  pendingHomeCandidateValid_ = false;
+  return result;
+}
+
+bool Stepper::didLastMoveProbeEndpoint() const {
+  return lastEndpointProbeValid_;
+}
+
+bool Stepper::wasLastEndpointProbeUpper() const {
+  return lastEndpointProbePositiveEnd_;
+}
+
+int32_t Stepper::getLastEndpointDeltaSteps() const {
+  return lastEndpointDeltaSteps_;
+}
+
 uint32_t Stepper::getMinMoveFrequency() const {
   return minMoveFrequency() / max<uint8_t>(sgAdj_, 1);
 }
@@ -1218,6 +1378,19 @@ bool Stepper::setSafeMaxMoveFrequency(uint32_t frequency) {
   }
 
   safeMaxMoveFrequency_ = frequency;
+  return true;
+}
+
+uint32_t Stepper::getMoveRampDurationMs() const {
+  return moveRampDurationMsSetting_;
+}
+
+bool Stepper::setMoveRampDurationMs(uint32_t durationMs) {
+  if (durationMs < kMinMoveRampDurationMs || durationMs > kMaxMoveRampDurationMs) {
+    return false;
+  }
+
+  moveRampDurationMsSetting_ = durationMs;
   return true;
 }
 
