@@ -212,7 +212,7 @@
         box-shadow: 0 0 20px rgba(0, 229, 255, 0.2);
         border-color: var(--accent);
       }
-      .sidebar:not(.collapsed) ~ .main-area .sidebar-toggle {
+      body:has(.sidebar:not(.collapsed)) .main-area .sidebar-toggle {
         left: 310px;
       }
 
@@ -811,7 +811,7 @@
       @media (max-width: 700px) {
         .sidebar { width: 260px; }
         .sidebar.collapsed { margin-left: -260px; }
-        .sidebar:not(.collapsed) ~ .main-area .sidebar-toggle { left: 270px; }
+        body:has(.sidebar:not(.collapsed)) .main-area .sidebar-toggle { left: 270px; }
         .log-pane { width: min(320px, 86vw); }
         .log-pane.collapsed { margin-right: min(-320px, -86vw); }
         .log-pane:not(.collapsed) .log-pane-toggle { right: calc(min(320px, 86vw) + 10px); }

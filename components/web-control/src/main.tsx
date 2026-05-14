@@ -1,17 +1,22 @@
 // @ts-nocheck
 import "./styles.css";
+import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
-import { ConnectionsPanel } from "./features/connections/ConnectionsPanel";
 import {
   createConnection,
   type Connection,
   type MappingTarget,
 } from "./features/connections/connection-model";
 import {
-  formatLogTime,
-  formatSerialBytes,
-  splitLogPayload,
-} from "./features/logs/log-format";
+  setConnectionCallbacks,
+  setConnectionsSnapshot,
+} from "./features/connections/connections-store";
+import { formatSerialBytes } from "./features/logs/log-format";
+import {
+  appendDeviceLog,
+  setDeviceCommandHandler,
+  setDeviceCommandEnabled,
+} from "./features/logs/log-store";
 import { builtinScripts } from "./features/animation/builtin-scripts";
 import {
   buildDistanceMap,
@@ -79,28 +84,47 @@ import {
   formatMidiMessage,
   getMidiInputLabel,
 } from "./devices/midi";
+import { LeftSidebar } from "./features/sidebar/LeftSidebar";
+import { RightLogPane } from "./features/logs/RightLogPane";
+import { setStats } from "./features/sidebar/stats-store";
+import {
+  setGridCallbacks,
+  setGridSnapshot,
+} from "./features/sidebar/grid-store";
+import {
+  sequenceOptions,
+  setAnimationControlsCallbacks,
+  setAnimationControlsSnapshot,
+} from "./features/animation/animation-controls-store";
+import {
+  setScriptEditorCallbacks,
+  setScriptEditorSnapshot,
+} from "./features/sidebar/script-editor-store";
+import {
+  setMidiCallbacks,
+  setMidiSnapshot,
+  setMidiStatus,
+} from "./features/midi/midi-store";
+import { SidebarToggle } from "./features/sidebar/SidebarToggle";
+import {
+  setSidebarCallbacks,
+  setSidebarCollapsed,
+} from "./features/sidebar/sidebar-store";
+
+      flushSync(() => {
+        createRoot(document.getElementById("left-sidebar-root")).render(
+          <LeftSidebar />,
+        );
+        createRoot(document.getElementById("right-log-pane-root")).render(
+          <RightLogPane />,
+        );
+        createRoot(document.getElementById("sidebar-toggle-root")).render(
+          <SidebarToggle />,
+        );
+      });
 
       const canvas = document.getElementById("hex-canvas");
       const context = canvas.getContext("2d");
-      const ringsInput = document.getElementById("rings");
-      const ringCount = document.getElementById("ring-count");
-      const resetButton = document.getElementById("reset-button");
-      const jetModeSelect = document.getElementById("jet-mode-select");
-      const allOnButton = document.getElementById("all-on-button");
-      const allOffButton = document.getElementById("all-off-button");
-      const labelModeSelect = document.getElementById("label-mode-select");
-      const sequenceSelect = document.getElementById("sequence-select");
-      const playPauseButton = document.getElementById("play-pause-button");
-      const loopToggleButton = document.getElementById("loop-toggle-button");
-      const speedSlider = document.getElementById("speed-slider");
-      const speedReadout = document.getElementById("speed-readout");
-      const connectionsList = document.getElementById("connections-list");
-      const addRelayConnectionButton = document.getElementById(
-        "add-relay-connection-button",
-      );
-      const addStepperConnectionButton = document.getElementById(
-        "add-stepper-connection-button",
-      );
       const stepperEnvelopePath = document.getElementById(
         "stepper-envelope-path",
       );
@@ -125,58 +149,28 @@ import {
       const stepperReleaseReadout = document.getElementById(
         "stepper-release-readout",
       );
-      const editorToggleButton = document.getElementById("editor-toggle-button");
-      const editorPanel = document.getElementById("editor-panel");
-      const animationEditor = document.getElementById("animation-editor");
-      const restoreOriginalButton = document.getElementById(
-        "restore-original-button",
-      );
-      const editorError = document.getElementById("editor-error");
-      const midiConnectButton = document.getElementById("midi-connect-button");
-      const midiStatus = document.getElementById("midi-status");
-      const relayCommandForm = document.getElementById("relay-command-form");
-      const relayCommandInput = document.getElementById("relay-command-input");
-      const relayCommandSendButton = document.getElementById(
-        "relay-command-send-button",
-      );
-      const stepperCommandForm = document.getElementById("stepper-command-form");
-      const stepperCommandInput = document.getElementById(
-        "stepper-command-input",
-      );
-      const stepperCommandSendButton = document.getElementById(
-        "stepper-command-send-button",
-      );
-      const logPane = document.getElementById("log-pane");
-      const logPaneToggleButton = document.getElementById("log-pane-toggle");
-      const clearDeviceLogsButton = document.getElementById(
-        "clear-device-logs-button",
-      );
-      const deviceLogStreams = {
-        midi: document.getElementById("midi-log-stream"),
-        relay: document.getElementById("relay-log-stream"),
-        stepper: document.getElementById("stepper-log-stream"),
+      const midiStatus = {
+        set textContent(value) {
+          setMidiStatus(value);
+        },
       };
-      const deviceLogCounts = {
-        midi: document.getElementById("midi-log-count"),
-        relay: document.getElementById("relay-log-count"),
-        stepper: document.getElementById("stepper-log-count"),
-      };
-      const outlineStats = document.getElementById("outline-stats");
-      const spokeStats = document.getElementById("spoke-stats");
       const STORAGE_KEY = "hexagon-rings-state";
       const RELAY_PORT_KEY = `${STORAGE_KEY}:relay-port`;
       const STEPPER_PORT_KEY = `${STORAGE_KEY}:stepper-port`;
-      const LOG_PANE_COLLAPSED_KEY = `${STORAGE_KEY}:log-pane-collapsed`;
       const HIT_RADIUS = 10;
       const DEFAULT_RINGS = 2;
-      const DEVICE_LOG_LIMIT = 250;
+      const MIN_RINGS = 1;
+      const MAX_RINGS = 12;
       const activeNodes = new Set();
       const knownNodeIds = new Set();
       let scene = null;
       let hoveredNodeId = null;
+      let rings = 4;
       let jetMode = "all";
       let labelMode = "address";
       const customScripts = {};
+      let scriptEditorOpen = false;
+      let scriptHelpOpen = false;
       let selectedSequenceId = "ripple";
       let animationSpeed = 12;
       let animationLoopEnabled = true;
@@ -186,13 +180,7 @@ import {
       let midiAccess = null;
       const midiInputs = new Map();
       const midiHeldNotes = new Set();
-      const deviceLogs = {
-        midi: [],
-        relay: [],
-        stepper: [],
-      };
       const connections: Connection[] = [];
-      const connectionsRoot = createRoot(connectionsList);
       let mappingTarget: MappingTarget = null;
       let activeStepperConnectionId = null;
       let relayPort = null;
@@ -279,10 +267,10 @@ import {
 
       function updateSerialUi(mappedCount = 0) {
         const serialSupported = "serial" in navigator;
-        relayCommandInput.disabled =
-          !serialSupported || !getPrimaryRelayConnection()?.port;
-        relayCommandSendButton.disabled =
-          !serialSupported || !getPrimaryRelayConnection()?.port;
+        setDeviceCommandEnabled(
+          "relay",
+          serialSupported && Boolean(getPrimaryRelayConnection()?.port),
+        );
         updateConnectionDom();
       }
 
@@ -659,166 +647,214 @@ import {
 
       function updateStepperUi() {
         const serialSupported = "serial" in navigator;
-        stepperCommandInput.disabled = !serialSupported || stepperPort === null;
-        stepperCommandSendButton.disabled =
-          !serialSupported || stepperPort === null;
+        setDeviceCommandEnabled("stepper", serialSupported && stepperPort !== null);
         updateStepperHomedReadout();
         updateConnectionDom();
       }
 
       function updateMidiUi() {
         const midiSupported = Boolean(navigator.requestMIDIAccess);
-        midiConnectButton.disabled = !midiSupported;
-        midiConnectButton.classList.toggle("connected", midiInputs.size > 0);
+        setMidiSnapshot({
+          connected: midiInputs.size > 0,
+          supported: midiSupported,
+        });
         if (!midiSupported) {
           midiStatus.textContent = "Web MIDI not supported";
         }
       }
 
-      function formatChannelTarget(channel) {
-        return channel.jetId ? channel.jetId : "Unmapped";
-      }
-
       function renderConnections() {
-        connectionsRoot.render(
-          <ConnectionsPanel
-            activeNodeIds={activeNodes}
-            connections={[...connections]}
-            mappingTarget={mappingTarget}
-            serialSupported={"serial" in navigator}
-            onConnect={(connection) => {
-              if (connection.type === "relay") {
-                void connectRelay(connection);
-              } else {
-                void connectStepper(connection);
-              }
-            }}
-            onDisconnect={(connection) => {
-              if (connection.type === "relay") {
-                void disconnectRelay(connection);
-              } else {
-                void disconnectStepper();
-              }
-            }}
-            onHome={(connection) => {
-              activeStepperConnectionId = connection.id;
-              void homeStepper();
-            }}
-            onMap={(connection, channel) => {
-              mappingTarget = {
-                connectionId: connection.id,
-                channelIndex: channel.index,
-              };
-              renderConnections();
-            }}
-            onPositionCommit={(connection, channel, positionPercent) => {
-              channel.positionPercent = positionPercent;
-              if (connection === getPrimaryStepperConnection()) {
-                setStepperBasePosition(positionPercent, { send: false });
-                void flushStepperPositionSend();
-              }
-              renderConnections();
-            }}
-            onPositionInput={(connection, channel, positionPercent) => {
-              channel.positionPercent = positionPercent;
-              if (connection === getPrimaryStepperConnection()) {
-                setStepperBasePosition(positionPercent);
-              }
-              renderConnections();
-            }}
-            onToggleConfig={(connection) => {
-              connection.expanded = !connection.expanded;
-              saveState();
-              renderConnections();
-            }}
-          />,
-        );
+        setConnectionsSnapshot({
+          activeNodeIds: new Set(activeNodes),
+          connections: [...connections],
+          mappingTarget,
+          serialSupported: "serial" in navigator,
+        });
       }
 
       function updateConnectionDom() {
         renderConnections();
       }
 
-      function renderDeviceLog(role) {
-        const stream = deviceLogStreams[role];
-        const count = deviceLogCounts[role];
-        const entries = deviceLogs[role];
-        if (!stream || !count || !entries) {
-          return;
-        }
+      setConnectionCallbacks({
+        onAddRelay: () => {
+          connections.push(createConnection("relay"));
+          saveState();
+          renderConnections();
+        },
+        onAddStepper: () => {
+          connections.push(createConnection("stepper"));
+          saveState();
+          renderConnections();
+        },
+        onConnect: (connection) => {
+          if (connection.type === "relay") {
+            void connectRelay(connection);
+          } else {
+            void connectStepper(connection);
+          }
+        },
+        onDisconnect: (connection) => {
+          if (connection.type === "relay") {
+            void disconnectRelay(connection);
+          } else {
+            void disconnectStepper();
+          }
+        },
+        onHome: (connection) => {
+          activeStepperConnectionId = connection.id;
+          void homeStepper();
+        },
+        onMap: (connection, channel) => {
+          mappingTarget = {
+            connectionId: connection.id,
+            channelIndex: channel.index,
+          };
+          renderConnections();
+        },
+        onPositionCommit: (connection, channel, positionPercent) => {
+          channel.positionPercent = positionPercent;
+          if (connection === getPrimaryStepperConnection()) {
+            setStepperBasePosition(positionPercent, { send: false });
+            void flushStepperPositionSend();
+          }
+          renderConnections();
+        },
+        onPositionInput: (connection, channel, positionPercent) => {
+          channel.positionPercent = positionPercent;
+          if (connection === getPrimaryStepperConnection()) {
+            setStepperBasePosition(positionPercent);
+          }
+          renderConnections();
+        },
+        onToggleConfig: (connection) => {
+          connection.expanded = !connection.expanded;
+          saveState();
+          renderConnections();
+        },
+      });
 
-        count.textContent = `${entries.length} ${entries.length === 1 ? "entry" : "entries"}`;
-        stream.replaceChildren();
+      setGridCallbacks({
+        onAllOff: () => {
+          stopAnimation();
+          activeNodes.clear();
+          saveState();
+          render();
+        },
+        onAllOn: () => {
+          if (!scene) return;
+          stopAnimation();
+          for (const node of scene.nodes) {
+            activeNodes.add(node.id);
+          }
+          saveState();
+          render();
+        },
+        onJetModeChange: (nextJetMode) => {
+          stopAnimation();
+          jetMode = nextJetMode;
+          updateGridControls();
+          saveState();
+          render();
+        },
+        onLabelModeChange: (nextLabelMode) => {
+          labelMode = nextLabelMode;
+          updateGridControls();
+          saveState();
+          render();
+        },
+        onReset: resetVisualization,
+        onRingsChange: (nextRings) => {
+          stopAnimation();
+          rings = Math.min(Math.max(nextRings, MIN_RINGS), MAX_RINGS);
+          updateGridControls();
+          saveState();
+          render();
+        },
+      });
 
-        if (entries.length === 0) {
-          const empty = document.createElement("div");
-          empty.className = "log-empty";
-          empty.textContent = `No ${role} traffic yet.`;
-          stream.appendChild(empty);
-          return;
-        }
+      setAnimationControlsCallbacks({
+        onLoopToggle: () => {
+          animationLoopEnabled = !animationLoopEnabled;
+          updateLoopToggleButton();
+          saveState();
+        },
+        onPlayPause: () => {
+          if (animationTimerId === null) {
+            startAnimation();
+          } else {
+            stopAnimation();
+          }
+        },
+        onSequenceChange: (sequenceId) => {
+          selectedSequenceId = sequenceId;
+          updateEditorFromSequence();
+          updateAnimationControls();
+          saveState();
+          if (animationTimerId !== null) {
+            startAnimation();
+          }
+        },
+        onSpeedChange: (speed) => {
+          animationSpeed = speed;
+          updateSpeedReadout();
+          saveState();
+        },
+      });
 
-        for (const entry of entries) {
-          const row = document.createElement("div");
-          row.className = "log-entry";
+      setScriptEditorCallbacks({
+        onChange: (script) => {
+          const builtin = builtinScripts[selectedSequenceId];
+          if (script === builtin) {
+            delete customScripts[selectedSequenceId];
+          } else {
+            customScripts[selectedSequenceId] = script;
+          }
+          setScriptEditorSnapshot({ script });
+          saveState();
+          if (animationTimerId !== null) {
+            startAnimation();
+          }
+        },
+        onRestore: () => {
+          delete customScripts[selectedSequenceId];
+          updateEditorFromSequence();
+          saveState();
+          if (animationTimerId !== null) {
+            startAnimation();
+          }
+        },
+        onToggleHelp: () => {
+          scriptHelpOpen = !scriptHelpOpen;
+          setScriptEditorSnapshot({ helpOpen: scriptHelpOpen });
+        },
+        onToggleOpen: () => {
+          scriptEditorOpen = !scriptEditorOpen;
+          setScriptEditorSnapshot({ open: scriptEditorOpen });
+        },
+      });
 
-          const time = document.createElement("span");
-          time.className = "log-time";
-          time.textContent = formatLogTime(entry.timestampMs);
+      setMidiCallbacks({
+        onConnect: () => {
+          void initMidi();
+        },
+        onDisconnect: () => {
+          disconnectMidi();
+        },
+      });
 
-          const direction = document.createElement("span");
-          direction.className = `log-dir ${entry.direction}`;
-          direction.textContent = entry.direction.toUpperCase();
-
-          const payload = document.createElement("span");
-          payload.className = "log-payload";
-          payload.textContent = entry.payload;
-
-          row.append(time, direction, payload);
-          stream.appendChild(row);
-        }
-
-        stream.scrollTop = stream.scrollHeight;
-      }
-
-      function appendDeviceLog(role, direction, payload) {
-        const entries = deviceLogs[role];
-        if (!entries) {
-          return;
-        }
-
-        const formattedPayloads = splitLogPayload(payload);
-
-        const timestampMs = Date.now();
-        for (const formattedPayload of formattedPayloads) {
-          entries.push({
-            timestampMs,
-            direction,
-            payload: formattedPayload,
-          });
-        }
-        if (entries.length > DEVICE_LOG_LIMIT) {
-          entries.splice(0, entries.length - DEVICE_LOG_LIMIT);
-        }
-        renderDeviceLog(role);
-      }
-
-      function clearDeviceLogs() {
-        for (const role of Object.keys(deviceLogs)) {
-          deviceLogs[role] = [];
-          renderDeviceLog(role);
-        }
-      }
-
-      function setLogPaneCollapsed(collapsed) {
-        logPane.classList.toggle("collapsed", collapsed);
-        logPaneToggleButton.setAttribute("aria-expanded", String(!collapsed));
-        try {
-          window.localStorage.setItem(LOG_PANE_COLLAPSED_KEY, collapsed ? "1" : "0");
-        } catch {
-          // Ignore storage failures; the pane can still be toggled.
-        }
-      }
+      let sidebarCollapsed = false;
+      setSidebarCallbacks({
+        onToggle: () => {
+          sidebarCollapsed = !sidebarCollapsed;
+          setSidebarCollapsed(sidebarCollapsed);
+          render();
+        },
+        onTransitionEnd: () => {
+          render();
+        },
+      });
+      setSidebarCollapsed(sidebarCollapsed);
 
       function logSerialTx(label, payload) {
         appendDeviceLog(label, "tx", payload);
@@ -1007,7 +1043,7 @@ import {
           window.localStorage.setItem(
             STORAGE_KEY,
             JSON.stringify({
-              rings: Number(ringsInput.value),
+              rings,
               activeNodeIds: [...activeNodes],
               knownNodeIds: [...knownNodeIds],
               jetMode,
@@ -1070,8 +1106,12 @@ import {
         }
       }
 
-      function updateLabelModeSelect() {
-        labelModeSelect.value = labelMode;
+      function updateGridControls() {
+        setGridSnapshot({
+          jetMode,
+          labelMode,
+          rings,
+        });
       }
 
       function findHitNode(clientX, clientY) {
@@ -1098,8 +1138,10 @@ import {
 
       function updateStats() {
         if (!scene) {
-          outlineStats.textContent = "Visible 0 / Total 0";
-          spokeStats.textContent = "Visible 0 / Total 0";
+          setStats({
+            outline: { total: 0, visible: 0 },
+            spoke: { total: 0, visible: 0 },
+          });
           return;
         }
 
@@ -1124,23 +1166,28 @@ import {
           }
         }
 
-        outlineStats.textContent = `Visible ${counts.outline.visible} / Total ${counts.outline.total}`;
-        spokeStats.textContent = `Visible ${counts.spoke.visible} / Total ${counts.spoke.total}`;
+        setStats(counts);
       }
 
       function updateSpeedReadout() {
-        speedReadout.value = `${Number(animationSpeed).toFixed(1)} steps/s`;
+        updateAnimationControls();
       }
 
       function updatePlayPauseButton() {
-        playPauseButton.textContent =
-          animationTimerId === null ? "Play" : "Pause";
+        updateAnimationControls();
       }
 
       function updateLoopToggleButton() {
-        loopToggleButton.textContent = animationLoopEnabled
-          ? "Loop On"
-          : "Loop Off";
+        updateAnimationControls();
+      }
+
+      function updateAnimationControls() {
+        setAnimationControlsSnapshot({
+          loopEnabled: animationLoopEnabled,
+          playing: animationTimerId !== null,
+          selectedSequenceId,
+          speed: animationSpeed,
+        });
       }
 
       function getMappedRelayNodeIds(currentScene) {
@@ -2635,7 +2682,6 @@ import {
           // Speed knob
           if (data1 === MIDI_CC_SPEED) {
             animationSpeed = 1 + (data2 / 127) * 17;
-            speedSlider.value = String(animationSpeed);
             updateSpeedReadout();
             saveState();
             midiStatus.textContent =
@@ -2667,23 +2713,23 @@ import {
               return;
             }
             if (data1 === MIDI_CC_NEXT) {
-              const idx = sequenceSelect.selectedIndex;
-              sequenceSelect.selectedIndex =
-                (idx + 1) % sequenceSelect.options.length;
-              selectedSequenceId = sequenceSelect.value;
+              const sequenceIds = sequenceOptions.map((option) => option.value);
+              const idx = sequenceIds.indexOf(selectedSequenceId);
+              selectedSequenceId = sequenceIds[(idx + 1) % sequenceIds.length];
               updateEditorFromSequence();
+              updateAnimationControls();
               saveState();
               if (animationTimerId !== null) startAnimation();
               midiStatus.textContent = `Next: ${selectedSequenceId}`;
               return;
             }
             if (data1 === MIDI_CC_BACK) {
-              const idx = sequenceSelect.selectedIndex;
-              sequenceSelect.selectedIndex =
-                (idx - 1 + sequenceSelect.options.length) %
-                sequenceSelect.options.length;
-              selectedSequenceId = sequenceSelect.value;
+              const sequenceIds = sequenceOptions.map((option) => option.value);
+              const idx = sequenceIds.indexOf(selectedSequenceId);
+              selectedSequenceId =
+                sequenceIds[(idx - 1 + sequenceIds.length) % sequenceIds.length];
               updateEditorFromSequence();
+              updateAnimationControls();
               saveState();
               if (animationTimerId !== null) startAnimation();
               midiStatus.textContent = `Prev: ${selectedSequenceId}`;
@@ -2803,7 +2849,7 @@ import {
       function startAnimation() {
         stopAnimation();
         scene = buildScene(
-          Number(ringsInput.value),
+          rings,
           canvas.clientWidth,
           canvas.clientHeight,
           jetMode,
@@ -2823,10 +2869,9 @@ import {
                 new Set([...frame].filter((id) => visibleIds.has(id))),
             ),
           );
-          editorError.style.display = "none";
+          setScriptEditorSnapshot({ error: null });
         } catch (err) {
-          editorError.textContent = err.message;
-          editorError.style.display = "block";
+          setScriptEditorSnapshot({ error: err.message });
           return;
         }
         animationFrameIndex = 0;
@@ -2838,7 +2883,8 @@ import {
 
       function resetVisualization() {
         stopAnimation();
-        ringsInput.value = String(DEFAULT_RINGS);
+        rings = DEFAULT_RINGS;
+        updateGridControls();
         activeNodes.clear();
 
         for (const nodeId of knownNodeIds) {
@@ -2861,8 +2907,7 @@ import {
       function render() {
         resizeCanvas();
 
-        const totalRings = Number(ringsInput.value);
-        ringCount.value = String(totalRings);
+        const totalRings = rings;
 
         const width = canvas.clientWidth;
         const height = canvas.clientHeight;
@@ -2936,264 +2981,37 @@ import {
         render();
       });
 
-      document.getElementById("sidebar-toggle").addEventListener("click", () => {
-        document.getElementById("sidebar").classList.toggle("collapsed");
-        render();
-      });
-      logPaneToggleButton.addEventListener("click", () => {
-        setLogPaneCollapsed(!logPane.classList.contains("collapsed"));
-        render();
-      });
-      clearDeviceLogsButton.addEventListener("click", clearDeviceLogs);
-
-      resetButton.addEventListener("click", resetVisualization);
-      midiConnectButton.addEventListener("click", async (event) => {
-        if (event.target.closest(".connection-close")) {
-          disconnectMidi();
-          return;
-        }
-        await initMidi();
-      });
-
-      addRelayConnectionButton.addEventListener("click", () => {
-        connections.push(createConnection("relay"));
-        saveState();
-        renderConnections();
-      });
-
-      addStepperConnectionButton.addEventListener("click", () => {
-        connections.push(createConnection("stepper"));
-        saveState();
-        renderConnections();
-      });
-
-      connectionsList.addEventListener("click", async (event) => {
-        const actionElement = event.target.closest("[data-action]");
-        const card = event.target.closest(".connection-card");
-        if (!actionElement || !card) {
-          return;
-        }
-
-        const connection = connections.find(
-          (candidate) => candidate.id === card.dataset.connectionId,
-        );
-        if (!connection) {
-          return;
-        }
-
-        const channelRow = event.target.closest(".channel-row");
-        const channelIndex = channelRow
-          ? Number(channelRow.dataset.channelIndex)
-          : null;
-        const action = actionElement.dataset.action;
-
-        if (action === "toggle-config") {
-          connection.expanded = !connection.expanded;
-          saveState();
-          renderConnections();
-          return;
-        }
-
-        if (action === "connect") {
-          if (connection.type === "relay") {
-            await connectRelay(connection);
-          } else {
-            await connectStepper(connection);
-          }
-          return;
-        }
-
-        if (action === "disconnect") {
-          if (connection.type === "relay") {
-            await disconnectRelay(connection);
-          } else {
-            await disconnectStepper();
-          }
-          return;
-        }
-
-        if (action === "map-channel" && channelIndex !== null) {
-          mappingTarget = {
-            connectionId: connection.id,
-            channelIndex,
-          };
-          renderConnections();
-          return;
-        }
-
-        if (action === "home-channel" && connection.type === "stepper") {
-          activeStepperConnectionId = connection.id;
-          await homeStepper();
-        }
-      });
-
-      connectionsList.addEventListener("input", (event) => {
-        const target = event.target;
-        if (!(target instanceof HTMLInputElement)) {
-          return;
-        }
-        if (target.dataset.action !== "position-channel") {
-          return;
-        }
-        const card = target.closest(".connection-card");
-        const channelRow = target.closest(".channel-row");
-        const connection = connections.find(
-          (candidate) => candidate.id === card?.dataset.connectionId,
-        );
-        const channelIndex = Number(channelRow?.dataset.channelIndex);
-        const channel = connection?.channels[channelIndex];
-        if (!channel) {
-          return;
-        }
-        channel.positionPercent = Number(target.value);
-        if (connection === getPrimaryStepperConnection()) {
-          setStepperBasePosition(Number(target.value));
-        }
-        updateConnectionDom();
-      });
-
-      connectionsList.addEventListener("change", async (event) => {
-        const target = event.target;
-        if (!(target instanceof HTMLInputElement)) {
-          return;
-        }
-        if (target.dataset.action !== "position-channel") {
-          return;
-        }
-        if (getPrimaryStepperConnection()?.port !== null) {
-          setStepperBasePosition(Number(target.value), { send: false });
-          await flushStepperPositionSend();
-        }
-      });
-      relayCommandForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
+      setDeviceCommandHandler("relay", async (command) => {
         try {
-          await sendRelayCommand(relayCommandInput.value);
-          relayCommandInput.value = "";
+          await sendRelayCommand(command);
+          return true;
         } catch (error) {
           console.error(error);
           relayStatusMessage = error?.message || "Relay command failed";
           updateSerialUi(scene ? getMappedRelayNodeIds(scene).length : 0);
+          return false;
         }
       });
-      stepperCommandForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
+      setDeviceCommandHandler("stepper", async (command) => {
         try {
-          await sendStepperCommand(stepperCommandInput.value);
-          stepperCommandInput.value = "";
+          await sendStepperCommand(command);
+          return true;
         } catch (error) {
           console.error(error);
           stepperStatusMessage = "Stepper command failed";
           updateStepperUi();
+          return false;
         }
-      });
-      jetModeSelect.addEventListener("change", () => {
-        stopAnimation();
-        jetMode = jetModeSelect.value;
-        saveState();
-        render();
-      });
-      allOnButton.addEventListener("click", () => {
-        if (!scene) return;
-        stopAnimation();
-        for (const node of scene.nodes) {
-          activeNodes.add(node.id);
-        }
-        saveState();
-        render();
-      });
-      allOffButton.addEventListener("click", () => {
-        stopAnimation();
-        activeNodes.clear();
-        saveState();
-        render();
-      });
-      labelModeSelect.addEventListener("change", () => {
-        labelMode = labelModeSelect.value;
-        saveState();
-        render();
       });
       function updateEditorFromSequence() {
-        animationEditor.value = getScriptForSequence(selectedSequenceId);
-        editorError.style.display = "none";
+        setScriptEditorSnapshot({
+          error: null,
+          helpOpen: scriptHelpOpen,
+          open: scriptEditorOpen,
+          script: getScriptForSequence(selectedSequenceId),
+        });
       }
 
-      sequenceSelect.addEventListener("change", () => {
-        selectedSequenceId = sequenceSelect.value;
-        updateEditorFromSequence();
-        saveState();
-        if (animationTimerId !== null) {
-          startAnimation();
-        }
-      });
-      editorToggleButton.addEventListener("click", () => {
-        const open = editorPanel.style.display === "none";
-        editorPanel.style.display = open ? "" : "none";
-        editorToggleButton.textContent = open
-          ? "Hide Script"
-          : "Edit Script";
-      });
-      document.getElementById("script-help-button").addEventListener("click", () => {
-        const help = document.getElementById("script-help");
-        help.style.display = help.style.display === "none" ? "" : "none";
-      });
-      animationEditor.addEventListener("keydown", (event) => {
-        if (event.key === "Tab") {
-          event.preventDefault();
-          const start = animationEditor.selectionStart;
-          const end = animationEditor.selectionEnd;
-          animationEditor.value =
-            animationEditor.value.substring(0, start) +
-            "  " +
-            animationEditor.value.substring(end);
-          animationEditor.selectionStart = animationEditor.selectionEnd =
-            start + 2;
-          animationEditor.dispatchEvent(new Event("input"));
-        }
-      });
-      animationEditor.addEventListener("input", () => {
-        const script = animationEditor.value;
-        const builtin = builtinScripts[selectedSequenceId];
-        if (script === builtin) {
-          delete customScripts[selectedSequenceId];
-        } else {
-          customScripts[selectedSequenceId] = script;
-        }
-        saveState();
-        if (animationTimerId !== null) {
-          startAnimation();
-        }
-      });
-      restoreOriginalButton.addEventListener("click", () => {
-        delete customScripts[selectedSequenceId];
-        updateEditorFromSequence();
-        saveState();
-        if (animationTimerId !== null) {
-          startAnimation();
-        }
-      });
-      playPauseButton.addEventListener("click", () => {
-        if (animationTimerId === null) {
-          startAnimation();
-        } else {
-          stopAnimation();
-        }
-      });
-      loopToggleButton.addEventListener("click", () => {
-        animationLoopEnabled = !animationLoopEnabled;
-        updateLoopToggleButton();
-        saveState();
-      });
-      speedSlider.addEventListener("input", () => {
-        animationSpeed = Number(speedSlider.value);
-        updateSpeedReadout();
-        saveState();
-      });
-      ringsInput.addEventListener("input", () => {
-        stopAnimation();
-        saveState();
-        render();
-      });
       if ("serial" in navigator) {
         navigator.serial.addEventListener("disconnect", async (event) => {
           for (const connection of getRelayConnections()) {
@@ -3219,14 +3037,10 @@ import {
         disconnectStepper().catch((error) => console.error(error));
       });
       window.addEventListener("resize", render);
-      document.getElementById("sidebar").addEventListener("transitionend", render);
 
       const savedState = loadState();
       if (savedState?.rings !== null) {
-        const min = Number(ringsInput.min);
-        const max = Number(ringsInput.max);
-        const clamped = Math.min(Math.max(savedState.rings, min), max);
-        ringsInput.value = String(clamped);
+        rings = Math.min(Math.max(savedState.rings, MIN_RINGS), MAX_RINGS);
       }
 
       if (savedState?.activeNodeIds) {
@@ -3328,11 +3142,9 @@ import {
 
       stepperEnvelope.originValue = stepperBasePositionPercent;
 
-      jetModeSelect.value = jetMode;
-      sequenceSelect.value = selectedSequenceId;
       updateEditorFromSequence();
-      speedSlider.value = String(animationSpeed);
-      updateLabelModeSelect();
+      updateGridControls();
+      updateAnimationControls();
       updateSpeedReadout();
       updateStepperReadout();
       updateStepperTravelReadout();
@@ -3342,17 +3154,6 @@ import {
       updateMidiUi();
       updateSerialUi(0);
       updateStepperUi();
-      let logPaneCollapsed = true;
-      try {
-        logPaneCollapsed =
-          window.localStorage.getItem(LOG_PANE_COLLAPSED_KEY) !== "0";
-      } catch {
-        logPaneCollapsed = true;
-      }
-      setLogPaneCollapsed(logPaneCollapsed);
-      for (const role of Object.keys(deviceLogs)) {
-        renderDeviceLog(role);
-      }
       render();
       autoConnectRelay();
       autoConnectStepper();
