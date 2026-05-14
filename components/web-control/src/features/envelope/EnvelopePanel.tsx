@@ -6,7 +6,6 @@ export function EnvelopePanel() {
 
   return (
     <Section label="Envelope">
-      <div className="device-label">Center ADSR</div>
       <svg
         aria-label="Center ADSR envelope"
         className="envelope-graph"

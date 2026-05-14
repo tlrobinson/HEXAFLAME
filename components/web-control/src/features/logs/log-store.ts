@@ -2,43 +2,56 @@ import { splitLogPayload } from "./log-format";
 
 export type DeviceLogRole = "midi" | "relay" | "stepper";
 export type DeviceLogDirection = "event" | "rx" | "tx";
+export type DeviceCommandRole = "relay" | "stepper";
 
 export type DeviceLogEntry = {
+  device: DeviceLogRole;
   direction: DeviceLogDirection;
+  id: number;
   payload: string;
   timestampMs: number;
 };
 
-type DeviceLogs = Record<DeviceLogRole, DeviceLogEntry[]>;
-
-type LogPaneSnapshot = {
-  commandEnabled: Record<"relay" | "stepper", boolean>;
-  collapsed: boolean;
-  logs: DeviceLogs;
+type LogFilters = {
+  device: DeviceLogRole | "all";
+  type: DeviceLogDirection | "all";
 };
 
-type DeviceCommandRole = "relay" | "stepper";
+type LogPaneSnapshot = {
+  activeTab: "editor" | "logs";
+  commandDevice: DeviceCommandRole;
+  commandEnabled: Record<DeviceCommandRole, boolean>;
+  collapsed: boolean;
+  filters: LogFilters;
+  logs: DeviceLogEntry[];
+  width: number;
+};
+
 type DeviceCommandHandler = (command: string) => Promise<boolean> | boolean;
 
 const STORAGE_KEY = "hexagon-rings-state";
 const LOG_PANE_COLLAPSED_KEY = `${STORAGE_KEY}:log-pane-collapsed`;
-const DEVICE_LOG_LIMIT = 250;
-const emptyLogs = (): DeviceLogs => ({
-  midi: [],
-  relay: [],
-  stepper: [],
-});
+const RIGHT_PANE_WIDTH_KEY = `${STORAGE_KEY}:right-pane-width`;
+const DEVICE_LOG_LIMIT = 500;
 
 const listeners = new Set<() => void>();
 const commandHandlers: Partial<Record<DeviceCommandRole, DeviceCommandHandler>> = {};
 
+let nextLogId = 1;
 let snapshot: LogPaneSnapshot = {
+  activeTab: "logs",
+  commandDevice: "stepper",
   commandEnabled: {
     relay: false,
     stepper: false,
   },
   collapsed: getInitialCollapsed(),
-  logs: emptyLogs(),
+  filters: {
+    device: "all",
+    type: "all",
+  },
+  logs: [],
+  width: getInitialWidth(),
 };
 
 function getInitialCollapsed() {
@@ -47,6 +60,18 @@ function getInitialCollapsed() {
   } catch {
     return true;
   }
+}
+
+function getInitialWidth() {
+  try {
+    const saved = Number(window.localStorage.getItem(RIGHT_PANE_WIDTH_KEY));
+    if (Number.isFinite(saved)) {
+      return Math.min(Math.max(saved, 320), 720);
+    }
+  } catch {
+    // Ignore storage failures; the default width is usable.
+  }
+  return 420;
 }
 
 function emit() {
@@ -72,14 +97,17 @@ export function appendDeviceLog(
   payload: string | BufferSource,
 ) {
   const timestampMs = Date.now();
-  const entries = [...snapshot.logs[role]];
+  const entries = [...snapshot.logs];
 
   for (const formattedPayload of splitLogPayload(payload)) {
     entries.push({
+      device: role,
       direction,
+      id: nextLogId,
       payload: formattedPayload,
       timestampMs,
     });
+    nextLogId += 1;
   }
 
   if (entries.length > DEVICE_LOG_LIMIT) {
@@ -88,10 +116,7 @@ export function appendDeviceLog(
 
   snapshot = {
     ...snapshot,
-    logs: {
-      ...snapshot.logs,
-      [role]: entries,
-    },
+    logs: entries,
   };
   emit();
 }
@@ -99,7 +124,7 @@ export function appendDeviceLog(
 export function clearDeviceLogs() {
   snapshot = {
     ...snapshot,
-    logs: emptyLogs(),
+    logs: [],
   };
   emit();
 }
@@ -114,6 +139,47 @@ export function setLogPaneCollapsed(collapsed: boolean) {
   } catch {
     // Ignore storage failures; the pane can still be toggled.
   }
+  emit();
+}
+
+export function setLogPaneTab(activeTab: "editor" | "logs") {
+  snapshot = {
+    ...snapshot,
+    activeTab,
+  };
+  emit();
+}
+
+export function setLogPaneWidth(width: number) {
+  const nextWidth = Math.min(Math.max(width, 320), 720);
+  snapshot = {
+    ...snapshot,
+    width: nextWidth,
+  };
+  try {
+    window.localStorage.setItem(RIGHT_PANE_WIDTH_KEY, String(nextWidth));
+  } catch {
+    // Ignore storage failures; resizing should still work.
+  }
+  emit();
+}
+
+export function setLogFilters(filters: Partial<LogFilters>) {
+  snapshot = {
+    ...snapshot,
+    filters: {
+      ...snapshot.filters,
+      ...filters,
+    },
+  };
+  emit();
+}
+
+export function setCommandDevice(device: DeviceCommandRole) {
+  snapshot = {
+    ...snapshot,
+    commandDevice: device,
+  };
   emit();
 }
 

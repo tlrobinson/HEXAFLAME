@@ -2,6 +2,7 @@
 import "./styles.css";
 import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
+import { App } from "./App";
 import {
   createConnection,
   type Connection,
@@ -84,8 +85,6 @@ import {
   formatMidiMessage,
   getMidiInputLabel,
 } from "./devices/midi";
-import { LeftSidebar } from "./features/sidebar/LeftSidebar";
-import { RightLogPane } from "./features/logs/RightLogPane";
 import { setStats } from "./features/sidebar/stats-store";
 import {
   setGridCallbacks,
@@ -105,17 +104,16 @@ import {
   setMidiSnapshot,
   setMidiStatus,
 } from "./features/midi/midi-store";
-import { SidebarToggle } from "./features/sidebar/SidebarToggle";
 import {
   setSidebarCallbacks,
   setSidebarCollapsed,
 } from "./features/sidebar/sidebar-store";
 import { setEnvelopeSnapshot } from "./features/envelope/envelope-store";
-import { HexCanvas } from "./features/canvas/HexCanvas";
 import {
   getCanvasElement,
   setCanvasCallbacks,
 } from "./features/canvas/canvas-store";
+import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
 
       setCanvasCallbacks({
         onClick: (event) => {
@@ -162,19 +160,35 @@ import {
         },
       });
 
+      function disconnectAllDevices() {
+        for (const connection of getRelayConnections()) {
+          disconnectRelay(connection).catch((error) => console.error(error));
+        }
+        disconnectStepper().catch((error) => console.error(error));
+      }
+
+      setLifecycleCallbacks({
+        onBeforeUnload: disconnectAllDevices,
+        onPageHide: disconnectAllDevices,
+        onResize: () => {
+          render();
+        },
+        onSerialDisconnect: (event) => {
+          void (async () => {
+            for (const connection of getRelayConnections()) {
+              if (event.target === connection.port) {
+                await disconnectRelay(connection);
+              }
+            }
+            if (event.target === stepperPort) {
+              await disconnectStepper();
+            }
+          })();
+        },
+      });
+
       flushSync(() => {
-        createRoot(document.getElementById("left-sidebar-root")).render(
-          <LeftSidebar />,
-        );
-        createRoot(document.getElementById("right-log-pane-root")).render(
-          <RightLogPane />,
-        );
-        createRoot(document.getElementById("sidebar-toggle-root")).render(
-          <SidebarToggle />,
-        );
-        createRoot(document.getElementById("hex-canvas-root")).render(
-          <HexCanvas />,
-        );
+        createRoot(document.getElementById("app-root")).render(<App />);
       });
 
       const canvas = getCanvasElement();
@@ -2993,32 +3007,6 @@ import {
           script: getScriptForSequence(selectedSequenceId),
         });
       }
-
-      if ("serial" in navigator) {
-        navigator.serial.addEventListener("disconnect", async (event) => {
-          for (const connection of getRelayConnections()) {
-            if (event.target === connection.port) {
-              await disconnectRelay(connection);
-            }
-          }
-          if (event.target === stepperPort) {
-            await disconnectStepper();
-          }
-        });
-      }
-      window.addEventListener("pagehide", () => {
-        for (const connection of getRelayConnections()) {
-          disconnectRelay(connection).catch((error) => console.error(error));
-        }
-        disconnectStepper().catch((error) => console.error(error));
-      });
-      window.addEventListener("beforeunload", () => {
-        for (const connection of getRelayConnections()) {
-          disconnectRelay(connection).catch((error) => console.error(error));
-        }
-        disconnectStepper().catch((error) => console.error(error));
-      });
-      window.addEventListener("resize", render);
 
       const savedState = loadState();
       if (savedState?.rings !== null) {
