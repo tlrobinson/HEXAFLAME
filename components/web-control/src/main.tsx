@@ -1,5 +1,18 @@
 // @ts-nocheck
 import "./styles.css";
+import { createRoot } from "react-dom/client";
+import { ConnectionsPanel } from "./features/connections/ConnectionsPanel";
+import {
+  createConnection,
+  type Connection,
+  type MappingTarget,
+} from "./features/connections/connection-model";
+import {
+  formatLogTime,
+  formatSerialBytes,
+  splitLogPayload,
+} from "./features/logs/log-format";
+import { builtinScripts } from "./features/animation/builtin-scripts";
 import {
   buildDistanceMap,
   buildScene,
@@ -178,9 +191,9 @@ import {
         relay: [],
         stepper: [],
       };
-      const connections = [];
-      let connectionSequence = 1;
-      let mappingTarget = null;
+      const connections: Connection[] = [];
+      const connectionsRoot = createRoot(connectionsList);
+      let mappingTarget: MappingTarget = null;
       let activeStepperConnectionId = null;
       let relayPort = null;
       let relayReader = null;
@@ -209,52 +222,6 @@ import {
       });
       stepperEnvelope.originValue = 50;
       stepperEnvelope.targetValue = 100;
-
-      function makeChannels(type) {
-        const count = type === "relay" ? RELAY_CHANNEL_COUNT : 1;
-        return Array.from({ length: count }, (_, index) => ({
-          index,
-          jetId: null,
-          state: "Unknown",
-          homed: false,
-          travelSteps: null,
-          positionPercent: 50,
-        }));
-      }
-
-      function createConnection(type, saved = {}) {
-        const id =
-          saved.id ||
-          `${type}-${Date.now().toString(36)}-${connectionSequence++}`;
-        return {
-          id,
-          type,
-          name:
-            saved.name ||
-            `${type === "relay" ? "Relay" : "Stepper"} ${connectionSequence++}`,
-          expanded: saved.expanded !== false,
-          portKey: saved.portKey || null,
-          port: null,
-          reader: null,
-          status:
-            saved.status ||
-            `${type === "relay" ? "Relay sync" : "Stepper"} disconnected`,
-          connectInProgress: false,
-          syncInProgress: false,
-          stateQueue: [],
-          lastStates: Array(RELAY_CHANNEL_COUNT).fill(null),
-          queuedPosition: null,
-          positionSendInProgress: false,
-          positionSendTimerId: null,
-          lastSendAtMs: -Infinity,
-          channels: Array.isArray(saved.channels)
-            ? makeChannels(type).map((channel, index) => ({
-                ...channel,
-                ...(saved.channels[index] || {}),
-              }))
-            : makeChannels(type),
-        };
-      }
 
       function getRelayConnections() {
         return connections.filter((connection) => connection.type === "relay");
@@ -713,267 +680,63 @@ import {
       }
 
       function renderConnections() {
-        if (!connectionsList) {
-          return;
-        }
-
-        const serialSupported = "serial" in navigator;
-        connectionsList.replaceChildren();
-
-        for (const connection of connections) {
-          const card = document.createElement("div");
-          card.className = "connection-card";
-          card.dataset.connectionId = connection.id;
-
-          const header = document.createElement("div");
-          header.className = "connection-card-header";
-
-          const title = document.createElement("div");
-          title.className = "connection-title";
-
-          const name = document.createElement("div");
-          name.className = "connection-name";
-          name.textContent = connection.name;
-
-          const meta = document.createElement("div");
-          meta.className = "connection-meta";
-          const mappedCount = connection.channels.filter((channel) => channel.jetId).length;
-          meta.textContent = `${connection.status} · ${mappedCount}/${connection.channels.length} mapped`;
-
-          title.append(name, meta);
-
-          const connectButton = document.createElement("button");
-          connectButton.className = "connection-button";
-          connectButton.type = "button";
-          connectButton.disabled = !serialSupported || connection.connectInProgress;
-          connectButton.classList.toggle("connected", connection.port !== null);
-          connectButton.dataset.action = connection.port ? "disconnect" : "connect";
-          connectButton.textContent = connection.port ? "Disconnect" : "Connect";
-
-          const configButton = document.createElement("button");
-          configButton.className = "btn-compact";
-          configButton.type = "button";
-          configButton.dataset.action = "toggle-config";
-          configButton.textContent = "Config";
-
-          header.append(title, connectButton, configButton);
-          card.appendChild(header);
-
-          if (connection.expanded) {
-            const channels = document.createElement("div");
-            channels.className = "connection-channels";
-
-            for (const channel of connection.channels) {
-              const row = document.createElement("div");
-              row.className = "channel-row";
-              row.dataset.channelIndex = String(channel.index);
-              row.dataset.connectionId = connection.id;
-
-              const topline = document.createElement("div");
-              topline.className = "channel-topline";
-              const channelTitle = document.createElement("span");
-              channelTitle.className = "channel-title";
-              channelTitle.textContent = `Channel ${channel.index + 1}`;
-              const target = document.createElement("span");
-              target.className = "channel-map-target";
-              target.textContent =
-                mappingTarget?.connectionId === connection.id &&
-                mappingTarget?.channelIndex === channel.index
-                  ? "Click a jet..."
-                  : formatChannelTarget(channel);
-              topline.append(channelTitle, target);
-              row.appendChild(topline);
-
-              const actions = document.createElement("div");
-              actions.className = "channel-actions";
-              const mapButton = document.createElement("button");
-              mapButton.className = "btn-compact";
-              mapButton.type = "button";
-              mapButton.dataset.action = "map-channel";
-              mapButton.textContent = "Map";
-              actions.appendChild(mapButton);
-
-              if (connection.type === "stepper") {
-                const homeButton = document.createElement("button");
-                homeButton.className = "btn-compact";
-                homeButton.type = "button";
-                homeButton.dataset.action = "home-channel";
-                homeButton.disabled = connection.port === null;
-                homeButton.textContent = "Home";
-                actions.appendChild(homeButton);
-              }
-
-              row.appendChild(actions);
-
-              if (connection.type === "stepper") {
-                const metrics = document.createElement("div");
-                metrics.className = "channel-metrics";
-                const state = document.createElement("span");
-                state.className = "metric-text";
-                state.textContent = `State: ${channel.state || "Unknown"}`;
-                const travel = document.createElement("span");
-                travel.className = "metric-text";
-                travel.textContent =
-                  channel.travelSteps === null
-                    ? "Travel: Unknown"
-                    : `Travel: ${Number(channel.travelSteps).toLocaleString()} steps`;
-                metrics.append(state, travel);
-                row.appendChild(metrics);
-
-                const position = document.createElement("div");
-                position.className = "channel-position";
-                const label = document.createElement("label");
-                label.textContent = "Position";
-                const slider = document.createElement("input");
-                slider.type = "range";
-                slider.min = "0";
-                slider.max = "100";
-                slider.step = "0.1";
-                slider.value = String(channel.positionPercent ?? 50);
-                slider.disabled = connection.port === null || !channel.homed;
-                slider.dataset.action = "position-channel";
-                const readout = document.createElement("output");
-                readout.textContent = `${Number(channel.positionPercent ?? 50).toFixed(1)}%`;
-                position.append(label, slider, readout);
-                row.appendChild(position);
+        connectionsRoot.render(
+          <ConnectionsPanel
+            activeNodeIds={activeNodes}
+            connections={[...connections]}
+            mappingTarget={mappingTarget}
+            serialSupported={"serial" in navigator}
+            onConnect={(connection) => {
+              if (connection.type === "relay") {
+                void connectRelay(connection);
               } else {
-                const metrics = document.createElement("div");
-                metrics.className = "channel-metrics";
-                const state = document.createElement("span");
-                state.className = "metric-text";
-                state.textContent = `State: ${activeNodes.has(channel.jetId) ? "On" : "Off"}`;
-                metrics.appendChild(state);
-                row.appendChild(metrics);
+                void connectStepper(connection);
               }
-
-              channels.appendChild(row);
-            }
-
-            card.appendChild(channels);
-          }
-
-          connectionsList.appendChild(card);
-        }
+            }}
+            onDisconnect={(connection) => {
+              if (connection.type === "relay") {
+                void disconnectRelay(connection);
+              } else {
+                void disconnectStepper();
+              }
+            }}
+            onHome={(connection) => {
+              activeStepperConnectionId = connection.id;
+              void homeStepper();
+            }}
+            onMap={(connection, channel) => {
+              mappingTarget = {
+                connectionId: connection.id,
+                channelIndex: channel.index,
+              };
+              renderConnections();
+            }}
+            onPositionCommit={(connection, channel, positionPercent) => {
+              channel.positionPercent = positionPercent;
+              if (connection === getPrimaryStepperConnection()) {
+                setStepperBasePosition(positionPercent, { send: false });
+                void flushStepperPositionSend();
+              }
+              renderConnections();
+            }}
+            onPositionInput={(connection, channel, positionPercent) => {
+              channel.positionPercent = positionPercent;
+              if (connection === getPrimaryStepperConnection()) {
+                setStepperBasePosition(positionPercent);
+              }
+              renderConnections();
+            }}
+            onToggleConfig={(connection) => {
+              connection.expanded = !connection.expanded;
+              saveState();
+              renderConnections();
+            }}
+          />,
+        );
       }
 
       function updateConnectionDom() {
-        if (!connectionsList) {
-          return;
-        }
-
-        const serialSupported = "serial" in navigator;
-        for (const connection of connections) {
-          const card = connectionsList.querySelector(
-            `.connection-card[data-connection-id="${connection.id}"]`,
-          );
-          if (!card) {
-            continue;
-          }
-
-          const mappedCount = connection.channels.filter((channel) => channel.jetId).length;
-          const meta = card.querySelector(".connection-meta");
-          if (meta) {
-            meta.textContent = `${connection.status} · ${mappedCount}/${connection.channels.length} mapped`;
-          }
-
-          const connectButton = card.querySelector(
-            '[data-action="connect"], [data-action="disconnect"]',
-          );
-          if (connectButton) {
-            connectButton.disabled =
-              !serialSupported || connection.connectInProgress;
-            connectButton.classList.toggle("connected", connection.port !== null);
-            connectButton.dataset.action = connection.port ? "disconnect" : "connect";
-            connectButton.textContent = connection.port ? "Disconnect" : "Connect";
-          }
-
-          for (const channel of connection.channels) {
-            const row = card.querySelector(
-              `.channel-row[data-channel-index="${channel.index}"]`,
-            );
-            if (!row) {
-              continue;
-            }
-
-            const target = row.querySelector(".channel-map-target");
-            if (target) {
-              target.textContent =
-                mappingTarget?.connectionId === connection.id &&
-                mappingTarget?.channelIndex === channel.index
-                  ? "Click a jet..."
-                  : formatChannelTarget(channel);
-            }
-
-            const metrics = row.querySelectorAll(".metric-text");
-            if (connection.type === "stepper") {
-              if (metrics[0]) {
-                metrics[0].textContent = `State: ${channel.state || "Unknown"}`;
-              }
-              if (metrics[1]) {
-                metrics[1].textContent =
-                  channel.travelSteps === null
-                    ? "Travel: Unknown"
-                    : `Travel: ${Number(channel.travelSteps).toLocaleString()} steps`;
-              }
-
-              const slider = row.querySelector('[data-action="position-channel"]');
-              const readout = row.querySelector("output");
-              if (slider && document.activeElement !== slider) {
-                slider.value = String(channel.positionPercent ?? 50);
-              }
-              if (slider) {
-                slider.disabled = connection.port === null || !channel.homed;
-              }
-              if (readout) {
-                readout.textContent = `${Number(channel.positionPercent ?? 50).toFixed(1)}%`;
-              }
-            } else if (metrics[0]) {
-              metrics[0].textContent = `State: ${activeNodes.has(channel.jetId) ? "On" : "Off"}`;
-            }
-          }
-        }
-      }
-
-      function formatSerialBytes(bytes) {
-        return [...bytes]
-          .map((value) => value.toString(16).padStart(2, "0"))
-          .join(" ");
-      }
-
-      function formatLogTime(timestampMs) {
-        const date = new Date(timestampMs);
-        return [
-          date.getHours().toString().padStart(2, "0"),
-          date.getMinutes().toString().padStart(2, "0"),
-          date.getSeconds().toString().padStart(2, "0"),
-        ].join(":");
-      }
-
-      function formatLogPayload(payload) {
-        if (typeof payload === "string") {
-          const normalized = payload.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-          if (normalized.length === 0) {
-            return "(empty)";
-          }
-
-          try {
-            const parsed = JSON.parse(normalized);
-            if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-              const { jsonrpc, ...withoutJsonRpc } = parsed;
-              return JSON.stringify(withoutJsonRpc);
-            }
-          } catch {
-            // Non-JSON log payloads are displayed as plain text.
-          }
-
-          return normalized;
-        }
-
-        if (payload instanceof Uint8Array || Array.isArray(payload)) {
-          return formatSerialBytes(payload);
-        }
-
-        return String(payload);
+        renderConnections();
       }
 
       function renderDeviceLog(role) {
@@ -1024,20 +787,10 @@ import {
           return;
         }
 
-        const formattedPayloads =
-          typeof payload === "string"
-            ? payload
-                .replace(/\r\n/g, "\n")
-                .replace(/\r/g, "\n")
-                .split("\n")
-                .filter((line) => line.length > 0)
-                .map(formatLogPayload)
-            : [formatLogPayload(payload)];
+        const formattedPayloads = splitLogPayload(payload);
 
         const timestampMs = Date.now();
-        for (const formattedPayload of formattedPayloads.length > 0
-          ? formattedPayloads
-          : ["(empty)"]) {
+        for (const formattedPayload of formattedPayloads) {
           entries.push({
             timestampMs,
             direction,
@@ -2130,90 +1883,6 @@ import {
       // Scene filter:
       //   filter-scene type:vertex    – keep only vertex nodes + center
       //
-
-      const builtinScripts = {
-        ripple: `# Ripple: expanding wave then contracting
-for-dist
-  add dist:$d
-  frame
-end
-for-dist-rev
-  remove dist:$d
-  frame
-end`,
-
-        band: `# Band: traveling pair of adjacent layers
-set dist:0
-frame
-for-dist 1
-  set dist:$d-1..$d
-  frame
-  set dist:$d
-  frame
-end
-for-dist-rev $max-1 0
-  set dist:$d..$d+1
-  frame
-  set dist:$d
-  frame
-end`,
-
-        chase: `# Chase: walk around each distance ring
-cursor center
-for-dist 1
-  for-node dist:$d sort angle
-    walk-to $n constrain dist:$d-1..$d
-  end
-end
-walk-to center`,
-
-        walker: `# Walker: depth-first graph traversal
-cursor center
-dfs sort shell-angle`,
-
-        "ripple-outline": `# Ripple (outlines only)
-filter-scene type:vertex
-for-dist
-  add dist:$d
-  frame
-end
-for-dist-rev
-  remove dist:$d
-  frame
-end`,
-
-        "band-outline": `# Band (outlines only)
-filter-scene type:vertex
-set dist:0
-frame
-for-dist 1
-  set dist:$d-1..$d
-  frame
-  set dist:$d
-  frame
-end
-for-dist-rev $max-1 0
-  set dist:$d..$d+1
-  frame
-  set dist:$d
-  frame
-end`,
-
-        "chase-outline": `# Chase (outlines only)
-filter-scene type:vertex
-cursor center
-for-dist 1
-  for-node dist:$d sort angle
-    walk-to $n constrain dist:$d-1..$d
-  end
-end
-walk-to center`,
-
-        "walker-outline": `# Walker (outlines only)
-filter-scene type:vertex
-cursor center
-dfs sort shell-angle`,
-      };
 
       function resolveSelector(token, vars, distanceMap, currentScene) {
         if (token === "$n") {
