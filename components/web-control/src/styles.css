@@ -104,6 +104,88 @@
       }
       .section-row-wrap:last-child { margin-bottom: 0; }
 
+      .connections-list {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .connection-card {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.025);
+        overflow: hidden;
+      }
+
+      .connection-card-header {
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        gap: 6px;
+        align-items: center;
+        padding: 8px;
+      }
+
+      .connection-title {
+        min-width: 0;
+      }
+
+      .connection-name {
+        font-weight: 700;
+        font-size: 11px;
+        color: var(--text-bright);
+      }
+
+      .connection-meta {
+        margin-top: 2px;
+        color: var(--text-dim);
+        font-family: var(--mono);
+        font-size: 9px;
+      }
+
+      .connection-channels {
+        display: grid;
+        gap: 8px;
+        padding: 8px;
+        border-top: 1px solid var(--border);
+        background: rgba(0, 0, 0, 0.14);
+      }
+
+      .channel-row {
+        display: grid;
+        gap: 6px;
+        padding: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.025);
+      }
+
+      .channel-topline,
+      .channel-actions,
+      .channel-metrics {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+
+      .channel-title {
+        font-weight: 700;
+        color: var(--text-bright);
+      }
+
+      .channel-map-target {
+        color: var(--text-dim);
+        font-family: var(--mono);
+        font-size: 9px;
+      }
+
+      .channel-position {
+        display: grid;
+        grid-template-columns: 54px minmax(0, 1fr) 44px;
+        gap: 6px;
+        align-items: center;
+      }
+
       /* ── Toggle Button ─────────────────────────── */
       .sidebar-toggle {
         position: fixed;
@@ -432,7 +514,11 @@
         border-radius: 6px;
         padding: 5px 12px;
         cursor: pointer;
-        transition: all 150ms ease;
+        transition:
+          background-color 120ms ease,
+          border-color 120ms ease,
+          color 120ms ease,
+          box-shadow 120ms ease;
         white-space: nowrap;
       }
       button:hover {

@@ -26,6 +26,7 @@ import {
   buildRelayStates,
   buildRelayWriteMultipleFrame,
   findPreferredSerialPort,
+  getSerialPortKey,
   getRelayMappedNodeIds,
   parseRelayCommandInput,
   relayStatesEqual,
@@ -39,6 +40,8 @@ import {
   buildStepperHomeCommand,
   buildStepperReleaseCommand,
   buildStepperTimedPositionCommand,
+  buildStepperJsonRpcRequest,
+  parseStepperCommandInput,
   parseStepperProtocolLine,
   readStepperTextLines,
   writeStepperTextCommand,
@@ -78,24 +81,12 @@ import {
       const loopToggleButton = document.getElementById("loop-toggle-button");
       const speedSlider = document.getElementById("speed-slider");
       const speedReadout = document.getElementById("speed-readout");
-      const serialConnectButton = document.getElementById(
-        "serial-connect-button",
+      const connectionsList = document.getElementById("connections-list");
+      const addRelayConnectionButton = document.getElementById(
+        "add-relay-connection-button",
       );
-      const stepperConnectButton = document.getElementById(
-        "stepper-connect-button",
-      );
-      const stepperHomeButton = document.getElementById("stepper-home-button");
-      const stepperPositionSlider = document.getElementById(
-        "stepper-position-slider",
-      );
-      const stepperPositionReadout = document.getElementById(
-        "stepper-position-readout",
-      );
-      const stepperHomedStateText = document.getElementById(
-        "stepper-homed-state",
-      );
-      const stepperTravelStepsText = document.getElementById(
-        "stepper-travel-steps",
+      const addStepperConnectionButton = document.getElementById(
+        "add-stepper-connection-button",
       );
       const stepperEnvelopePath = document.getElementById(
         "stepper-envelope-path",
@@ -130,8 +121,6 @@ import {
       const editorError = document.getElementById("editor-error");
       const midiConnectButton = document.getElementById("midi-connect-button");
       const midiStatus = document.getElementById("midi-status");
-      const serialStatus = document.getElementById("serial-status");
-      const stepperStatus = document.getElementById("stepper-status");
       const relayCommandForm = document.getElementById("relay-command-form");
       const relayCommandInput = document.getElementById("relay-command-input");
       const relayCommandSendButton = document.getElementById(
@@ -189,6 +178,10 @@ import {
         relay: [],
         stepper: [],
       };
+      const connections = [];
+      let connectionSequence = 1;
+      let mappingTarget = null;
+      let activeStepperConnectionId = null;
       let relayPort = null;
       let relayReader = null;
       let relaySyncInProgress = false;
@@ -216,6 +209,73 @@ import {
       });
       stepperEnvelope.originValue = 50;
       stepperEnvelope.targetValue = 100;
+
+      function makeChannels(type) {
+        const count = type === "relay" ? RELAY_CHANNEL_COUNT : 1;
+        return Array.from({ length: count }, (_, index) => ({
+          index,
+          jetId: null,
+          state: "Unknown",
+          homed: false,
+          travelSteps: null,
+          positionPercent: 50,
+        }));
+      }
+
+      function createConnection(type, saved = {}) {
+        const id =
+          saved.id ||
+          `${type}-${Date.now().toString(36)}-${connectionSequence++}`;
+        return {
+          id,
+          type,
+          name:
+            saved.name ||
+            `${type === "relay" ? "Relay" : "Stepper"} ${connectionSequence++}`,
+          expanded: saved.expanded !== false,
+          portKey: saved.portKey || null,
+          port: null,
+          reader: null,
+          status:
+            saved.status ||
+            `${type === "relay" ? "Relay sync" : "Stepper"} disconnected`,
+          connectInProgress: false,
+          syncInProgress: false,
+          stateQueue: [],
+          lastStates: Array(RELAY_CHANNEL_COUNT).fill(null),
+          queuedPosition: null,
+          positionSendInProgress: false,
+          positionSendTimerId: null,
+          lastSendAtMs: -Infinity,
+          channels: Array.isArray(saved.channels)
+            ? makeChannels(type).map((channel, index) => ({
+                ...channel,
+                ...(saved.channels[index] || {}),
+              }))
+            : makeChannels(type),
+        };
+      }
+
+      function getRelayConnections() {
+        return connections.filter((connection) => connection.type === "relay");
+      }
+
+      function getStepperConnections() {
+        return connections.filter((connection) => connection.type === "stepper");
+      }
+
+      function getPrimaryRelayConnection() {
+        return getRelayConnections()[0] || null;
+      }
+
+      function getPrimaryStepperConnection() {
+        return (
+          connections.find((connection) => connection.id === activeStepperConnectionId) ||
+          getStepperConnections().find((connection) => connection.port !== null) ||
+          getStepperConnections()[0] ||
+          null
+        );
+      }
 
       function angleFromCenter(node) {
         return Math.atan2(
@@ -252,27 +312,27 @@ import {
 
       function updateSerialUi(mappedCount = 0) {
         const serialSupported = "serial" in navigator;
-        serialConnectButton.disabled = !serialSupported;
-        relayCommandInput.disabled = !serialSupported || relayPort === null;
-        relayCommandSendButton.disabled = !serialSupported || relayPort === null;
-        serialConnectButton.classList.toggle("connected", relayPort !== null);
-        if (!serialSupported) {
-          serialStatus.textContent = "Web Serial unavailable in this browser";
-          return;
-        }
-
-        serialStatus.textContent = `${relayStatusMessage} (${mappedCount}/${RELAY_CHANNEL_COUNT} mapped)`;
+        relayCommandInput.disabled =
+          !serialSupported || !getPrimaryRelayConnection()?.port;
+        relayCommandSendButton.disabled =
+          !serialSupported || !getPrimaryRelayConnection()?.port;
+        updateConnectionDom();
       }
 
       function updateStepperReadout() {
-        stepperPositionReadout.value = `${stepperPositionPercent.toFixed(1)}%`;
+        const stepper = getPrimaryStepperConnection();
+        if (stepper) {
+          stepper.channels[0].positionPercent = stepperPositionPercent;
+        }
+        updateConnectionDom();
       }
 
       function updateStepperTravelReadout() {
-        stepperTravelStepsText.textContent =
-          stepperTravelSteps === null
-            ? "Unknown"
-            : `${stepperTravelSteps.toLocaleString()} steps`;
+        const stepper = getPrimaryStepperConnection();
+        if (stepper) {
+          stepper.channels[0].travelSteps = stepperTravelSteps;
+        }
+        updateConnectionDom();
       }
 
       function canControlStepperPosition() {
@@ -288,12 +348,12 @@ import {
       }
 
       function updateStepperHomedReadout() {
-        if (stepperPort === null) {
-          stepperHomedStateText.textContent = "Unknown";
-          return;
+        const stepper = getPrimaryStepperConnection();
+        if (stepper) {
+          stepper.channels[0].homed = stepperHomed;
+          stepper.channels[0].state = stepperPort === null ? "Unknown" : stepperHomed ? "Homed" : "Not homed";
         }
-
-        stepperHomedStateText.textContent = stepperHomed ? "Yes" : "No";
+        updateConnectionDom();
       }
 
       function formatEnvelopeTime(ms) {
@@ -471,7 +531,6 @@ import {
         { send = true, save = true, sendDelayMs = STEPPER_SEND_DELAY_MS } = {},
       ) {
         stepperPositionPercent = Math.min(Math.max(percent, 0), 100);
-        stepperPositionSlider.value = stepperPositionPercent.toFixed(1);
         updateStepperReadout();
         if (save) {
           saveState();
@@ -633,25 +692,11 @@ import {
 
       function updateStepperUi() {
         const serialSupported = "serial" in navigator;
-        stepperConnectButton.disabled =
-          !serialSupported || stepperConnectInProgress;
-        stepperHomeButton.disabled = stepperPort === null;
-        stepperHomeButton.classList.toggle(
-          "btn-danger-compact",
-          stepperPort !== null && !stepperHomed,
-        );
-        stepperConnectButton.classList.toggle("connected", stepperPort !== null);
-        stepperPositionSlider.disabled = !canControlStepperPosition();
         stepperCommandInput.disabled = !serialSupported || stepperPort === null;
         stepperCommandSendButton.disabled =
           !serialSupported || stepperPort === null;
         updateStepperHomedReadout();
-        if (!serialSupported) {
-          stepperStatus.textContent = "Web Serial unavailable in this browser";
-          return;
-        }
-
-        stepperStatus.textContent = stepperStatusMessage;
+        updateConnectionDom();
       }
 
       function updateMidiUi() {
@@ -660,6 +705,232 @@ import {
         midiConnectButton.classList.toggle("connected", midiInputs.size > 0);
         if (!midiSupported) {
           midiStatus.textContent = "Web MIDI not supported";
+        }
+      }
+
+      function formatChannelTarget(channel) {
+        return channel.jetId ? channel.jetId : "Unmapped";
+      }
+
+      function renderConnections() {
+        if (!connectionsList) {
+          return;
+        }
+
+        const serialSupported = "serial" in navigator;
+        connectionsList.replaceChildren();
+
+        for (const connection of connections) {
+          const card = document.createElement("div");
+          card.className = "connection-card";
+          card.dataset.connectionId = connection.id;
+
+          const header = document.createElement("div");
+          header.className = "connection-card-header";
+
+          const title = document.createElement("div");
+          title.className = "connection-title";
+
+          const name = document.createElement("div");
+          name.className = "connection-name";
+          name.textContent = connection.name;
+
+          const meta = document.createElement("div");
+          meta.className = "connection-meta";
+          const mappedCount = connection.channels.filter((channel) => channel.jetId).length;
+          meta.textContent = `${connection.status} · ${mappedCount}/${connection.channels.length} mapped`;
+
+          title.append(name, meta);
+
+          const connectButton = document.createElement("button");
+          connectButton.className = "connection-button";
+          connectButton.type = "button";
+          connectButton.disabled = !serialSupported || connection.connectInProgress;
+          connectButton.classList.toggle("connected", connection.port !== null);
+          connectButton.dataset.action = connection.port ? "disconnect" : "connect";
+          connectButton.textContent = connection.port ? "Disconnect" : "Connect";
+
+          const configButton = document.createElement("button");
+          configButton.className = "btn-compact";
+          configButton.type = "button";
+          configButton.dataset.action = "toggle-config";
+          configButton.textContent = "Config";
+
+          header.append(title, connectButton, configButton);
+          card.appendChild(header);
+
+          if (connection.expanded) {
+            const channels = document.createElement("div");
+            channels.className = "connection-channels";
+
+            for (const channel of connection.channels) {
+              const row = document.createElement("div");
+              row.className = "channel-row";
+              row.dataset.channelIndex = String(channel.index);
+              row.dataset.connectionId = connection.id;
+
+              const topline = document.createElement("div");
+              topline.className = "channel-topline";
+              const channelTitle = document.createElement("span");
+              channelTitle.className = "channel-title";
+              channelTitle.textContent = `Channel ${channel.index + 1}`;
+              const target = document.createElement("span");
+              target.className = "channel-map-target";
+              target.textContent =
+                mappingTarget?.connectionId === connection.id &&
+                mappingTarget?.channelIndex === channel.index
+                  ? "Click a jet..."
+                  : formatChannelTarget(channel);
+              topline.append(channelTitle, target);
+              row.appendChild(topline);
+
+              const actions = document.createElement("div");
+              actions.className = "channel-actions";
+              const mapButton = document.createElement("button");
+              mapButton.className = "btn-compact";
+              mapButton.type = "button";
+              mapButton.dataset.action = "map-channel";
+              mapButton.textContent = "Map";
+              actions.appendChild(mapButton);
+
+              if (connection.type === "stepper") {
+                const homeButton = document.createElement("button");
+                homeButton.className = "btn-compact";
+                homeButton.type = "button";
+                homeButton.dataset.action = "home-channel";
+                homeButton.disabled = connection.port === null;
+                homeButton.textContent = "Home";
+                actions.appendChild(homeButton);
+              }
+
+              row.appendChild(actions);
+
+              if (connection.type === "stepper") {
+                const metrics = document.createElement("div");
+                metrics.className = "channel-metrics";
+                const state = document.createElement("span");
+                state.className = "metric-text";
+                state.textContent = `State: ${channel.state || "Unknown"}`;
+                const travel = document.createElement("span");
+                travel.className = "metric-text";
+                travel.textContent =
+                  channel.travelSteps === null
+                    ? "Travel: Unknown"
+                    : `Travel: ${Number(channel.travelSteps).toLocaleString()} steps`;
+                metrics.append(state, travel);
+                row.appendChild(metrics);
+
+                const position = document.createElement("div");
+                position.className = "channel-position";
+                const label = document.createElement("label");
+                label.textContent = "Position";
+                const slider = document.createElement("input");
+                slider.type = "range";
+                slider.min = "0";
+                slider.max = "100";
+                slider.step = "0.1";
+                slider.value = String(channel.positionPercent ?? 50);
+                slider.disabled = connection.port === null || !channel.homed;
+                slider.dataset.action = "position-channel";
+                const readout = document.createElement("output");
+                readout.textContent = `${Number(channel.positionPercent ?? 50).toFixed(1)}%`;
+                position.append(label, slider, readout);
+                row.appendChild(position);
+              } else {
+                const metrics = document.createElement("div");
+                metrics.className = "channel-metrics";
+                const state = document.createElement("span");
+                state.className = "metric-text";
+                state.textContent = `State: ${activeNodes.has(channel.jetId) ? "On" : "Off"}`;
+                metrics.appendChild(state);
+                row.appendChild(metrics);
+              }
+
+              channels.appendChild(row);
+            }
+
+            card.appendChild(channels);
+          }
+
+          connectionsList.appendChild(card);
+        }
+      }
+
+      function updateConnectionDom() {
+        if (!connectionsList) {
+          return;
+        }
+
+        const serialSupported = "serial" in navigator;
+        for (const connection of connections) {
+          const card = connectionsList.querySelector(
+            `.connection-card[data-connection-id="${connection.id}"]`,
+          );
+          if (!card) {
+            continue;
+          }
+
+          const mappedCount = connection.channels.filter((channel) => channel.jetId).length;
+          const meta = card.querySelector(".connection-meta");
+          if (meta) {
+            meta.textContent = `${connection.status} · ${mappedCount}/${connection.channels.length} mapped`;
+          }
+
+          const connectButton = card.querySelector(
+            '[data-action="connect"], [data-action="disconnect"]',
+          );
+          if (connectButton) {
+            connectButton.disabled =
+              !serialSupported || connection.connectInProgress;
+            connectButton.classList.toggle("connected", connection.port !== null);
+            connectButton.dataset.action = connection.port ? "disconnect" : "connect";
+            connectButton.textContent = connection.port ? "Disconnect" : "Connect";
+          }
+
+          for (const channel of connection.channels) {
+            const row = card.querySelector(
+              `.channel-row[data-channel-index="${channel.index}"]`,
+            );
+            if (!row) {
+              continue;
+            }
+
+            const target = row.querySelector(".channel-map-target");
+            if (target) {
+              target.textContent =
+                mappingTarget?.connectionId === connection.id &&
+                mappingTarget?.channelIndex === channel.index
+                  ? "Click a jet..."
+                  : formatChannelTarget(channel);
+            }
+
+            const metrics = row.querySelectorAll(".metric-text");
+            if (connection.type === "stepper") {
+              if (metrics[0]) {
+                metrics[0].textContent = `State: ${channel.state || "Unknown"}`;
+              }
+              if (metrics[1]) {
+                metrics[1].textContent =
+                  channel.travelSteps === null
+                    ? "Travel: Unknown"
+                    : `Travel: ${Number(channel.travelSteps).toLocaleString()} steps`;
+              }
+
+              const slider = row.querySelector('[data-action="position-channel"]');
+              const readout = row.querySelector("output");
+              if (slider && document.activeElement !== slider) {
+                slider.value = String(channel.positionPercent ?? 50);
+              }
+              if (slider) {
+                slider.disabled = connection.port === null || !channel.homed;
+              }
+              if (readout) {
+                readout.textContent = `${Number(channel.positionPercent ?? 50).toFixed(1)}%`;
+              }
+            } else if (metrics[0]) {
+              metrics[0].textContent = `State: ${activeNodes.has(channel.jetId) ? "On" : "Off"}`;
+            }
+          }
         }
       }
 
@@ -681,7 +952,21 @@ import {
       function formatLogPayload(payload) {
         if (typeof payload === "string") {
           const normalized = payload.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-          return normalized.length > 0 ? normalized : "(empty)";
+          if (normalized.length === 0) {
+            return "(empty)";
+          }
+
+          try {
+            const parsed = JSON.parse(normalized);
+            if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+              const { jsonrpc, ...withoutJsonRpc } = parsed;
+              return JSON.stringify(withoutJsonRpc);
+            }
+          } catch {
+            // Non-JSON log payloads are displayed as plain text.
+          }
+
+          return normalized;
         }
 
         if (payload instanceof Uint8Array || Array.isArray(payload)) {
@@ -739,11 +1024,26 @@ import {
           return;
         }
 
-        entries.push({
-          timestampMs: Date.now(),
-          direction,
-          payload: formatLogPayload(payload),
-        });
+        const formattedPayloads =
+          typeof payload === "string"
+            ? payload
+                .replace(/\r\n/g, "\n")
+                .replace(/\r/g, "\n")
+                .split("\n")
+                .filter((line) => line.length > 0)
+                .map(formatLogPayload)
+            : [formatLogPayload(payload)];
+
+        const timestampMs = Date.now();
+        for (const formattedPayload of formattedPayloads.length > 0
+          ? formattedPayloads
+          : ["(empty)"]) {
+          entries.push({
+            timestampMs,
+            direction,
+            payload: formattedPayload,
+          });
+        }
         if (entries.length > DEVICE_LOG_LIMIT) {
           entries.splice(0, entries.length - DEVICE_LOG_LIMIT);
         }
@@ -800,22 +1100,39 @@ import {
       }
 
       function handleStepperLine(line) {
+        logSerialRx("stepper", line);
         const update = parseStepperProtocolLine(line);
+        const connection = getPrimaryStepperConnection();
         if (update.homed !== undefined) {
           stepperHomed = update.homed;
+          if (connection) {
+            connection.channels[0].homed = update.homed;
+            connection.channels[0].state = update.homed ? "Homed" : "Not homed";
+          }
         }
 
         if (update.travelSteps !== undefined) {
           stepperTravelSteps = update.travelSteps;
+          if (connection) {
+            connection.channels[0].travelSteps = update.travelSteps;
+          }
           updateStepperTravelReadout();
           saveState();
         }
 
         if (update.positionPercent !== undefined) {
+          if (connection) {
+            connection.channels[0].positionPercent = update.positionPercent;
+          }
           syncStepperPositionFromBoard(update.positionPercent);
         }
 
-        stepperStatusMessage = update.statusMessage;
+        if (update.statusMessage) {
+          stepperStatusMessage = update.statusMessage;
+          if (connection) {
+            connection.status = update.statusMessage;
+          }
+        }
         updateStepperUi();
       }
 
@@ -886,6 +1203,14 @@ import {
             typeof parsed.customScripts === "object"
               ? parsed.customScripts
               : {};
+          const savedConnections = Array.isArray(parsed.connections)
+            ? parsed.connections.filter(
+                (connection) =>
+                  connection &&
+                  typeof connection === "object" &&
+                  (connection.type === "relay" || connection.type === "stepper"),
+              )
+            : null;
 
           return {
             rings: Number.isFinite(rings) ? rings : null,
@@ -917,6 +1242,7 @@ import {
               ? centerEnvelopeReleaseMs
               : 320,
             customScripts: savedCustomScripts,
+            connections: savedConnections,
           };
         } catch {
           return null;
@@ -942,6 +1268,20 @@ import {
               centerEnvelopeDecayMs: stepperEnvelope.decayMs,
               centerEnvelopeSustainLevel: stepperEnvelope.sustainLevel,
               centerEnvelopeReleaseMs: stepperEnvelope.releaseMs,
+              connections: connections.map((connection) => ({
+                id: connection.id,
+                type: connection.type,
+                name: connection.name,
+                expanded: connection.expanded,
+                portKey: connection.portKey,
+                channels: connection.channels.map((channel) => ({
+                  index: channel.index,
+                  jetId: channel.jetId,
+                  homed: channel.homed,
+                  travelSteps: channel.travelSteps,
+                  positionPercent: channel.positionPercent,
+                })),
+              })),
               customScripts:
                 Object.keys(customScripts).length > 0
                   ? customScripts
@@ -1051,6 +1391,18 @@ import {
       }
 
       function getMappedRelayNodeIds(currentScene) {
+        const mapped = [];
+        for (const connection of getRelayConnections()) {
+          for (const channel of connection.channels) {
+            if (channel.jetId) {
+              mapped.push(channel.jetId);
+            }
+          }
+        }
+        if (mapped.length > 0) {
+          return mapped;
+        }
+
         return getRelayMappedNodeIds(
           currentScene,
           buildDistanceMap(currentScene),
@@ -1058,21 +1410,26 @@ import {
         );
       }
 
-      function getRelayStateSnapshot(currentScene) {
-        return buildRelayStates(
-          currentScene,
-          getMappedRelayNodeIds(currentScene),
-          activeNodes,
-        );
+      function getRelayStateSnapshot(connection) {
+        const states = Array(RELAY_CHANNEL_COUNT).fill(false);
+        for (const channel of connection.channels) {
+          states[channel.index] = channel.jetId ? activeNodes.has(channel.jetId) : false;
+        }
+        return {
+          mappedNodeIds: connection.channels
+            .filter((channel) => channel.jetId)
+            .map((channel) => channel.jetId),
+          states,
+        };
       }
 
-      async function writeRelayFrame(frame) {
-        if (!relayPort?.writable) {
+      async function writeRelayFrame(frame, connection = getPrimaryRelayConnection()) {
+        if (!connection?.port?.writable) {
           throw new Error("Relay port is not connected");
         }
 
         logSerialTx("relay", frame);
-        const writer = relayPort.writable.getWriter();
+        const writer = connection.port.writable.getWriter();
         try {
           await writer.write(frame);
         } finally {
@@ -1086,67 +1443,72 @@ import {
           return;
         }
 
-        await writeRelayFrame(frame);
-        relayStatusMessage = "Relay command sent";
+        const connection = getPrimaryRelayConnection();
+        await writeRelayFrame(frame, connection);
+        if (connection) {
+          connection.status = "Relay command sent";
+          relayStatusMessage = connection.status;
+        }
         updateSerialUi(scene ? getMappedRelayNodeIds(scene).length : 0);
       }
 
-      async function processRelaySyncQueue() {
-        if (relaySyncInProgress || relayPort === null) {
+      async function processRelaySyncQueue(connection = getPrimaryRelayConnection()) {
+        if (!connection || connection.syncInProgress || connection.port === null) {
           return;
         }
 
-        relaySyncInProgress = true;
+        connection.syncInProgress = true;
 
         try {
-          while (relayStateQueue.length > 0 && relayPort !== null) {
-            const nextStates = relayStateQueue.shift();
-            relayLastStates = [...nextStates];
-            await writeRelayFrame(buildRelayWriteMultipleFrame(nextStates));
+          while (connection.stateQueue.length > 0 && connection.port !== null) {
+            const nextStates = connection.stateQueue.shift();
+            connection.lastStates = [...nextStates];
+            await writeRelayFrame(buildRelayWriteMultipleFrame(nextStates), connection);
             await new Promise((resolve) => setTimeout(resolve, 10));
           }
 
-          if (relayPort !== null) {
-            relayStatusMessage = "Relay sync connected";
+          if (connection.port !== null) {
+            connection.status = "Relay sync connected";
+            relayStatusMessage = connection.status;
           }
         } catch (error) {
           console.error(error);
-          relayLastStates = Array(RELAY_CHANNEL_COUNT).fill(null);
-          relayStatusMessage = "Relay sync error";
+          connection.lastStates = Array(RELAY_CHANNEL_COUNT).fill(null);
+          connection.status = "Relay sync error";
+          relayStatusMessage = connection.status;
         } finally {
-          relaySyncInProgress = false;
-          if (scene) {
-            updateSerialUi(getMappedRelayNodeIds(scene).length);
-          } else {
-            updateSerialUi(0);
-          }
+          connection.syncInProgress = false;
+          updateSerialUi(scene ? getMappedRelayNodeIds(scene).length : 0);
         }
       }
 
       function syncRelayOutputs(currentScene) {
-        const { mappedNodeIds, states } = getRelayStateSnapshot(currentScene);
-        updateSerialUi(mappedNodeIds.length);
+        updateSerialUi(getMappedRelayNodeIds(currentScene).length);
 
-        if (relayPort === null) {
-          return;
+        for (const connection of getRelayConnections()) {
+          if (connection.port === null) {
+            continue;
+          }
+
+          const { states } = getRelayStateSnapshot(connection);
+          const queuedStates =
+            connection.stateQueue[connection.stateQueue.length - 1] ||
+            connection.lastStates;
+          if (relayStatesEqual(queuedStates, states)) {
+            continue;
+          }
+
+          connection.stateQueue.push([...states]);
+          processRelaySyncQueue(connection);
         }
-
-        const queuedStates =
-          relayStateQueue[relayStateQueue.length - 1] || relayLastStates;
-        if (relayStatesEqual(queuedStates, states)) {
-          return;
-        }
-
-        relayStateQueue.push([...states]);
-        processRelaySyncQueue();
       }
 
-      async function readRelayLoop(port) {
-        while (relayPort === port && port.readable) {
+      async function readRelayLoop(connection, port) {
+        while (connection.port === port && port.readable) {
           const reader = port.readable.getReader();
-          relayReader = reader;
+          connection.reader = reader;
           try {
-            while (relayPort === port) {
+            while (connection.port === port) {
               const { value, done } = await reader.read();
               if (done) {
                 break;
@@ -1156,108 +1518,132 @@ import {
               }
             }
           } catch (error) {
-            if (relayPort === port) {
+            if (connection.port === port) {
               console.error(error);
-              relayStatusMessage = "Relay read error";
+              connection.status = "Relay read error";
+              relayStatusMessage = connection.status;
               updateSerialUi(scene ? getMappedRelayNodeIds(scene).length : 0);
             }
           } finally {
-            relayReader = null;
+            connection.reader = null;
             reader.releaseLock();
           }
         }
       }
 
-      async function openRelayPort(port) {
+      async function openRelayPort(port, connection = getPrimaryRelayConnection()) {
         try {
+          if (!connection) {
+            return;
+          }
           if (port === stepperPort) {
-            relayStatusMessage = "Selected port is already in use by Stepper";
+            connection.status = "Selected port is already in use by Stepper";
+            relayStatusMessage = connection.status;
             updateSerialUi(scene ? getMappedRelayNodeIds(scene).length : 0);
             return;
           }
 
-          relayPort = port;
-          await relayPort.open({
+          connection.port = port;
+          relayPort = getPrimaryRelayConnection()?.port || null;
+          await connection.port.open({
             baudRate: 115200,
             dataBits: 8,
             stopBits: 1,
             parity: "none",
             flowControl: "none",
           });
+          connection.portKey = getSerialPortKey(port);
           rememberSerialPortRole("relay", port, RELAY_PORT_KEY, STEPPER_PORT_KEY);
-          relayLastStates = Array(RELAY_CHANNEL_COUNT).fill(null);
-          relayStatusMessage = "Relay sync connected";
+          connection.lastStates = Array(RELAY_CHANNEL_COUNT).fill(null);
+          connection.status = "Relay sync connected";
+          relayStatusMessage = connection.status;
           appendDeviceLog("relay", "event", "connected");
-          readRelayLoop(relayPort);
+          readRelayLoop(connection, connection.port);
           if (scene) {
             syncRelayOutputs(scene);
           } else {
             updateSerialUi(0);
           }
+          saveState();
         } catch (error) {
-          relayPort = null;
-          relayStatusMessage = "Relay connection failed";
+          connection.port = null;
+          relayPort = getPrimaryRelayConnection()?.port || null;
+          connection.status = "Relay connection failed";
+          relayStatusMessage = connection.status;
           updateSerialUi(scene ? getMappedRelayNodeIds(scene).length : 0);
           console.error(error);
         }
       }
 
-      async function connectRelay() {
-        if (!("serial" in navigator) || relayPort !== null) {
+      async function connectRelay(connection = getPrimaryRelayConnection()) {
+        if (!("serial" in navigator) || !connection || connection.port !== null) {
           return;
         }
 
         try {
           const ports = await navigator.serial.getPorts();
           const port =
+            (connection.portKey
+              ? ports.find((candidate) => getSerialPortKey(candidate) === connection.portKey)
+              : null) ||
             findPreferredSerialPort(ports, "relay", RELAY_PORT_KEY, STEPPER_PORT_KEY) ||
             (await navigator.serial.requestPort());
-          await openRelayPort(port);
+          await openRelayPort(port, connection);
         } catch (error) {
           console.error(error);
         }
       }
 
       async function autoConnectRelay() {
-        if (!("serial" in navigator) || relayPort !== null) {
+        if (!("serial" in navigator)) {
           return;
         }
 
         try {
           const ports = await navigator.serial.getPorts();
-          const port = findPreferredSerialPort(ports, "relay", RELAY_PORT_KEY, STEPPER_PORT_KEY);
-          if (port) {
-            await openRelayPort(port);
+          for (const connection of getRelayConnections()) {
+            if (connection.port !== null || !connection.portKey) {
+              continue;
+            }
+            const port = ports.find((candidate) => getSerialPortKey(candidate) === connection.portKey);
+            if (port) {
+              await openRelayPort(port, connection);
+            }
           }
         } catch (error) {
           console.error(error);
         }
       }
 
-      async function disconnectRelay() {
-        const wasConnected = relayPort !== null;
-        relayStateQueue = [];
-        relaySyncInProgress = false;
-        if (relayReader !== null) {
+      async function disconnectRelay(connection = getPrimaryRelayConnection()) {
+        if (!connection) {
+          return;
+        }
+        const wasConnected = connection.port !== null;
+        connection.stateQueue = [];
+        connection.syncInProgress = false;
+        if (connection.reader !== null) {
           try {
-            await relayReader.cancel();
+            await connection.reader.cancel();
           } catch (error) {
             console.error(error);
           }
         }
 
-        if (relayPort !== null) {
+        if (connection.port !== null) {
           try {
-            await relayPort.close();
+            await connection.port.close();
           } catch (error) {
             console.error(error);
           }
         }
 
-        relayPort = null;
-        relayReader = null;
-        relayLastStates = Array(RELAY_CHANNEL_COUNT).fill(null);
-        relayStatusMessage = "Relay sync disconnected";
+        connection.port = null;
+        connection.reader = null;
+        relayPort = getPrimaryRelayConnection()?.port || null;
+        connection.lastStates = Array(RELAY_CHANNEL_COUNT).fill(null);
+        connection.status = "Relay sync disconnected";
+        relayStatusMessage = connection.status;
         if (wasConnected) {
           appendDeviceLog("relay", "event", "disconnected");
         }
@@ -1276,7 +1662,12 @@ import {
           return;
         }
 
-        await writeStepperCommand(trimmed);
+        const request = parseStepperCommandInput(trimmed);
+        if (request === null) {
+          return;
+        }
+
+        await writeStepperCommand(request);
         stepperStatusMessage = `Stepper command sent: ${trimmed}`;
         updateStepperUi();
       }
@@ -1286,7 +1677,7 @@ import {
           return;
         }
 
-        await writeStepperCommand("status");
+        await writeStepperCommand(buildStepperJsonRpcRequest("status"));
       }
 
       async function processStepperPositionQueue() {
@@ -1395,14 +1786,14 @@ import {
         }
       }
 
-      async function readStepperLoop(port) {
+      async function readStepperLoop(port, connection = getPrimaryStepperConnection()) {
         await readStepperTextLines(port, {
           isActive: (currentPort) => stepperPort === currentPort,
           onReader: (reader) => {
             stepperReader = reader;
-          },
-          onRx: (chunk) => {
-            logSerialRx("stepper", chunk);
+            if (connection) {
+              connection.reader = reader;
+            }
           },
           onLine: handleStepperLine,
           onError: (error) => {
@@ -1415,15 +1806,21 @@ import {
         });
       }
 
-      async function openStepperPort(port) {
+      async function openStepperPort(port, connection = getPrimaryStepperConnection()) {
         try {
+          if (!connection) {
+            return;
+          }
           if (port === relayPort) {
             stepperStatusMessage = "Selected port is already in use by Relay";
+            connection.status = stepperStatusMessage;
             updateStepperUi();
             return;
           }
 
           stepperPort = port;
+          activeStepperConnectionId = connection.id;
+          connection.port = port;
           await stepperPort.open({
             baudRate: STEPPER_SERIAL_BAUD,
             dataBits: 8,
@@ -1431,51 +1828,70 @@ import {
             parity: "none",
             flowControl: "none",
           });
+          connection.portKey = getSerialPortKey(port);
           rememberSerialPortRole("stepper", port, RELAY_PORT_KEY, STEPPER_PORT_KEY);
           stepperHomed = false;
           stepperTravelSteps = null;
           updateStepperTravelReadout();
           stepperStatusMessage = "Checking stepper status...";
+          connection.status = stepperStatusMessage;
+          connection.channels[0].state = "Checking";
           appendDeviceLog("stepper", "event", "connected");
           updateStepperUi();
-          readStepperLoop(stepperPort);
+          readStepperLoop(stepperPort, connection);
           await requestStepperStatus();
+          saveState();
         } catch (error) {
           stepperPort = null;
+          if (connection) {
+            connection.port = null;
+          }
           stepperHomed = false;
           stepperStatusMessage =
             error?.name === "InvalidStateError"
               ? "Selected port is already open"
               : "Stepper connection failed";
+          if (connection) {
+            connection.status = stepperStatusMessage;
+          }
           updateStepperUi();
           console.error(error);
         }
       }
 
-      async function connectStepper() {
+      async function connectStepper(connection = getPrimaryStepperConnection()) {
         if (
           !("serial" in navigator) ||
+          !connection ||
           stepperPort !== null ||
-          stepperConnectInProgress
+          connection.connectInProgress
         ) {
           return;
         }
 
+        activeStepperConnectionId = connection.id;
+        connection.connectInProgress = true;
         stepperConnectInProgress = true;
         stepperStatusMessage = "Connecting stepper...";
+        connection.status = stepperStatusMessage;
         updateStepperUi();
 
         try {
           const ports = await navigator.serial.getPorts();
           const port =
+            (connection.portKey
+              ? ports.find((candidate) => getSerialPortKey(candidate) === connection.portKey)
+              : null) ||
             findPreferredSerialPort(ports, "stepper", RELAY_PORT_KEY, STEPPER_PORT_KEY) ||
             (await navigator.serial.requestPort());
-          await openStepperPort(port);
+          await openStepperPort(port, connection);
         } catch (error) {
           stepperStatusMessage = "Stepper disconnected";
+          connection.status = stepperStatusMessage;
           updateStepperUi();
           console.error(error);
         } finally {
+          connection.connectInProgress = false;
           stepperConnectInProgress = false;
           updateStepperUi();
         }
@@ -1490,30 +1906,47 @@ import {
           return;
         }
 
+        const connection =
+          getStepperConnections().find((candidate) => candidate.portKey) ||
+          getPrimaryStepperConnection();
+        if (!connection) {
+          return;
+        }
+        activeStepperConnectionId = connection.id;
+        connection.connectInProgress = true;
         stepperConnectInProgress = true;
         stepperStatusMessage = "Connecting stepper...";
+        connection.status = stepperStatusMessage;
         updateStepperUi();
 
         try {
           const ports = await navigator.serial.getPorts();
-          const port = findPreferredSerialPort(ports, "stepper", RELAY_PORT_KEY, STEPPER_PORT_KEY);
+          const port =
+            (connection.portKey
+              ? ports.find((candidate) => getSerialPortKey(candidate) === connection.portKey)
+              : null) ||
+            findPreferredSerialPort(ports, "stepper", RELAY_PORT_KEY, STEPPER_PORT_KEY);
           if (port) {
             await openStepperPort(port);
           } else {
             stepperStatusMessage = "Stepper disconnected";
+            connection.status = stepperStatusMessage;
             updateStepperUi();
           }
         } catch (error) {
           stepperStatusMessage = "Stepper disconnected";
+          connection.status = stepperStatusMessage;
           updateStepperUi();
           console.error(error);
         } finally {
+          connection.connectInProgress = false;
           stepperConnectInProgress = false;
           updateStepperUi();
         }
       }
 
       async function disconnectStepper() {
+        const connection = getPrimaryStepperConnection();
         const wasConnected = stepperPort !== null;
         if (stepperPositionSendTimerId !== null) {
           window.clearTimeout(stepperPositionSendTimerId);
@@ -1541,10 +1974,20 @@ import {
 
         stepperPort = null;
         stepperReader = null;
+        if (connection) {
+          connection.port = null;
+          connection.reader = null;
+        }
+        activeStepperConnectionId = null;
         stepperHomed = false;
         stepperTravelSteps = null;
         updateStepperTravelReadout();
         stepperStatusMessage = "Stepper disconnected";
+        if (connection) {
+          connection.status = stepperStatusMessage;
+          connection.channels[0].state = "Unknown";
+          connection.channels[0].homed = false;
+        }
         if (wasConnected) {
           appendDeviceLog("stepper", "event", "disconnected");
         }
@@ -2799,6 +3242,21 @@ dfs sort shell-angle`,
           return;
         }
 
+        if (mappingTarget) {
+          const connection = connections.find(
+            (candidate) => candidate.id === mappingTarget.connectionId,
+          );
+          const channel = connection?.channels[mappingTarget.channelIndex];
+          if (channel) {
+            channel.jetId = hitNode.id;
+            mappingTarget = null;
+            saveState();
+            renderConnections();
+            render();
+          }
+          return;
+        }
+
         if (activeNodes.has(hitNode.id)) {
           activeNodes.delete(hitNode.id);
         } else {
@@ -2827,19 +3285,116 @@ dfs sort shell-angle`,
         }
         await initMidi();
       });
-      serialConnectButton.addEventListener("click", async (event) => {
-        if (event.target.closest(".connection-close")) {
-          await disconnectRelay();
-          return;
-        }
-        await connectRelay();
+
+      addRelayConnectionButton.addEventListener("click", () => {
+        connections.push(createConnection("relay"));
+        saveState();
+        renderConnections();
       });
-      stepperConnectButton.addEventListener("click", async (event) => {
-        if (event.target.closest(".connection-close")) {
-          await disconnectStepper();
+
+      addStepperConnectionButton.addEventListener("click", () => {
+        connections.push(createConnection("stepper"));
+        saveState();
+        renderConnections();
+      });
+
+      connectionsList.addEventListener("click", async (event) => {
+        const actionElement = event.target.closest("[data-action]");
+        const card = event.target.closest(".connection-card");
+        if (!actionElement || !card) {
           return;
         }
-        await connectStepper();
+
+        const connection = connections.find(
+          (candidate) => candidate.id === card.dataset.connectionId,
+        );
+        if (!connection) {
+          return;
+        }
+
+        const channelRow = event.target.closest(".channel-row");
+        const channelIndex = channelRow
+          ? Number(channelRow.dataset.channelIndex)
+          : null;
+        const action = actionElement.dataset.action;
+
+        if (action === "toggle-config") {
+          connection.expanded = !connection.expanded;
+          saveState();
+          renderConnections();
+          return;
+        }
+
+        if (action === "connect") {
+          if (connection.type === "relay") {
+            await connectRelay(connection);
+          } else {
+            await connectStepper(connection);
+          }
+          return;
+        }
+
+        if (action === "disconnect") {
+          if (connection.type === "relay") {
+            await disconnectRelay(connection);
+          } else {
+            await disconnectStepper();
+          }
+          return;
+        }
+
+        if (action === "map-channel" && channelIndex !== null) {
+          mappingTarget = {
+            connectionId: connection.id,
+            channelIndex,
+          };
+          renderConnections();
+          return;
+        }
+
+        if (action === "home-channel" && connection.type === "stepper") {
+          activeStepperConnectionId = connection.id;
+          await homeStepper();
+        }
+      });
+
+      connectionsList.addEventListener("input", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLInputElement)) {
+          return;
+        }
+        if (target.dataset.action !== "position-channel") {
+          return;
+        }
+        const card = target.closest(".connection-card");
+        const channelRow = target.closest(".channel-row");
+        const connection = connections.find(
+          (candidate) => candidate.id === card?.dataset.connectionId,
+        );
+        const channelIndex = Number(channelRow?.dataset.channelIndex);
+        const channel = connection?.channels[channelIndex];
+        if (!channel) {
+          return;
+        }
+        channel.positionPercent = Number(target.value);
+        if (connection === getPrimaryStepperConnection()) {
+          setStepperBasePosition(Number(target.value));
+        }
+        updateConnectionDom();
+      });
+
+      connectionsList.addEventListener("change", async (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLInputElement)) {
+          return;
+        }
+        if (target.dataset.action !== "position-channel") {
+          return;
+        }
+        if (getPrimaryStepperConnection()?.port !== null) {
+          setStepperBasePosition(Number(target.value), { send: false });
+          await flushStepperPositionSend();
+        }
       });
       relayCommandForm.addEventListener("submit", async (event) => {
         event.preventDefault();
@@ -2863,7 +3418,6 @@ dfs sort shell-angle`,
           updateStepperUi();
         }
       });
-      stepperHomeButton.addEventListener("click", homeStepper);
       jetModeSelect.addEventListener("change", () => {
         stopAnimation();
         jetMode = jetModeSelect.value;
@@ -2966,18 +3520,6 @@ dfs sort shell-angle`,
         updateSpeedReadout();
         saveState();
       });
-      stepperPositionSlider.addEventListener("input", () => {
-        setStepperBasePosition(Number(stepperPositionSlider.value));
-      });
-      stepperPositionSlider.addEventListener("change", async () => {
-        setStepperBasePosition(Number(stepperPositionSlider.value), {
-          send: false,
-        });
-        if (stepperPort !== null) {
-          await flushStepperPositionSend();
-        }
-      });
-
       ringsInput.addEventListener("input", () => {
         stopAnimation();
         saveState();
@@ -2985,8 +3527,10 @@ dfs sort shell-angle`,
       });
       if ("serial" in navigator) {
         navigator.serial.addEventListener("disconnect", async (event) => {
-          if (event.target === relayPort) {
-            await disconnectRelay();
+          for (const connection of getRelayConnections()) {
+            if (event.target === connection.port) {
+              await disconnectRelay(connection);
+            }
           }
           if (event.target === stepperPort) {
             await disconnectStepper();
@@ -2994,11 +3538,15 @@ dfs sort shell-angle`,
         });
       }
       window.addEventListener("pagehide", () => {
-        disconnectRelay().catch((error) => console.error(error));
+        for (const connection of getRelayConnections()) {
+          disconnectRelay(connection).catch((error) => console.error(error));
+        }
         disconnectStepper().catch((error) => console.error(error));
       });
       window.addEventListener("beforeunload", () => {
-        disconnectRelay().catch((error) => console.error(error));
+        for (const connection of getRelayConnections()) {
+          disconnectRelay(connection).catch((error) => console.error(error));
+        }
         disconnectStepper().catch((error) => console.error(error));
       });
       window.addEventListener("resize", render);
@@ -3046,6 +3594,19 @@ dfs sort shell-angle`,
         Object.assign(customScripts, savedState.customScripts);
       }
 
+      if (savedState?.connections?.length > 0) {
+        connections.splice(
+          0,
+          connections.length,
+          ...savedState.connections.map((connection) =>
+            createConnection(connection.type, connection),
+          ),
+        );
+      } else {
+        connections.push(createConnection("relay", { name: "Relay 1" }));
+        connections.push(createConnection("stepper", { name: "Stepper 1" }));
+      }
+
       if (Number.isFinite(savedState?.animationSpeed)) {
         animationSpeed = Math.min(Math.max(savedState.animationSpeed, 1), 18);
       }
@@ -3060,6 +3621,12 @@ dfs sort shell-angle`,
 
       if (Number.isFinite(savedState?.stepperTravelSteps)) {
         stepperTravelSteps = Math.max(savedState.stepperTravelSteps, 0);
+      }
+
+      const primaryStepper = getPrimaryStepperConnection();
+      if (primaryStepper) {
+        primaryStepper.channels[0].positionPercent = stepperPositionPercent;
+        primaryStepper.channels[0].travelSteps = stepperTravelSteps;
       }
 
       if (Number.isFinite(savedState?.centerEnvelopeAttackMs)) {
@@ -3096,7 +3663,6 @@ dfs sort shell-angle`,
       sequenceSelect.value = selectedSequenceId;
       updateEditorFromSequence();
       speedSlider.value = String(animationSpeed);
-      stepperPositionSlider.value = stepperPositionPercent.toFixed(1);
       updateLabelModeSelect();
       updateSpeedReadout();
       updateStepperReadout();

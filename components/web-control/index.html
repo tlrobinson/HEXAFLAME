@@ -121,67 +121,6 @@
           </div>
         </div>
 
-        <!-- Connections -->
-        <div class="section">
-          <div class="section-label">Connections</div>
-          <div class="section-row">
-            <button id="midi-connect-button" class="connection-button" type="button">
-              <span class="connection-label">MIDI</span>
-              <span class="connection-close" aria-hidden="true">×</span>
-            </button>
-            <span id="midi-status" class="status-text">Disconnected</span>
-          </div>
-          <div class="section-row">
-            <button id="serial-connect-button" class="connection-button" type="button">
-              <span class="connection-label">Relay</span>
-              <span class="connection-close" aria-hidden="true">×</span>
-            </button>
-            <span id="serial-status" class="status-text">Disconnected</span>
-          </div>
-          <div class="section-row">
-            <button id="stepper-connect-button" class="connection-button" type="button">
-              <span class="connection-label">Stepper</span>
-              <span class="connection-close" aria-hidden="true">×</span>
-            </button>
-            <span id="stepper-status" class="status-text">Disconnected</span>
-          </div>
-        </div>
-        
-        <!-- Steppers -->
-        <div class="section">
-          <div class="section-label">Steppers</div>
-          <div class="device-label">Stepper 1</div>
-          <div class="section-row">
-            <label for="stepper-position-slider">Position</label>
-            <input
-              id="stepper-position-slider"
-              type="range"
-              min="0"
-              max="100"
-              step="0.1"
-              value="50"
-              disabled
-            />
-            <output id="stepper-position-readout" for="stepper-position-slider">50.0%</output>
-            <button
-              id="stepper-home-button"
-              class="btn-compact"
-              type="button"
-              disabled
-            >
-              Home
-            </button>
-          </div>
-          <div class="section-row">
-            <label>Homed</label>
-            <span id="stepper-homed-state" class="metric-text">Unknown</span>
-          </div>
-          <div class="section-row">
-            <label>Travel</label>
-            <span id="stepper-travel-steps" class="metric-text">Unknown</span>
-          </div>
-        </div>
-
         <div class="section">
           <div class="section-label">Envelope</div>
           <div class="device-label">Center ADSR</div>
@@ -205,6 +144,23 @@
             <div id="stepper-decay-readout" class="param-text">D 220ms</div>
             <div id="stepper-sustain-readout" class="param-text">S 55%</div>
             <div id="stepper-release-readout" class="param-text">R 320ms</div>
+          </div>
+        </div>
+
+        <!-- Connections -->
+        <div class="section">
+          <div class="section-label">Connections</div>
+          <div class="section-row">
+            <button id="midi-connect-button" class="connection-button" type="button">
+              <span class="connection-label">MIDI</span>
+              <span class="connection-close" aria-hidden="true">×</span>
+            </button>
+            <span id="midi-status" class="status-text">Disconnected</span>
+          </div>
+          <div id="connections-list" class="connections-list"></div>
+          <div class="section-row-wrap">
+            <button id="add-relay-connection-button" class="btn-compact" type="button">Add Relay</button>
+            <button id="add-stepper-connection-button" class="btn-compact" type="button">Add Stepper</button>
           </div>
         </div>
 
