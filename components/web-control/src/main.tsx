@@ -110,6 +110,57 @@ import {
   setSidebarCallbacks,
   setSidebarCollapsed,
 } from "./features/sidebar/sidebar-store";
+import { setEnvelopeSnapshot } from "./features/envelope/envelope-store";
+import { HexCanvas } from "./features/canvas/HexCanvas";
+import {
+  getCanvasElement,
+  setCanvasCallbacks,
+} from "./features/canvas/canvas-store";
+
+      setCanvasCallbacks({
+        onClick: (event) => {
+          stopAnimation();
+          const hitNode = findHitNode(event.clientX, event.clientY);
+          if (!hitNode) {
+            return;
+          }
+
+          if (mappingTarget) {
+            const connection = connections.find(
+              (candidate) => candidate.id === mappingTarget.connectionId,
+            );
+            const channel = connection?.channels[mappingTarget.channelIndex];
+            if (channel) {
+              channel.jetId = hitNode.id;
+              mappingTarget = null;
+              saveState();
+              renderConnections();
+              render();
+            }
+            return;
+          }
+
+          if (activeNodes.has(hitNode.id)) {
+            activeNodes.delete(hitNode.id);
+          } else {
+            activeNodes.add(hitNode.id);
+          }
+
+          saveState();
+          render();
+        },
+        onMouseLeave: () => {
+          hoveredNodeId = null;
+          canvas.style.cursor = "default";
+          render();
+        },
+        onMouseMove: (event) => {
+          const hitNode = findHitNode(event.clientX, event.clientY);
+          hoveredNodeId = hitNode ? hitNode.id : null;
+          canvas.style.cursor = hitNode ? "pointer" : "default";
+          render();
+        },
+      });
 
       flushSync(() => {
         createRoot(document.getElementById("left-sidebar-root")).render(
@@ -121,34 +172,13 @@ import {
         createRoot(document.getElementById("sidebar-toggle-root")).render(
           <SidebarToggle />,
         );
+        createRoot(document.getElementById("hex-canvas-root")).render(
+          <HexCanvas />,
+        );
       });
 
-      const canvas = document.getElementById("hex-canvas");
+      const canvas = getCanvasElement();
       const context = canvas.getContext("2d");
-      const stepperEnvelopePath = document.getElementById(
-        "stepper-envelope-path",
-      );
-      const stepperEnvelopeFill = document.getElementById(
-        "stepper-envelope-fill",
-      );
-      const stepperEnvelopeSweep = document.getElementById(
-        "stepper-envelope-sweep",
-      );
-      const stepperEnvelopeMarker = document.getElementById(
-        "stepper-envelope-marker",
-      );
-      const stepperAttackReadout = document.getElementById(
-        "stepper-attack-readout",
-      );
-      const stepperDecayReadout = document.getElementById(
-        "stepper-decay-readout",
-      );
-      const stepperSustainReadout = document.getElementById(
-        "stepper-sustain-readout",
-      );
-      const stepperReleaseReadout = document.getElementById(
-        "stepper-release-readout",
-      );
       const midiStatus = {
         set textContent(value) {
           setMidiStatus(value);
@@ -414,13 +444,6 @@ import {
 
       function updateStepperEnvelopeUi(now = performance.now()) {
         const sustainPercent = Math.round(stepperEnvelope.sustainLevel * 100);
-        stepperAttackReadout.textContent =
-          `A ${formatEnvelopeTime(stepperEnvelope.attackMs)}`;
-        stepperDecayReadout.textContent =
-          `D ${formatEnvelopeTime(stepperEnvelope.decayMs)}`;
-        stepperSustainReadout.textContent = `S ${sustainPercent}%`;
-        stepperReleaseReadout.textContent =
-          `R ${formatEnvelopeTime(stepperEnvelope.releaseMs)}`;
 
         const {
           graphLeft,
@@ -434,14 +457,12 @@ import {
         } = getStepperEnvelopeGraphLayout();
         const graphHeight = graphBottom - graphTop;
 
-        stepperEnvelopePath.setAttribute(
-          "d",
+        const path =
           `M ${graphLeft} ${graphBottom} ` +
-            `L ${attackX.toFixed(1)} ${graphTop} ` +
-            `L ${decayX.toFixed(1)} ${sustainY.toFixed(1)} ` +
-            `L ${sustainEndX.toFixed(1)} ${sustainY.toFixed(1)} ` +
-            `L ${graphRight} ${graphBottom}`,
-        );
+          `L ${attackX.toFixed(1)} ${graphTop} ` +
+          `L ${decayX.toFixed(1)} ${sustainY.toFixed(1)} ` +
+          `L ${sustainEndX.toFixed(1)} ${sustainY.toFixed(1)} ` +
+          `L ${graphRight} ${graphBottom}`;
 
         const point = getStepperEnvelopeGraphPoint(now);
         const fillSegments = [`M ${graphLeft} ${graphBottom}`];
@@ -466,19 +487,25 @@ import {
         }
         fillSegments.push(`L ${point.x.toFixed(1)} ${graphBottom.toFixed(1)}`);
         fillSegments.push("Z");
-        stepperEnvelopeFill.setAttribute("d", fillSegments.join(" "));
 
         const envelopeLevel = stepperEnvelope.active
           ? stepperEnvelope.currentLevel
           : 0;
         const actualLevel = envelopeLevel * stepperEnvelope.velocityScale;
         const markerY = graphBottom - graphHeight * actualLevel;
-        stepperEnvelopeSweep.setAttribute("x1", point.x.toFixed(1));
-        stepperEnvelopeSweep.setAttribute("x2", point.x.toFixed(1));
-        stepperEnvelopeSweep.setAttribute("y1", point.y.toFixed(1));
-        stepperEnvelopeSweep.setAttribute("y2", graphBottom.toFixed(1));
-        stepperEnvelopeMarker.setAttribute("cx", point.x.toFixed(1));
-        stepperEnvelopeMarker.setAttribute("cy", markerY.toFixed(1));
+        setEnvelopeSnapshot({
+          attackLabel: `A ${formatEnvelopeTime(stepperEnvelope.attackMs)}`,
+          decayLabel: `D ${formatEnvelopeTime(stepperEnvelope.decayMs)}`,
+          fillPath: fillSegments.join(" "),
+          markerX: point.x.toFixed(1),
+          markerY: markerY.toFixed(1),
+          path,
+          releaseLabel: `R ${formatEnvelopeTime(stepperEnvelope.releaseMs)}`,
+          sustainLabel: `S ${sustainPercent}%`,
+          sweepX: point.x.toFixed(1),
+          sweepY1: point.y.toFixed(1),
+          sweepY2: graphBottom.toFixed(1),
+        });
       }
 
       function applyStepperOutputPosition(
@@ -2935,51 +2962,6 @@ import {
         );
         syncRelayOutputs(scene);
       }
-
-      canvas.addEventListener("mousemove", (event) => {
-        const hitNode = findHitNode(event.clientX, event.clientY);
-        hoveredNodeId = hitNode ? hitNode.id : null;
-        canvas.style.cursor = hitNode ? "pointer" : "default";
-        render();
-      });
-
-      canvas.addEventListener("mouseleave", () => {
-        hoveredNodeId = null;
-        canvas.style.cursor = "default";
-        render();
-      });
-
-      canvas.addEventListener("click", (event) => {
-        stopAnimation();
-        const hitNode = findHitNode(event.clientX, event.clientY);
-        if (!hitNode) {
-          return;
-        }
-
-        if (mappingTarget) {
-          const connection = connections.find(
-            (candidate) => candidate.id === mappingTarget.connectionId,
-          );
-          const channel = connection?.channels[mappingTarget.channelIndex];
-          if (channel) {
-            channel.jetId = hitNode.id;
-            mappingTarget = null;
-            saveState();
-            renderConnections();
-            render();
-          }
-          return;
-        }
-
-        if (activeNodes.has(hitNode.id)) {
-          activeNodes.delete(hitNode.id);
-        } else {
-          activeNodes.add(hitNode.id);
-        }
-
-        saveState();
-        render();
-      });
 
       setDeviceCommandHandler("relay", async (command) => {
         try {

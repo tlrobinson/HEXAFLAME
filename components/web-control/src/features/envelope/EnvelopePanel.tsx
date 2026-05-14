@@ -1,6 +1,9 @@
 import { Section } from "../../components/ui/Section";
+import { useEnvelope } from "./envelope-store";
 
 export function EnvelopePanel() {
+  const envelope = useEnvelope();
+
   return (
     <Section label="Envelope">
       <div className="device-label">Center ADSR</div>
@@ -14,16 +17,27 @@ export function EnvelopePanel() {
         <path className="envelope-grid" d="M0 70.5H260" />
         <path className="envelope-grid" d="M0 46.5H260" />
         <path className="envelope-grid" d="M0 22.5H260" />
-        <path className="envelope-fill" id="stepper-envelope-fill" d="M14 78 L14 78 L14 78 Z" />
-        <path className="envelope-path" id="stepper-envelope-path" d="M14 78 L70 14 L124 40 L190 40 L246 78" />
-        <line className="envelope-sweep" id="stepper-envelope-sweep" x1="14" x2="14" y1="78" y2="78" />
-        <circle className="envelope-marker" id="stepper-envelope-marker" cx="14" cy="78" r="3.5" />
+        <path className="envelope-fill" d={envelope.fillPath} />
+        <path className="envelope-path" d={envelope.path} />
+        <line
+          className="envelope-sweep"
+          x1={envelope.sweepX}
+          x2={envelope.sweepX}
+          y1={envelope.sweepY1}
+          y2={envelope.sweepY2}
+        />
+        <circle
+          className="envelope-marker"
+          cx={envelope.markerX}
+          cy={envelope.markerY}
+          r="3.5"
+        />
       </svg>
       <div className="param-row">
-        <div className="param-text" id="stepper-attack-readout">A 180ms</div>
-        <div className="param-text" id="stepper-decay-readout">D 220ms</div>
-        <div className="param-text" id="stepper-sustain-readout">S 55%</div>
-        <div className="param-text" id="stepper-release-readout">R 320ms</div>
+        <div className="param-text">{envelope.attackLabel}</div>
+        <div className="param-text">{envelope.decayLabel}</div>
+        <div className="param-text">{envelope.sustainLabel}</div>
+        <div className="param-text">{envelope.releaseLabel}</div>
       </div>
     </Section>
   );
