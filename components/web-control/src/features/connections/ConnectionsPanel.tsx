@@ -6,6 +6,7 @@ export function ConnectionsPanel({
   connections,
   mappingTarget,
   serialSupported,
+  onAddChannel,
   onConnect,
   onDelete,
   onDisconnect,
@@ -13,6 +14,8 @@ export function ConnectionsPanel({
   onMap,
   onPositionCommit,
   onPositionInput,
+  onResetFault,
+  onRemoveChannel,
   onRename,
   onToggleConfig,
 }: {
@@ -20,6 +23,7 @@ export function ConnectionsPanel({
   connections: Connection[];
   mappingTarget: MappingTarget;
   serialSupported: boolean;
+  onAddChannel: (connection: Connection) => void;
   onConnect: (connection: Connection) => void;
   onDelete: (connection: Connection) => void;
   onDisconnect: (connection: Connection) => void;
@@ -27,6 +31,8 @@ export function ConnectionsPanel({
   onMap: (connection: Connection, channel: Channel) => void;
   onPositionCommit: (connection: Connection, channel: Channel, positionPercent: number) => void;
   onPositionInput: (connection: Connection, channel: Channel, positionPercent: number) => void;
+  onResetFault: (connection: Connection, channel: Channel) => void;
+  onRemoveChannel: (connection: Connection) => void;
   onRename: (connection: Connection, name: string) => void;
   onToggleConfig: (connection: Connection) => void;
 }) {
@@ -39,6 +45,7 @@ export function ConnectionsPanel({
           key={connection.id}
           mappingTarget={mappingTarget}
           serialSupported={serialSupported}
+          onAddChannel={() => onAddChannel(connection)}
           onConnect={() => onConnect(connection)}
           onDelete={() => onDelete(connection)}
           onDisconnect={() => onDisconnect(connection)}
@@ -50,6 +57,8 @@ export function ConnectionsPanel({
           onPositionInput={(channel, positionPercent) =>
             onPositionInput(connection, channel, positionPercent)
           }
+          onResetFault={(channel) => onResetFault(connection, channel)}
+          onRemoveChannel={() => onRemoveChannel(connection)}
           onRename={(name) => onRename(connection, name)}
           onToggleConfig={() => onToggleConfig(connection)}
         />

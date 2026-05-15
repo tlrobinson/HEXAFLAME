@@ -5,6 +5,7 @@ import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import {
   createConnection,
+  makeChannel,
   type Connection,
   type MappingTarget,
 } from "./features/connections/connection-model";
@@ -106,7 +107,10 @@ import {
   setSidebarCallbacks,
   setSidebarCollapsed,
 } from "./features/sidebar/sidebar-store";
-import { setEnvelopeSnapshot } from "./features/envelope/envelope-store";
+import {
+  setEnvelopeCallbacks,
+  setEnvelopeSnapshot,
+} from "./features/envelope/envelope-store";
 import {
   getCanvasElement,
   setCanvasCallbacks,
@@ -132,6 +136,7 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
                 : mapping,
             );
             setMidiSnapshot({ mappingTargetId: null, mappings });
+            saveState();
             renderConnections();
             render();
             return;
@@ -262,7 +267,9 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
       const STORAGE_KEY = "hexagon-rings-state";
       const RELAY_PORT_KEY = `${STORAGE_KEY}:relay-port`;
       const STEPPER_PORT_KEY = `${STORAGE_KEY}:stepper-port`;
-      const HIT_RADIUS = 10;
+      const MIN_HIT_RADIUS = 10;
+      const MAX_HIT_RADIUS = 24;
+      const HIT_RADIUS_SPACING_RATIO = 0.45;
       const DEFAULT_RINGS = 2;
       const MIN_RINGS = 1;
       const MAX_RINGS = 12;
@@ -273,6 +280,7 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
       const animationGateIds = new Set();
       const knownNodeIds = new Set();
       let scene = null;
+      let hitRadius = MIN_HIT_RADIUS;
       let hoveredNodeId = null;
       let pressedNodeId = null;
       let pressedNodeWasActive = false;
@@ -431,6 +439,34 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
         return `${Math.round(ms)}ms`;
       }
 
+      function clampEnvelopeTime(ms) {
+        return Math.min(Math.max(ms, 20), 2000);
+      }
+
+      function setEnvelopeParameters(nextParameters) {
+        if (Number.isFinite(nextParameters.attackMs)) {
+          stepperEnvelope.attackMs = clampEnvelopeTime(nextParameters.attackMs);
+        }
+        if (Number.isFinite(nextParameters.decayMs)) {
+          stepperEnvelope.decayMs = clampEnvelopeTime(nextParameters.decayMs);
+        }
+        if (Number.isFinite(nextParameters.releaseMs)) {
+          stepperEnvelope.releaseMs = clampEnvelopeTime(nextParameters.releaseMs);
+        }
+        if (Number.isFinite(nextParameters.sustainLevel)) {
+          stepperEnvelope.sustainLevel = Math.min(
+            Math.max(nextParameters.sustainLevel, 0),
+            1,
+          );
+        }
+        for (const envelope of addressEnvelopes.values()) {
+          syncEnvelopeParameters(envelope);
+        }
+        updateStepperEnvelopeUi();
+        saveState();
+        render();
+      }
+
       function getStepperEnvelopeGraphLayout() {
         const graphLeft = 14;
         const graphRight = 246;
@@ -464,6 +500,56 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
           sustainY,
           sustainWidthWeight,
         };
+      }
+
+      function envelopeXToFraction(x) {
+        const { graphLeft, graphRight } = getStepperEnvelopeGraphLayout();
+        return Math.min(
+          Math.max((x - graphLeft) / (graphRight - graphLeft), 0.02),
+          0.98,
+        );
+      }
+
+      function setAttackFromEnvelopeX(x) {
+        const fraction = envelopeXToFraction(x);
+        const fixed =
+          stepperEnvelope.decayMs +
+          stepperEnvelope.releaseMs +
+          getStepperEnvelopeGraphLayout().sustainWidthWeight;
+        setEnvelopeParameters({
+          attackMs: (fraction * fixed) / Math.max(1 - fraction, 0.001),
+        });
+      }
+
+      function setDecayFromEnvelopeX(x) {
+        const fraction = envelopeXToFraction(x);
+        const fixed =
+          stepperEnvelope.attackMs +
+          stepperEnvelope.releaseMs +
+          getStepperEnvelopeGraphLayout().sustainWidthWeight;
+        setEnvelopeParameters({
+          decayMs:
+            (fraction * fixed) / Math.max(1 - fraction, 0.001) -
+            stepperEnvelope.attackMs,
+        });
+      }
+
+      function setReleaseFromEnvelopeX(x) {
+        const fraction = envelopeXToFraction(x);
+        const fixed =
+          stepperEnvelope.attackMs +
+          stepperEnvelope.decayMs +
+          getStepperEnvelopeGraphLayout().sustainWidthWeight;
+        setEnvelopeParameters({
+          releaseMs: (fixed * Math.max(1 - fraction, 0.001)) / fraction,
+        });
+      }
+
+      function setSustainFromEnvelopeY(y) {
+        const { graphBottom, graphTop } = getStepperEnvelopeGraphLayout();
+        setEnvelopeParameters({
+          sustainLevel: (graphBottom - y) / (graphBottom - graphTop),
+        });
       }
 
       function getStepperEnvelopeGraphPoint(now = performance.now()) {
@@ -731,14 +817,20 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
         }
       }
 
-      function openAddressGate(gateId, address, velocity = 127, triggerLabel = address) {
+      function openAddressGate(
+        gateId,
+        address,
+        velocity = 127,
+        triggerLabel = address,
+        { showEnvelopeDisplay = true } = {},
+      ) {
         if (!address) {
           return false;
         }
 
         const previousAddress = gateAddresses.get(gateId);
         if (previousAddress && previousAddress !== address) {
-          closeAddressGate(gateId, previousAddress);
+          closeAddressGate(gateId, previousAddress, { showEnvelopeDisplay });
         }
 
         let gates = addressGateIds.get(address);
@@ -751,8 +843,10 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
         gateAddresses.set(gateId, address);
 
         const envelope = getAddressEnvelope(address);
-        stepperEnvelopeDisplayAddress = address;
-        stepperEnvelopeTriggerLabel = triggerLabel;
+        if (showEnvelopeDisplay) {
+          stepperEnvelopeDisplayAddress = address;
+          stepperEnvelopeTriggerLabel = triggerLabel;
+        }
         if (!wasOpen) {
           triggerAdsrEnvelope(envelope, {
             velocity,
@@ -765,12 +859,18 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
 
         syncActiveNodesFromEnvelopes();
         updateStepperOutputsFromEnvelopes();
-        updateStepperEnvelopeUi();
+        if (showEnvelopeDisplay) {
+          updateStepperEnvelopeUi();
+        }
         scheduleEnvelopeTick({ restart: !wasOpen });
         return true;
       }
 
-      function closeAddressGate(gateId, triggerLabel = "Release") {
+      function closeAddressGate(
+        gateId,
+        triggerLabel = "Release",
+        { showEnvelopeDisplay = true } = {},
+      ) {
         const address = gateAddresses.get(gateId);
         if (!address) {
           return;
@@ -785,11 +885,15 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
         addressGateIds.delete(address);
         const envelope = addressEnvelopes.get(address);
         if (envelope) {
-          stepperEnvelopeDisplayAddress = address;
-          stepperEnvelopeTriggerLabel = triggerLabel;
+          if (showEnvelopeDisplay) {
+            stepperEnvelopeDisplayAddress = address;
+            stepperEnvelopeTriggerLabel = triggerLabel;
+          }
           sendNativeStepperEnvelopeRelease(address);
           releaseAdsrEnvelope(envelope, performance.now());
-          updateStepperEnvelopeUi();
+          if (showEnvelopeDisplay) {
+            updateStepperEnvelopeUi();
+          }
           scheduleEnvelopeTick();
         }
       }
@@ -800,12 +904,18 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
         }
       }
 
-      function toggleAddressGate(gateId, address, velocity = 127, triggerLabel = address) {
+      function toggleAddressGate(
+        gateId,
+        address,
+        velocity = 127,
+        triggerLabel = address,
+        options = {},
+      ) {
         if (gateAddresses.has(gateId)) {
-          closeAddressGate(gateId, triggerLabel);
+          closeAddressGate(gateId, triggerLabel, options);
           return false;
         }
-        openAddressGate(gateId, address, velocity, triggerLabel);
+        openAddressGate(gateId, address, velocity, triggerLabel, options);
         return true;
       }
 
@@ -863,13 +973,17 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
         const markerY = graphBottom - graphHeight * actualLevel;
         setEnvelopeSnapshot({
           attackLabel: `A ${formatEnvelopeTime(stepperEnvelope.attackMs)}`,
+          attackX: attackX.toFixed(1),
           decayLabel: `D ${formatEnvelopeTime(stepperEnvelope.decayMs)}`,
+          decayX: decayX.toFixed(1),
           fillPath: fillSegments.join(" "),
           markerX: point.x.toFixed(1),
           markerY: markerY.toFixed(1),
           noteLabel: stepperEnvelopeTriggerLabel,
           path,
           releaseLabel: `R ${formatEnvelopeTime(stepperEnvelope.releaseMs)}`,
+          releaseX: sustainEndX.toFixed(1),
+          sustainY: sustainY.toFixed(1),
           sustainLabel: `S ${sustainPercent}%`,
           sweepX: point.x.toFixed(1),
           sweepY1: point.y.toFixed(1),
@@ -973,6 +1087,7 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
 
       function saveMidiMappings(mappings) {
         setMidiSnapshot({ mappings });
+        saveState();
       }
 
       function getPrimaryStepperMappedNodeId(currentScene) {
@@ -1021,6 +1136,17 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
       }
 
       setConnectionCallbacks({
+        onAddChannel: (connection) => {
+          if (
+            connection.type === "relay" &&
+            connection.channels.length >= RELAY_CHANNEL_COUNT
+          ) {
+            return;
+          }
+          connection.channels.push(makeChannel(connection.channels.length));
+          saveState();
+          renderConnections();
+        },
         onAddDevice: (device) => {
           if (device.type === "midi") {
             setMidiDeviceName(device.name);
@@ -1077,6 +1203,10 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
           activeStepperConnectionId = connection.id;
           void homeStepper();
         },
+        onResetFault: (connection, channel) => {
+          activeStepperConnectionId = connection.id;
+          void clearStepperFault(channel.index);
+        },
         onMap: (connection, channel) => {
           mappingTarget = {
             connectionId: connection.id,
@@ -1099,6 +1229,21 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
           }
           renderConnections();
         },
+        onRemoveChannel: (connection) => {
+          if (connection.channels.length <= 1) {
+            return;
+          }
+          const removed = connection.channels.pop();
+          if (
+            mappingTarget?.connectionId === connection.id &&
+            mappingTarget.channelIndex === removed?.index
+          ) {
+            mappingTarget = null;
+          }
+          saveState();
+          renderConnections();
+          render();
+        },
         onRename: (connection, name) => {
           connection.name = name;
           saveState();
@@ -1109,6 +1254,13 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
           saveState();
           renderConnections();
         },
+      });
+
+      setEnvelopeCallbacks({
+        onAttackChange: setAttackFromEnvelopeX,
+        onDecayChange: setDecayFromEnvelopeX,
+        onReleaseChange: setReleaseFromEnvelopeX,
+        onSustainChange: setSustainFromEnvelopeY,
       });
 
       setGridCallbacks({
@@ -1236,13 +1388,14 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
             return;
           }
           disconnectMidi();
-          setMidiSnapshot({
-            enabled: false,
-            expanded: false,
-            learningMappingId: null,
-            mappingTargetId: null,
-          });
-        },
+            setMidiSnapshot({
+              enabled: false,
+              expanded: false,
+              learningMappingId: null,
+              mappingTargetId: null,
+            });
+            saveState();
+          },
         onDisconnect: () => {
           disconnectMidi();
         },
@@ -1251,6 +1404,7 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
             learningMappingId: mapping.note === null ? mapping.id : null,
             mappingTargetId: mapping.note === null ? null : mapping.id,
           });
+          saveState();
         },
         onRemoveMapping: (mapping) => {
           const snapshot = getMidiSnapshot();
@@ -1268,12 +1422,15 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
                 : snapshot.mappingTargetId,
             mappings,
           });
+          saveState();
         },
         onRename: (name) => {
           setMidiDeviceName(name);
+          saveState();
         },
         onToggleConfig: () => {
           setMidiSnapshot({ expanded: !getMidiSnapshot().expanded });
+          saveState();
         },
       });
 
@@ -1376,12 +1533,16 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
           const gateId = `animation:${node.address}`;
           nextGateIds.add(gateId);
           if (!animationGateIds.has(gateId)) {
-            openAddressGate(gateId, node.address, 127, "Animation");
+            openAddressGate(gateId, node.address, 127, "Animation", {
+              showEnvelopeDisplay: false,
+            });
           }
         }
         for (const gateId of [...animationGateIds]) {
           if (!nextGateIds.has(gateId)) {
-            closeAddressGate(gateId, "Animation");
+            closeAddressGate(gateId, "Animation", {
+              showEnvelopeDisplay: false,
+            });
           }
         }
         animationGateIds.clear();
@@ -1458,6 +1619,27 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
                   (connection.type === "relay" || connection.type === "stepper"),
               )
             : null;
+          const savedMidiDevice =
+            parsed.midiDevice && typeof parsed.midiDevice === "object"
+              ? parsed.midiDevice
+              : null;
+          const savedMidiMappings = Array.isArray(savedMidiDevice?.mappings)
+            ? savedMidiDevice.mappings
+                .map((mapping, index) => {
+                  const note =
+                    mapping?.note === null ? null : Number(mapping?.note);
+                  return {
+                    id:
+                      typeof mapping?.id === "string"
+                        ? mapping.id
+                        : `midi-note-${index}`,
+                    note: Number.isFinite(note) ? note : null,
+                    jetId:
+                      typeof mapping?.jetId === "string" ? mapping.jetId : null,
+                  };
+                })
+                .filter(Boolean)
+            : null;
 
           return {
             rings: Number.isFinite(rings) ? rings : null,
@@ -1490,6 +1672,23 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
               : 320,
             customScripts: savedCustomScripts,
             connections: savedConnections,
+            midiDevice: savedMidiDevice
+              ? {
+                  deviceName:
+                    typeof savedMidiDevice.deviceName === "string"
+                      ? savedMidiDevice.deviceName
+                      : null,
+                  enabled:
+                    typeof savedMidiDevice.enabled === "boolean"
+                      ? savedMidiDevice.enabled
+                      : null,
+                  expanded:
+                    typeof savedMidiDevice.expanded === "boolean"
+                      ? savedMidiDevice.expanded
+                      : null,
+                  mappings: savedMidiMappings,
+                }
+              : null,
           };
         } catch {
           return null;
@@ -1498,6 +1697,7 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
 
       function saveState() {
         try {
+          const midiSnapshot = getMidiSnapshot();
           window.localStorage.setItem(
             STORAGE_KEY,
             JSON.stringify({
@@ -1529,6 +1729,16 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
                   positionPercent: channel.positionPercent,
                 })),
               })),
+              midiDevice: {
+                deviceName: midiSnapshot.deviceName,
+                enabled: midiSnapshot.enabled,
+                expanded: midiSnapshot.expanded,
+                mappings: midiSnapshot.mappings.map((mapping) => ({
+                  id: mapping.id,
+                  note: mapping.note,
+                  jetId: mapping.jetId,
+                })),
+              },
               customScripts:
                 Object.keys(customScripts).length > 0
                   ? customScripts
@@ -1573,6 +1783,35 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
         });
       }
 
+      function getAdaptiveHitRadius(currentScene) {
+        let nearestDistance = Infinity;
+        for (let leftIndex = 0; leftIndex < currentScene.nodes.length; leftIndex += 1) {
+          const left = currentScene.nodes[leftIndex];
+          for (
+            let rightIndex = leftIndex + 1;
+            rightIndex < currentScene.nodes.length;
+            rightIndex += 1
+          ) {
+            const right = currentScene.nodes[rightIndex];
+            nearestDistance = Math.min(
+              nearestDistance,
+              Math.hypot(left.x - right.x, left.y - right.y),
+            );
+          }
+        }
+
+        if (!Number.isFinite(nearestDistance)) {
+          return MAX_HIT_RADIUS;
+        }
+
+        const nonOverlappingRadius = Math.max(1, nearestDistance / 2 - 1);
+        return Math.min(
+          MAX_HIT_RADIUS,
+          nonOverlappingRadius,
+          Math.max(MIN_HIT_RADIUS, nearestDistance * HIT_RADIUS_SPACING_RATIO),
+        );
+      }
+
       function findHitNode(clientX, clientY) {
         if (!scene) {
           return null;
@@ -1582,7 +1821,7 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
         const x = clientX - rect.left;
         const y = clientY - rect.top;
         let hit = null;
-        let bestDistance = HIT_RADIUS;
+        let bestDistance = hitRadius;
 
         for (const node of scene.nodes) {
           const distance = Math.hypot(node.x - x, node.y - y);
@@ -2062,6 +2301,25 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
         } catch (error) {
           console.error(error);
           stepperStatusMessage = "Stepper home failed";
+          updateStepperUi();
+        }
+      }
+
+      async function clearStepperFault(channelIndex = 0) {
+        if (stepperPort === null) {
+          return;
+        }
+
+        stepperStatusMessage = "Clearing stepper fault";
+        updateStepperUi();
+
+        try {
+          await writeStepperCommand(
+            buildStepperJsonRpcRequest("clear-fault", { channel: channelIndex }),
+          );
+        } catch (error) {
+          console.error(error);
+          stepperStatusMessage = "Stepper reset failed";
           updateStepperUi();
         }
       }
@@ -3086,6 +3344,7 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
               mappingTargetId: midiSnapshot.learningMappingId,
               mappings,
             });
+            saveState();
             midiStatus.textContent = `Note ${data1} learned; click a jet`;
             return;
           }
@@ -3340,7 +3599,9 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
           updatePlayPauseButton();
         }
         for (const gateId of [...animationGateIds]) {
-          closeAddressGate(gateId, "Animation");
+          closeAddressGate(gateId, "Animation", {
+            showEnvelopeDisplay: false,
+          });
         }
         animationGateIds.clear();
       }
@@ -3439,6 +3700,7 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
         context.clearRect(0, 0, width, height);
 
         scene = buildScene(totalRings, width, height, jetMode);
+        hitRadius = getAdaptiveHitRadius(scene);
         const mappingAddressesChanged = normalizeAllMappingAddresses(scene);
         syncActiveNodes(scene.nodes);
         const nodeLevels = new Map();
@@ -3536,6 +3798,25 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
 
       if (savedState?.customScripts) {
         Object.assign(customScripts, savedState.customScripts);
+      }
+
+      if (savedState?.midiDevice) {
+        if (typeof savedState.midiDevice.deviceName === "string") {
+          setMidiDeviceName(savedState.midiDevice.deviceName);
+        }
+        setMidiSnapshot({
+          enabled:
+            typeof savedState.midiDevice.enabled === "boolean"
+              ? savedState.midiDevice.enabled
+              : getMidiSnapshot().enabled,
+          expanded:
+            typeof savedState.midiDevice.expanded === "boolean"
+              ? savedState.midiDevice.expanded
+              : getMidiSnapshot().expanded,
+          mappings: Array.isArray(savedState.midiDevice.mappings)
+            ? savedState.midiDevice.mappings
+            : getMidiSnapshot().mappings,
+        });
       }
 
       if (savedState?.connections?.length > 0) {

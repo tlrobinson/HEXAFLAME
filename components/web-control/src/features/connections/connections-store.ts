@@ -20,6 +20,7 @@ type ConnectionsSnapshot = {
 };
 
 type ConnectionCallbacks = {
+  onAddChannel: (connection: Connection) => void;
   onAddDevice: (device: AddDeviceRequest) => void;
   onConnect: (connection: Connection) => void;
   onDelete: (connection: Connection) => void;
@@ -36,6 +37,8 @@ type ConnectionCallbacks = {
     channel: Channel,
     positionPercent: number,
   ) => void;
+  onResetFault: (connection: Connection, channel: Channel) => void;
+  onRemoveChannel: (connection: Connection) => void;
   onRename: (connection: Connection, name: string) => void;
   onToggleConfig: (connection: Connection) => void;
 };
@@ -51,6 +54,7 @@ let snapshot: ConnectionsSnapshot = {
 };
 
 let callbacks: ConnectionCallbacks = {
+  onAddChannel: noop,
   onAddDevice: noop,
   onConnect: noop,
   onDelete: noop,
@@ -59,6 +63,8 @@ let callbacks: ConnectionCallbacks = {
   onMap: noop,
   onPositionCommit: noop,
   onPositionInput: noop,
+  onResetFault: noop,
+  onRemoveChannel: noop,
   onRename: noop,
   onToggleConfig: noop,
 };

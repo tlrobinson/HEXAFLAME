@@ -39,9 +39,8 @@ export type MappingTarget = {
 
 let connectionSequence = 1;
 
-export function makeChannels(type: ConnectionType): Channel[] {
-  const count = type === "relay" ? RELAY_CHANNEL_COUNT : 1;
-  return Array.from({ length: count }, (_, index) => ({
+export function makeChannel(index: number): Channel {
+  return {
     index,
     jetId: null,
     state: "Unknown",
@@ -49,7 +48,11 @@ export function makeChannels(type: ConnectionType): Channel[] {
     homed: false,
     travelSteps: null,
     positionPercent: 50,
-  }));
+  };
+}
+
+export function makeChannels(type: ConnectionType): Channel[] {
+  return [makeChannel(0)];
 }
 
 export function createConnection(
@@ -80,10 +83,11 @@ export function createConnection(
     positionSendInProgress: false,
     positionSendTimerId: null,
     lastSendAtMs: -Infinity,
-    channels: Array.isArray(saved.channels)
-      ? makeChannels(type).map((channel, index) => ({
-          ...channel,
-          ...(saved.channels?.[index] || {}),
+    channels: Array.isArray(saved.channels) && saved.channels.length > 0
+      ? saved.channels.map((savedChannel, index) => ({
+          ...makeChannel(index),
+          ...savedChannel,
+          index,
         }))
       : makeChannels(type),
   };

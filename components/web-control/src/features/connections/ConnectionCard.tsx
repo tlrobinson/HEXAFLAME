@@ -57,12 +57,15 @@ export function ConnectionCard({
   mappingTarget,
   serialSupported,
   onConnect,
+  onAddChannel,
   onDelete,
   onDisconnect,
   onHome,
   onMap,
   onPositionCommit,
   onPositionInput,
+  onResetFault,
+  onRemoveChannel,
   onRename,
   onToggleConfig,
 }: {
@@ -70,6 +73,7 @@ export function ConnectionCard({
   connection: Connection;
   mappingTarget: MappingTarget;
   serialSupported: boolean;
+  onAddChannel: () => void;
   onConnect: () => void;
   onDelete: () => void;
   onDisconnect: () => void;
@@ -77,6 +81,8 @@ export function ConnectionCard({
   onMap: (channel: Channel) => void;
   onPositionCommit: (channel: Channel, positionPercent: number) => void;
   onPositionInput: (channel: Channel, positionPercent: number) => void;
+  onResetFault: (channel: Channel) => void;
+  onRemoveChannel: () => void;
   onRename: (name: string) => void;
   onToggleConfig: () => void;
 }) {
@@ -110,11 +116,23 @@ export function ConnectionCard({
               onPositionInput={(positionPercent) =>
                 onPositionInput(channel, positionPercent)
               }
+              onResetFault={() => onResetFault(channel)}
             />
           ))}
           <div className="connection-card-actions">
+            <button className="btn-compact" type="button" onClick={onAddChannel}>
+              Add Channel
+            </button>
+            <button
+              className="btn-compact"
+              disabled={connection.channels.length <= 1}
+              type="button"
+              onClick={onRemoveChannel}
+            >
+              Remove Channel
+            </button>
             <button className="btn-danger-compact" type="button" onClick={onDelete}>
-              Delete
+              Delete Device
             </button>
           </div>
         </div>

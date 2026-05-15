@@ -245,6 +245,7 @@
 
       .connection-card-actions {
         display: flex;
+        gap: 6px;
         justify-content: flex-end;
       }
 
@@ -387,6 +388,9 @@
         line-height: 1;
         white-space: nowrap;
       }
+      button.motion-state-pill {
+        cursor: pointer;
+      }
       .motion-state-pill.idle {
         border-color: rgba(41, 214, 111, 0.36);
         background: rgba(41, 214, 111, 0.08);
@@ -396,6 +400,17 @@
         border-color: rgba(255, 46, 170, 0.4);
         background: rgba(255, 46, 170, 0.1);
         color: var(--magenta);
+      }
+      .motion-state-pill.fault {
+        border-color: rgba(255, 77, 79, 0.48);
+        background: rgba(255, 77, 79, 0.1);
+        color: #ff6b6d;
+      }
+      .motion-state-pill.fault.resettable:hover,
+      .motion-state-pill.fault.resettable:focus-visible {
+        border-color: #ff6b6d;
+        background: rgba(255, 77, 79, 0.18);
+        color: #fff1f1;
       }
 
       /* ── Toggle Button ─────────────────────────── */
@@ -991,10 +1006,12 @@
         stroke-width: 2.5;
         stroke-linecap: round;
         stroke-linejoin: round;
+        pointer-events: none;
       }
 
       .envelope-fill {
         fill: rgba(255, 56, 96, 0.12);
+        pointer-events: none;
       }
 
       .envelope-sweep {
@@ -1006,6 +1023,42 @@
 
       .envelope-marker {
         fill: var(--magenta);
+      }
+
+      .envelope-handle {
+        cursor: ew-resize;
+        touch-action: none;
+      }
+
+      .envelope-handle line {
+        stroke: var(--text);
+        stroke-width: 1.5;
+        stroke-dasharray: 4 4;
+        opacity: 0.55;
+      }
+
+      .envelope-handle .envelope-handle-hit {
+        stroke: transparent;
+        stroke-width: 12;
+        stroke-dasharray: none;
+      }
+
+      .envelope-handle text {
+        fill: var(--text);
+        font-family: var(--mono);
+        font-size: 9px;
+        text-anchor: middle;
+        user-select: none;
+        opacity: 0.85;
+      }
+
+      .envelope-handle-sustain {
+        cursor: ns-resize;
+      }
+
+      .envelope-handle-sustain text {
+        dominant-baseline: middle;
+        text-anchor: start;
       }
 
       .envelope-note-label {
@@ -1020,8 +1073,8 @@
 
       .param-row {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 6px 10px;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        align-items: center;
         margin-top: 8px;
       }
 
@@ -1029,6 +1082,18 @@
         font-family: var(--mono);
         font-size: 10px;
         color: var(--text);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .param-text:nth-child(2),
+      .param-text:nth-child(3) {
+        text-align: center;
+      }
+
+      .param-text:last-child {
+        text-align: right;
       }
 
       /* ── Legend ─────────────────────────────────── */

@@ -50,7 +50,7 @@ export function buildStepperJsonRpcRequest(
     jsonrpc: "2.0",
     id: `web-control-${nextStepperRequestId++}`,
     method,
-    params,
+    params: { channel: 0, ...params },
   };
 }
 
@@ -184,9 +184,15 @@ function applyStepperResult(
 ): StepperProtocolUpdate {
   const update: StepperProtocolUpdate = { statusMessage };
 
-  if (typeof result.calibrated === "boolean") {
-    update.homed = result.calibrated;
-    if (!result.calibrated) {
+  const homed =
+    typeof result.homed === "boolean"
+      ? result.homed
+      : typeof result.calibrated === "boolean"
+        ? result.calibrated
+        : null;
+  if (homed !== null) {
+    update.homed = homed;
+    if (!homed) {
       update.travelSteps = null;
     }
   }
@@ -261,6 +267,10 @@ function parseStepperJsonRpcMessage(message: Record<string, unknown>): StepperPr
 
     if (event === "response") {
       return parseResponseEvent(data);
+    }
+
+    if (event === "state-change") {
+      return applyStepperResult(data, "Stepper state changed");
     }
 
     if (event === "move-started") {

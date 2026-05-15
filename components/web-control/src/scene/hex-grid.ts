@@ -26,10 +26,6 @@ function cubeToPixel(q: number, r: number, size: number) {
   };
 }
 
-function pointKey(x: number, y: number) {
-  return `${Math.round(x * 1000)}:${Math.round(y * 1000)}`;
-}
-
 function segmentKey(a: string, b: string) {
   return a < b ? `${a}|${b}` : `${b}|${a}`;
 }
@@ -173,7 +169,7 @@ function buildSceneWithGeometry(
     const vertices = hexVertices(centerX, centerY, size).map((vertex, index) => {
       const vertexA = latticeA + VERTEX_OFFSETS[index][0];
       const vertexB = latticeB + VERTEX_OFFSETS[index][1];
-      const id = `v:${pointKey(vertex.x, vertex.y)}`;
+      const id = `v:${vertexA},${vertexB}`;
       if (!nodeMap.has(id)) {
         const vertexNode: SceneNode = {
           id,

@@ -242,6 +242,7 @@ export function ConnectionsSection() {
           connections={snapshot.connections}
           mappingTarget={snapshot.mappingTarget}
           serialSupported={snapshot.serialSupported}
+          onAddChannel={callbacks.onAddChannel}
           onConnect={callbacks.onConnect}
           onDelete={callbacks.onDelete}
           onDisconnect={callbacks.onDisconnect}
@@ -249,6 +250,8 @@ export function ConnectionsSection() {
           onMap={callbacks.onMap}
           onPositionCommit={callbacks.onPositionCommit}
           onPositionInput={callbacks.onPositionInput}
+          onResetFault={callbacks.onResetFault}
+          onRemoveChannel={callbacks.onRemoveChannel}
           onRename={callbacks.onRename}
           onToggleConfig={callbacks.onToggleConfig}
         />

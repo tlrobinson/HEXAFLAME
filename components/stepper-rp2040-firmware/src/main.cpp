@@ -14,6 +14,8 @@ constexpr size_t kTmcRawMaxBytes = 32;
 constexpr size_t kEnvelopeMaxPhases = 4;
 constexpr uint32_t kTmcRawReadTimeoutMs = 50;
 constexpr size_t kSerialOutputQueueSize = 32;
+constexpr uint32_t kDefaultChannel = 0;
+constexpr uint32_t kChannelCount = 1;
 
 RgbLed g_rgbLed;
 Stepper g_stepper(g_rgbLed, 125000000, true);
@@ -26,6 +28,7 @@ int g_lastIdx = 1;
 String g_serialLine;
 String g_currentRequestId = "";
 bool g_currentRequestHasId = false;
+uint32_t g_currentChannel = kDefaultChannel;
 String g_serialOutputQueue[kSerialOutputQueueSize];
 size_t g_serialOutputHead = 0;
 size_t g_serialOutputTail = 0;
@@ -51,9 +54,13 @@ enum class MotionState : uint8_t {
 };
 
 MotionState g_motionState = MotionState::Idle;
+MotionState g_lastReportedMotionState = MotionState::Idle;
+bool g_lastReportedHomed = false;
+bool g_haveReportedState = false;
 
 String nextToken(const String &line, int &offset);
 void clearEnvelope();
+void emitStateChange(bool force = false);
 
 struct EnvelopePhase {
   const char *name = "";
@@ -506,6 +513,43 @@ String jsonPairFloat(const char *key, float value, uint8_t digits = 1) {
   return out;
 }
 
+String jsonObjectWithChannel(const String &objectJson) {
+  String body = objectJson;
+  body.trim();
+  if (body.length() >= 2 && body[0] == '{' && body[body.length() - 1] == '}') {
+    body = body.substring(1, body.length() - 1);
+    body.trim();
+  } else {
+    body = "";
+  }
+
+  String out = "{";
+  out += jsonPair("channel", g_currentChannel);
+  if (body.length() > 0) {
+    out += ",";
+    out += body;
+  }
+  out += "}";
+  return out;
+}
+
+String channelStateJson() {
+  String state = "{";
+  state += jsonPair("motion_state", motionStateName(g_motionState));
+  state += ",";
+  state += jsonPair("homed", g_stepper.isCalibrated());
+  if (g_stepper.isCalibrated()) {
+    state += ",";
+    state += jsonPair("travel_steps", g_stepper.getTravelSteps());
+    state += ",";
+    state += jsonPair("current_step", g_stepper.getCurrentPositionSteps());
+    state += ",";
+    state += jsonPairFloat("position_percent", g_stepper.getPositionPercent());
+  }
+  state += "}";
+  return state;
+}
+
 bool enqueueJsonLine(const String &line) {
   if (g_serialOutputCount >= kSerialOutputQueueSize) {
     ++g_serialOutputDropped;
@@ -545,7 +589,9 @@ void serviceSerialOutput() {
   if (g_serialOutputDropped > 0 && g_serialOutputCount < kSerialOutputQueueSize) {
     const uint32_t dropped = g_serialOutputDropped;
     g_serialOutputDropped = 0;
-    String line = "{\"jsonrpc\":\"2.0\",\"method\":\"log\",\"params\":{\"level\":\"WARN\",\"message\":\"serial output queue dropped messages\",\"dropped\":";
+    String line = "{\"jsonrpc\":\"2.0\",\"method\":\"log\",\"params\":{\"channel\":";
+    line += g_currentChannel;
+    line += ",\"level\":\"WARN\",\"message\":\"serial output queue dropped messages\",\"dropped\":";
     line += dropped;
     line += "}}";
     enqueueJsonLine(line);
@@ -579,6 +625,8 @@ void emitNotification(const char *method, const String &paramsJson) {
 
 void logLine(const char *level, const String &message) {
   String params = "{";
+  params += jsonPair("channel", g_currentChannel);
+  params += ",";
   params += jsonPair("level", level);
   params += ",";
   params += jsonPair("message", message);
@@ -590,9 +638,20 @@ void emitEvent(const char *event, const String &dataJson = "{}") {
   String params = "{";
   params += jsonPair("event", event);
   params += ",\"data\":";
-  params += dataJson.length() > 0 ? dataJson : "{}";
+  params += jsonObjectWithChannel(dataJson.length() > 0 ? dataJson : "{}");
   params += "}";
   emitNotification("event", params);
+}
+
+void emitStateChange(bool force) {
+  const bool homed = g_stepper.isCalibrated();
+  if (!force && g_haveReportedState && g_lastReportedMotionState == g_motionState && g_lastReportedHomed == homed) {
+    return;
+  }
+  g_lastReportedMotionState = g_motionState;
+  g_lastReportedHomed = homed;
+  g_haveReportedState = true;
+  emitEvent("state-change", channelStateJson());
 }
 
 void emitRpcResult(const String &resultJson) {
@@ -602,7 +661,7 @@ void emitRpcResult(const String &resultJson) {
   String line = "{\"jsonrpc\":\"2.0\",\"id\":";
   line += g_currentRequestId;
   line += ",\"result\":";
-  line += resultJson.length() > 0 ? resultJson : "{}";
+  line += jsonObjectWithChannel(resultJson.length() > 0 ? resultJson : "{}");
   line += "}";
   writeJsonLine(line);
 }
@@ -610,6 +669,8 @@ void emitRpcResult(const String &resultJson) {
 void emitRpcError(int code, const String &message) {
   if (!g_currentRequestHasId) {
     String params = "{";
+    params += jsonPair("channel", g_currentChannel);
+    params += ",";
     params += jsonPair("level", "ERROR");
     params += ",";
     params += jsonPair("message", message);
@@ -625,6 +686,8 @@ void emitRpcError(int code, const String &message) {
   line += code;
   line += ",\"message\":";
   appendJsonString(line, message);
+  line += ",\"data\":";
+  line += jsonObjectWithChannel("{}");
   line += "}}";
   writeJsonLine(line);
 }
@@ -654,6 +717,7 @@ void setMotionState(MotionState state, const char *reason) {
   }
   logLine("INFO", message);
   g_motionState = state;
+  emitStateChange();
 }
 
 bool isMotionIdle() {
@@ -672,11 +736,11 @@ bool requireIdleForCommand(const char *commandName) {
   return false;
 }
 
-bool requireCalibratedForCommand(const char *commandName) {
+bool requireHomedForCommand(const char *commandName) {
   if (g_stepper.isCalibrated()) {
     return true;
   }
-  String message = "uncalibrated rejected=";
+  String message = "unhomed rejected=";
   message += commandName;
   message += " run home first";
   rspLine("ERR", message);
@@ -979,7 +1043,7 @@ void printStatus() {
     result += "}";
   }
   result += ",";
-  result += jsonPair("calibrated", g_stepper.isCalibrated());
+  result += jsonPair("homed", g_stepper.isCalibrated());
   if (g_stepper.isCalibrated()) {
     result += ",";
     result += jsonPair("travel_steps", g_stepper.getTravelSteps());
@@ -1023,7 +1087,7 @@ void runCentering(uint32_t requestedFrequency) {
     String result = "{";
     result += jsonPair("ok", true);
     result += ",";
-    result += jsonPair("calibrated", g_stepper.isCalibrated());
+    result += jsonPair("homed", g_stepper.isCalibrated());
     result += ",";
     result += jsonPair("travel_steps", g_stepper.getTravelSteps());
     result += ",";
@@ -1392,12 +1456,31 @@ bool requireParam(bool condition, const char *message) {
   return false;
 }
 
+bool selectCommandChannel(const String &params) {
+  g_currentChannel = kDefaultChannel;
+
+  String rawChannel;
+  if (!extractJsonValue(params, "channel", rawChannel)) {
+    return true;
+  }
+
+  uint32_t channel = 0;
+  if (!jsonUintField(params, "channel", channel) || channel >= kChannelCount) {
+    emitRpcError(-32602, "unsupported channel");
+    return false;
+  }
+
+  g_currentChannel = channel;
+  return true;
+}
+
 void handleJsonRpcCommand(const String &rawLine) {
   String method;
   String params;
   String idRaw;
   bool hasId = false;
   if (!parseJsonRpcRequest(rawLine, method, params, idRaw, hasId)) {
+    g_currentChannel = kDefaultChannel;
     g_currentRequestId = "null";
     g_currentRequestHasId = true;
     emitRpcError(-32700, "expected newline-delimited JSON-RPC request");
@@ -1407,6 +1490,10 @@ void handleJsonRpcCommand(const String &rawLine) {
 
   g_currentRequestId = idRaw;
   g_currentRequestHasId = hasId;
+  if (!selectCommandChannel(params)) {
+    g_currentRequestHasId = false;
+    return;
+  }
   emitEvent("command-received", String("{") + jsonPair("method", method) + "}");
 
   if (method == "help") {
@@ -1589,7 +1676,7 @@ void handleJsonRpcCommand(const String &rawLine) {
     float percent = 0.0f;
     uint32_t frequency = 0;
     (void)jsonUintField(params, "hz", frequency);
-    if (requireIdleForCommand("move-percent") && requireCalibratedForCommand("move-percent") &&
+    if (requireIdleForCommand("move-percent") && requireHomedForCommand("move-percent") &&
         requireParam(jsonFloatField(params, "percent", percent), "move-percent requires percent")) {
       runMoveToPercent(percent, frequency);
     }
@@ -1597,14 +1684,14 @@ void handleJsonRpcCommand(const String &rawLine) {
     uint32_t step = 0;
     uint32_t frequency = 0;
     (void)jsonUintField(params, "hz", frequency);
-    if (requireIdleForCommand("move-step") && requireCalibratedForCommand("move-step") &&
+    if (requireIdleForCommand("move-step") && requireHomedForCommand("move-step") &&
         requireParam(jsonUintField(params, "step", step), "move-step requires step")) {
       runMoveToStep(step, frequency);
     }
   } else if (method == "move-percent-time") {
     float percent = 0.0f;
     uint32_t durationMs = 0;
-    if (requireIdleForCommand("move-percent-time") && requireCalibratedForCommand("move-percent-time") &&
+    if (requireIdleForCommand("move-percent-time") && requireHomedForCommand("move-percent-time") &&
         requireParam(jsonFloatField(params, "percent", percent) && jsonUintField(params, "duration_ms", durationMs) && durationMs > 0,
                      "move-percent-time requires percent and duration_ms")) {
       runMoveToPercentInTime(percent, durationMs);
@@ -1612,7 +1699,7 @@ void handleJsonRpcCommand(const String &rawLine) {
   } else if (method == "move-percent-speed") {
     float percent = 0.0f;
     uint32_t frequency = 0;
-    if (requireIdleForCommand("move-percent-speed") && requireCalibratedForCommand("move-percent-speed") &&
+    if (requireIdleForCommand("move-percent-speed") && requireHomedForCommand("move-percent-speed") &&
         requireParam(jsonFloatField(params, "percent", percent) && jsonUintField(params, "hz", frequency) && frequency > 0,
                      "move-percent-speed requires percent and hz")) {
       runMoveToPercentAtSpeed(percent, frequency);
@@ -1620,7 +1707,7 @@ void handleJsonRpcCommand(const String &rawLine) {
   } else if (method == "move-step-time") {
     uint32_t step = 0;
     uint32_t durationMs = 0;
-    if (requireIdleForCommand("move-step-time") && requireCalibratedForCommand("move-step-time") &&
+    if (requireIdleForCommand("move-step-time") && requireHomedForCommand("move-step-time") &&
         requireParam(jsonUintField(params, "step", step) && jsonUintField(params, "duration_ms", durationMs) && durationMs > 0,
                      "move-step-time requires step and duration_ms")) {
       runMoveToStepInTime(step, durationMs);
@@ -1628,7 +1715,7 @@ void handleJsonRpcCommand(const String &rawLine) {
   } else if (method == "move-step-speed") {
     uint32_t step = 0;
     uint32_t frequency = 0;
-    if (requireIdleForCommand("move-step-speed") && requireCalibratedForCommand("move-step-speed") &&
+    if (requireIdleForCommand("move-step-speed") && requireHomedForCommand("move-step-speed") &&
         requireParam(jsonUintField(params, "step", step) && jsonUintField(params, "hz", frequency) && frequency > 0,
                      "move-step-speed requires step and hz")) {
       runMoveToStepAtSpeed(step, frequency);
@@ -1641,7 +1728,7 @@ void handleJsonRpcCommand(const String &rawLine) {
     uint32_t decayMs = 0;
     uint32_t sustainMs = 0;
     uint32_t releaseMs = 0;
-    if (requireIdleForCommand("adsr") && requireCalibratedForCommand("adsr") &&
+    if (requireIdleForCommand("adsr") && requireHomedForCommand("adsr") &&
         requireParam(jsonFloatField(params, "attack_percent", attackPercent) && jsonUintField(params, "attack_ms", attackMs) &&
                          jsonFloatField(params, "decay_percent", decayPercent) && jsonUintField(params, "decay_ms", decayMs) &&
                          jsonUintField(params, "sustain_ms", sustainMs) && jsonFloatField(params, "release_percent", releasePercent) &&
@@ -1652,7 +1739,7 @@ void handleJsonRpcCommand(const String &rawLine) {
   } else if (method == "release") {
     float percent = 0.0f;
     uint32_t durationMs = 0;
-    if (requireIdleForCommand("release") && requireCalibratedForCommand("release") &&
+    if (requireIdleForCommand("release") && requireHomedForCommand("release") &&
         requireParam(jsonFloatField(params, "percent", percent) && jsonUintField(params, "duration_ms", durationMs),
                      "release requires percent and duration_ms")) {
       startReleaseMove(percent, durationMs);
@@ -1702,6 +1789,7 @@ void setup() {
 
   if (g_stepper.tmcTest()) {
     emitEvent("ready", "{\"protocol\":\"json-rpc\",\"transport\":\"newline-delimited-json\",\"firmware\":\"stepper-rp2040\"}");
+    emitStateChange(true);
   } else {
     logLine("ERROR", "TMC driver UART did not respond; check stepper power");
   }
@@ -1727,6 +1815,7 @@ void loop() {
     setMotionState(MotionState::Fault, "move failed");
   }
   serviceEnvelope(moveUpdate);
+  emitStateChange();
 
   const bool buttonLevel = digitalRead(kButtonPin);
   const uint32_t now = millis();

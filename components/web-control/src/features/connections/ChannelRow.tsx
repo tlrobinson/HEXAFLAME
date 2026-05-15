@@ -7,6 +7,9 @@ function channelTargetLabel(channel: Channel) {
 
 function motionStateClassName(motionState: string | undefined) {
   const normalized = (motionState || "").toLowerCase();
+  if (normalized.includes("fault")) {
+    return " fault";
+  }
   if (normalized.includes("moving") || normalized.includes("envelope")) {
     return " active";
   }
@@ -23,6 +26,7 @@ export function ChannelRow({
   active,
   onMap,
   onHome,
+  onResetFault,
   onPositionInput,
   onPositionCommit,
 }: {
@@ -32,6 +36,7 @@ export function ChannelRow({
   active: boolean;
   onMap: () => void;
   onHome: () => void;
+  onResetFault: () => void;
   onPositionInput: (positionPercent: number) => void;
   onPositionCommit: (positionPercent: number) => void;
 }) {
@@ -45,6 +50,12 @@ export function ChannelRow({
     connection.type === "stepper" && dotActive
       ? 0.22 + stepperLevel * 0.78
       : undefined;
+  const motionState = channel.motionState || "Unknown";
+  const motionStateClass = `motion-state-pill${motionStateClassName(channel.motionState)}`;
+  const canResetFault =
+    connection.type === "stepper" &&
+    connection.port !== null &&
+    motionState.toLowerCase().includes("fault");
 
   return (
     <div className="channel-row">
@@ -72,11 +83,19 @@ export function ChannelRow({
               >
                 {channel.homed ? "Homed" : "Not Homed"}
               </button>
-              <span
-                className={`motion-state-pill${motionStateClassName(channel.motionState)}`}
-              >
-                {channel.motionState || "Unknown"}
-              </span>
+              {canResetFault ? (
+                <button
+                  aria-label="Clear stepper fault"
+                  className={`${motionStateClass} resettable`}
+                  title="Clear fault"
+                  type="button"
+                  onClick={onResetFault}
+                >
+                  {motionState}
+                </button>
+              ) : (
+                <span className={motionStateClass}>{motionState}</span>
+              )}
             </>
           ) : null}
         </div>
