@@ -161,6 +161,32 @@ export function getSerialPortKey(port: unknown) {
   return null;
 }
 
+export function getSerialPortLabel(port: unknown) {
+  const info = (port as { getInfo?: () => Record<string, unknown> })?.getInfo?.();
+  if (!info) {
+    return "Serial port";
+  }
+
+  if (
+    Number.isFinite(info.usbVendorId) ||
+    Number.isFinite(info.usbProductId)
+  ) {
+    const vendorId = Number(info.usbVendorId ?? 0)
+      .toString(16)
+      .padStart(4, "0");
+    const productId = Number(info.usbProductId ?? 0)
+      .toString(16)
+      .padStart(4, "0");
+    return `USB ${vendorId}:${productId}`;
+  }
+
+  if (Number.isFinite(info.bluetoothServiceClassId)) {
+    return `Bluetooth ${info.bluetoothServiceClassId}`;
+  }
+
+  return "Serial port";
+}
+
 export function getRolePortStorageKey(
   role: SerialPortRole,
   relayStorageKey: string,

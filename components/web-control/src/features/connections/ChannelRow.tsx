@@ -1,8 +1,19 @@
-import { ActionButton, MetricText } from "../../components/ui/common";
+import { MetricText } from "../../components/ui/common";
 import type { Channel, Connection, MappingTarget } from "./connection-model";
 
 function channelTargetLabel(channel: Channel) {
   return channel.jetId || "Unmapped";
+}
+
+function motionStateClassName(motionState: string | undefined) {
+  const normalized = (motionState || "").toLowerCase();
+  if (normalized.includes("moving") || normalized.includes("envelope")) {
+    return " active";
+  }
+  if (normalized.includes("idle") || normalized.includes("ready")) {
+    return " idle";
+  }
+  return "";
 }
 
 export function ChannelRow({
@@ -28,27 +39,51 @@ export function ChannelRow({
     mappingTarget?.connectionId === connection.id &&
     mappingTarget?.channelIndex === channel.index;
   const positionPercent = Number(channel.positionPercent ?? 50);
+  const stepperLevel = Math.min(Math.max(positionPercent / 100, 0), 1);
+  const dotActive = connection.type === "stepper" ? stepperLevel > 0 : active;
+  const dotOpacity =
+    connection.type === "stepper" && dotActive
+      ? 0.22 + stepperLevel * 0.78
+      : undefined;
 
   return (
     <div className="channel-row">
       <div className="channel-topline">
-        <span className="channel-title">Channel {channel.index + 1}</span>
-        <span className="channel-map-target">
-          {isMapping ? "Click a jet..." : channelTargetLabel(channel)}
-        </span>
-      </div>
-      <div className="channel-actions">
-        <ActionButton onClick={onMap}>Map</ActionButton>
-        {connection.type === "stepper" ? (
-          <ActionButton disabled={connection.port === null} onClick={onHome}>
-            Home
-          </ActionButton>
-        ) : null}
+        <div className="channel-heading-text">
+          <span
+            aria-label={dotActive ? "Active" : "Inactive"}
+            className={`channel-state-dot${dotActive ? " active" : ""}`}
+            role="img"
+            style={dotOpacity === undefined ? undefined : { opacity: dotOpacity }}
+          />
+          <span className="channel-title">Ch {channel.index + 1}</span>
+          <button className="channel-map-target" type="button" onClick={onMap}>
+            {isMapping ? "Click a jet..." : channelTargetLabel(channel)}
+          </button>
+        </div>
+        <div className="channel-actions">
+          {connection.type === "stepper" ? (
+            <>
+              <button
+                className={`home-state-pill${channel.homed ? " homed" : " needs-home"}`}
+                disabled={connection.port === null}
+                type="button"
+                onClick={onHome}
+              >
+                {channel.homed ? "Homed" : "Not Homed"}
+              </button>
+              <span
+                className={`motion-state-pill${motionStateClassName(channel.motionState)}`}
+              >
+                {channel.motionState || "Unknown"}
+              </span>
+            </>
+          ) : null}
+        </div>
       </div>
       {connection.type === "stepper" ? (
         <>
           <div className="channel-metrics">
-            <MetricText>State: {channel.state || "Unknown"}</MetricText>
             <MetricText>
               {channel.travelSteps === null || channel.travelSteps === undefined
                 ? "Travel: Unknown"
@@ -71,11 +106,7 @@ export function ChannelRow({
             <output>{positionPercent.toFixed(1)}%</output>
           </div>
         </>
-      ) : (
-        <div className="channel-metrics">
-          <MetricText>State: {active ? "On" : "Off"}</MetricText>
-        </div>
-      )}
+      ) : null}
     </div>
   );
 }

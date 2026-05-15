@@ -10,9 +10,10 @@ export function HexCanvas() {
     <canvas
       id="hex-canvas"
       ref={setCanvasElement}
-      onClick={callbacks.onClick}
       onMouseLeave={callbacks.onMouseLeave}
       onMouseMove={callbacks.onMouseMove}
+      onPointerDown={callbacks.onPointerDown}
+      onPointerUp={callbacks.onPointerUp}
     />
   );
 }

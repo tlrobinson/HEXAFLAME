@@ -7,11 +7,13 @@ export function ConnectionsPanel({
   mappingTarget,
   serialSupported,
   onConnect,
+  onDelete,
   onDisconnect,
   onHome,
   onMap,
   onPositionCommit,
   onPositionInput,
+  onRename,
   onToggleConfig,
 }: {
   activeNodeIds: Set<string>;
@@ -19,11 +21,13 @@ export function ConnectionsPanel({
   mappingTarget: MappingTarget;
   serialSupported: boolean;
   onConnect: (connection: Connection) => void;
+  onDelete: (connection: Connection) => void;
   onDisconnect: (connection: Connection) => void;
   onHome: (connection: Connection, channel: Channel) => void;
   onMap: (connection: Connection, channel: Channel) => void;
   onPositionCommit: (connection: Connection, channel: Channel, positionPercent: number) => void;
   onPositionInput: (connection: Connection, channel: Channel, positionPercent: number) => void;
+  onRename: (connection: Connection, name: string) => void;
   onToggleConfig: (connection: Connection) => void;
 }) {
   return (
@@ -36,6 +40,7 @@ export function ConnectionsPanel({
           mappingTarget={mappingTarget}
           serialSupported={serialSupported}
           onConnect={() => onConnect(connection)}
+          onDelete={() => onDelete(connection)}
           onDisconnect={() => onDisconnect(connection)}
           onHome={(channel) => onHome(connection, channel)}
           onMap={(channel) => onMap(connection, channel)}
@@ -45,6 +50,7 @@ export function ConnectionsPanel({
           onPositionInput={(channel, positionPercent) =>
             onPositionInput(connection, channel, positionPercent)
           }
+          onRename={(name) => onRename(connection, name)}
           onToggleConfig={() => onToggleConfig(connection)}
         />
       ))}

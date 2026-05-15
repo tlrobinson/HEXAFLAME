@@ -53,13 +53,13 @@ function latticeShell(a: number, b: number) {
   return Math.max(Math.abs(a), Math.abs(b), Math.abs(a - b));
 }
 
-function formatSigned(value: number) {
-  return value >= 0 ? `+${value}` : String(value);
+function centerShell(q: number, r: number) {
+  return Math.max(Math.abs(q), Math.abs(r), Math.abs(q + r));
 }
 
-function makeAddress(type: "C" | "V", a: number, b: number) {
-  const shell = latticeShell(a, b);
-  return `${type}${shell}:${formatSigned(a)},${formatSigned(b)}`;
+function clockwiseIndex(x: number, y: number, startAngle: number) {
+  const angle = Math.atan2(y, x);
+  return (angle - startAngle + Math.PI * 2) % (Math.PI * 2);
 }
 
 function ringCoordinates(radius: number): Array<[number, number]> {
@@ -85,7 +85,33 @@ function ringCoordinates(radius: number): Array<[number, number]> {
 function allCoordinates(totalRings: number) {
   const cells: Array<[number, number]> = [];
   for (let radius = 0; radius < totalRings; radius += 1) {
-    cells.push(...ringCoordinates(radius));
+    cells.push(
+      ...ringCoordinates(radius)
+        .map(([q, r]) => {
+          const point = cubeToPixel(q, r, 1);
+          return {
+            point,
+            q,
+            r,
+          };
+        })
+        .sort((left, right) => {
+          const ringDelta = centerShell(left.q, left.r) - centerShell(right.q, right.r);
+          if (ringDelta !== 0) {
+            return ringDelta;
+          }
+
+          const angleDelta =
+            clockwiseIndex(left.point.x, left.point.y, (-5 * Math.PI) / 6) -
+            clockwiseIndex(right.point.x, right.point.y, (-5 * Math.PI) / 6);
+          if (Math.abs(angleDelta) > 0.0001) {
+            return angleDelta;
+          }
+
+          return left.q - right.q || left.r - right.r;
+        })
+        .map(({ q, r }): [number, number] => [q, r]),
+    );
   }
   return cells;
 }
@@ -102,6 +128,10 @@ function hexVertices(centerX: number, centerY: number, size: number) {
   return vertices;
 }
 
+function localVertexAddressIndex(vertexIndex: number) {
+  return [2, 3, 4, 5, 0, 1][vertexIndex] ?? vertexIndex;
+}
+
 function buildSceneWithGeometry(
   totalRings: number,
   size: number,
@@ -113,6 +143,7 @@ function buildSceneWithGeometry(
   const nodes: SceneNode[] = [];
   const nodeMap = new Map<string, SceneNode>();
   const jets: Jet[] = [];
+  const ringHexCounts = new Map<number, number>();
 
   for (const [q, r] of coords) {
     const point = cubeToPixel(q, r, size);
@@ -120,6 +151,9 @@ function buildSceneWithGeometry(
     const centerY = originY + point.y;
     const latticeA = q - r;
     const latticeB = q + 2 * r;
+    const ring = centerShell(q, r);
+    const hexIndex = ringHexCounts.get(ring) || 0;
+    ringHexCounts.set(ring, hexIndex + 1);
     const centerId = `c:${q},${r}`;
     const centerNode: SceneNode = {
       id: centerId,
@@ -128,8 +162,8 @@ function buildSceneWithGeometry(
       y: centerY,
       latticeA,
       latticeB,
-      shell: latticeShell(latticeA, latticeB),
-      address: makeAddress("C", latticeA, latticeB),
+      shell: ring,
+      address: `C${ring}.${hexIndex}`,
       neighbors: new Set(),
       controlledJetIds: [],
     };
@@ -148,8 +182,8 @@ function buildSceneWithGeometry(
           y: vertex.y,
           latticeA: vertexA,
           latticeB: vertexB,
-          shell: latticeShell(vertexA, vertexB),
-          address: makeAddress("V", vertexA, vertexB),
+          shell: Math.max(latticeShell(vertexA, vertexB) - 1, 0),
+          address: `V${ring}.${hexIndex}.${localVertexAddressIndex(index)}`,
           neighbors: new Set(),
           controlledJetIds: [],
         };

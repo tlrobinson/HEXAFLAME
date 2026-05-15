@@ -26,7 +26,6 @@ import {
 } from "./scene/hex-grid";
 import {
   createAdsrEnvelope,
-  getAdsrOutputValue,
   releaseAdsrEnvelope,
   tickAdsrEnvelope,
   triggerAdsrEnvelope,
@@ -35,10 +34,9 @@ import {
   drawAddressLabels,
   drawChannelLabels,
   drawDistanceLabels,
+  drawEnvelopeGlow,
   drawHoverNode,
   drawJet,
-  drawOutlineGlow,
-  drawStepperGlow,
 } from "./render/canvas";
 import {
   RELAY_CHANNEL_COUNT,
@@ -78,8 +76,6 @@ import {
   MIDI_CC_STEPPER_1_SUSTAIN,
   MIDI_NOTE_ALL_OFF,
   MIDI_NOTE_ALL_ON,
-  MIDI_NOTE_STEPPER_1_ENV,
-  MIDI_PAD_MAP,
   connectAllMidiInputs as connectMidiAccessInputs,
   disconnectMidiInputs,
   formatMidiMessage,
@@ -100,7 +96,9 @@ import {
   setScriptEditorSnapshot,
 } from "./features/sidebar/script-editor-store";
 import {
+  getMidiSnapshot,
   setMidiCallbacks,
+  setMidiDeviceName,
   setMidiSnapshot,
   setMidiStatus,
 } from "./features/midi/midi-store";
@@ -116,10 +114,26 @@ import {
 import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
 
       setCanvasCallbacks({
-        onClick: (event) => {
-          stopAnimation();
+        onPointerDown: (event) => {
+          if (event.button !== 0) {
+            return;
+          }
           const hitNode = findHitNode(event.clientX, event.clientY);
           if (!hitNode) {
+            return;
+          }
+          event.currentTarget.setPointerCapture(event.pointerId);
+
+          const midiSnapshot = getMidiSnapshot();
+          if (midiSnapshot.mappingTargetId !== null) {
+            const mappings = midiSnapshot.mappings.map((mapping) =>
+              mapping.id === midiSnapshot.mappingTargetId
+                ? { ...mapping, jetId: hitNode.address }
+                : mapping,
+            );
+            setMidiSnapshot({ mappingTargetId: null, mappings });
+            renderConnections();
+            render();
             return;
           }
 
@@ -129,7 +143,7 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
             );
             const channel = connection?.channels[mappingTarget.channelIndex];
             if (channel) {
-              channel.jetId = hitNode.id;
+              channel.jetId = hitNode.address;
               mappingTarget = null;
               saveState();
               renderConnections();
@@ -138,16 +152,63 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
             return;
           }
 
-          if (activeNodes.has(hitNode.id)) {
-            activeNodes.delete(hitNode.id);
+          stopAnimation();
+          if (event.metaKey) {
+            toggleAddressGate(
+              `manual:toggle:${hitNode.address}`,
+              hitNode.address,
+              127,
+              hitNode.address,
+            );
           } else {
-            activeNodes.add(hitNode.id);
+            pressedNodeId = hitNode.id;
+            pressedNodeWasActive = false;
+            openAddressGate(
+              `manual:press:${hitNode.id}`,
+              hitNode.address,
+              127,
+              hitNode.address,
+            );
           }
 
           saveState();
+          renderConnections();
+          render();
+        },
+        onPointerUp: () => {
+          if (!pressedNodeId) {
+            return;
+          }
+          const releasedNodeId = pressedNodeId;
+          pressedNodeId = null;
+          pressedNodeWasActive = false;
+
+          if (scene) {
+            const node = scene.nodes.find((candidate) => candidate.id === releasedNodeId);
+            closeAddressGate(
+              `manual:press:${releasedNodeId}`,
+              node?.address || "Manual",
+            );
+          }
+
+          saveState();
+          renderConnections();
           render();
         },
         onMouseLeave: () => {
+          if (pressedNodeId) {
+            const releasedNodeId = pressedNodeId;
+            if (scene) {
+              const node = scene.nodes.find((candidate) => candidate.id === releasedNodeId);
+              closeAddressGate(
+                `manual:press:${releasedNodeId}`,
+                node?.address || "Manual",
+              );
+            }
+            pressedNodeId = null;
+            pressedNodeWasActive = false;
+            renderConnections();
+          }
           hoveredNodeId = null;
           canvas.style.cursor = "default";
           render();
@@ -206,9 +267,15 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
       const MIN_RINGS = 1;
       const MAX_RINGS = 12;
       const activeNodes = new Set();
+      const addressEnvelopes = new Map();
+      const addressGateIds = new Map();
+      const gateAddresses = new Map();
+      const animationGateIds = new Set();
       const knownNodeIds = new Set();
       let scene = null;
       let hoveredNodeId = null;
+      let pressedNodeId = null;
+      let pressedNodeWasActive = false;
       let rings = 4;
       let jetMode = "all";
       let labelMode = "address";
@@ -246,6 +313,9 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
       let stepperLastSendAtMs = -Infinity;
       let stepperConnectInProgress = false;
       let stepperEnvelopeFrameId = null;
+      let stepperEnvelopeTriggerLabel = "No note";
+      let stepperEnvelopeDisplayAddress = null;
+      let stepperNativeEnvelopeAddress = null;
       const stepperEnvelope = createAdsrEnvelope({
         attackMs: 180,
         decayMs: 220,
@@ -350,7 +420,9 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
         const stepper = getPrimaryStepperConnection();
         if (stepper) {
           stepper.channels[0].homed = stepperHomed;
-          stepper.channels[0].state = stepperPort === null ? "Unknown" : stepperHomed ? "Homed" : "Not homed";
+          if (stepperPort === null) {
+            stepper.channels[0].motionState = "Unknown";
+          }
         }
         updateConnectionDom();
       }
@@ -395,6 +467,7 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
       }
 
       function getStepperEnvelopeGraphPoint(now = performance.now()) {
+        const displayEnvelope = getDisplayEnvelope();
         const {
           graphLeft,
           graphRight,
@@ -406,13 +479,13 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
           sustainY,
           sustainWidthWeight,
         } = getStepperEnvelopeGraphLayout();
-        const elapsed = Math.max(0, now - stepperEnvelope.phaseStartMs);
+        const elapsed = Math.max(0, now - displayEnvelope.phaseStartMs);
 
-        if (!stepperEnvelope.active) {
+        if (!displayEnvelope.active) {
           return { x: graphLeft, y: graphBottom };
         }
 
-        if (stepperEnvelope.phase === "attack") {
+        if (displayEnvelope.phase === "attack") {
           const progress =
             stepperEnvelope.attackMs <= 0
               ? 1
@@ -423,7 +496,7 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
           };
         }
 
-        if (stepperEnvelope.phase === "decay") {
+        if (displayEnvelope.phase === "decay") {
           const progress =
             stepperEnvelope.decayMs <= 0
               ? 1
@@ -434,7 +507,7 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
           };
         }
 
-        if (stepperEnvelope.phase === "sustain") {
+        if (displayEnvelope.phase === "sustain") {
           const progress = Math.min(elapsed / sustainWidthWeight, 1);
           return {
             x: decayX + (sustainEndX - decayX) * progress,
@@ -442,7 +515,7 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
           };
         }
 
-        if (stepperEnvelope.phase === "release") {
+        if (displayEnvelope.phase === "release") {
           const progress =
             stepperEnvelope.releaseMs <= 0
               ? 1
@@ -456,7 +529,288 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
         return { x: graphLeft, y: graphBottom };
       }
 
+      function getDisplayEnvelope() {
+        return (
+          (stepperEnvelopeDisplayAddress &&
+            addressEnvelopes.get(stepperEnvelopeDisplayAddress)) ||
+          stepperEnvelope
+        );
+      }
+
+      function syncEnvelopeParameters(envelope) {
+        envelope.attackMs = stepperEnvelope.attackMs;
+        envelope.decayMs = stepperEnvelope.decayMs;
+        envelope.sustainLevel = stepperEnvelope.sustainLevel;
+        envelope.releaseMs = stepperEnvelope.releaseMs;
+      }
+
+      function getAddressEnvelope(address) {
+        let envelope = addressEnvelopes.get(address);
+        if (!envelope) {
+          envelope = createAdsrEnvelope({
+            attackMs: stepperEnvelope.attackMs,
+            decayMs: stepperEnvelope.decayMs,
+            sustainLevel: stepperEnvelope.sustainLevel,
+            releaseMs: stepperEnvelope.releaseMs,
+          });
+          envelope.originValue = 0;
+          envelope.targetValue = 1;
+          addressEnvelopes.set(address, envelope);
+        }
+        syncEnvelopeParameters(envelope);
+        return envelope;
+      }
+
+      function getEnvelopeValueForAddress(address) {
+        if (!address) {
+          return 0;
+        }
+        const envelope = addressEnvelopes.get(address);
+        return envelope?.active
+          ? envelope.currentLevel * envelope.velocityScale
+          : 0;
+      }
+
+      function syncActiveNodesFromEnvelopes(currentScene = scene) {
+        activeNodes.clear();
+        if (!currentScene) {
+          return;
+        }
+        for (const node of currentScene.nodes) {
+          if (getEnvelopeValueForAddress(node.address) > 0) {
+            activeNodes.add(node.id);
+          }
+        }
+      }
+
+      function getMappedStepperAddresses() {
+        const addresses = [];
+        if (!scene) {
+          return addresses;
+        }
+        for (const connection of getStepperConnections()) {
+          for (const channel of connection.channels) {
+            const address = normalizeMappedAddress(scene, channel.jetId);
+            if (address) {
+              addresses.push({ address, channel, connection });
+            }
+          }
+        }
+        return addresses;
+      }
+
+      function isPrimaryStepperAddress(address) {
+        return Boolean(
+          scene &&
+            address &&
+            getPrimaryStepperMappedAddress(scene) ===
+              normalizeMappedAddress(scene, address),
+        );
+      }
+
+      function sendNativeStepperEnvelopeStart(address, velocity = 127) {
+        if (!isPrimaryStepperAddress(address) || !canControlStepperPosition()) {
+          return false;
+        }
+
+        const velocityScale = Math.min(Math.max(velocity / 127, 0), 1);
+        const attackPercent =
+          stepperBasePositionPercent +
+          (100 - stepperBasePositionPercent) * velocityScale;
+        const decayPercent =
+          stepperBasePositionPercent +
+          (100 - stepperBasePositionPercent) *
+            velocityScale *
+            stepperEnvelope.sustainLevel;
+
+        void writeStepperCommand(
+          buildStepperAdsrCommand({
+            attackPercent,
+            attackMs: stepperEnvelope.attackMs,
+            decayPercent,
+            decayMs: stepperEnvelope.decayMs,
+            sustainMs: 0,
+            releasePercent: stepperBasePositionPercent,
+            releaseMs: stepperEnvelope.releaseMs,
+          }),
+        ).catch((error) => {
+          console.error(error);
+          stepperStatusMessage = "Stepper ADSR start failed";
+          updateStepperUi();
+        });
+        stepperNativeEnvelopeAddress = address;
+        return true;
+      }
+
+      function sendNativeStepperEnvelopeRelease(address) {
+        if (
+          stepperNativeEnvelopeAddress !== address ||
+          !isPrimaryStepperAddress(address) ||
+          !canControlStepperPosition()
+        ) {
+          return false;
+        }
+
+        void writeStepperCommand(
+          buildStepperReleaseCommand(
+            stepperBasePositionPercent,
+            stepperEnvelope.releaseMs,
+          ),
+        ).catch((error) => {
+          console.error(error);
+          stepperStatusMessage = "Stepper ADSR release failed";
+          updateStepperUi();
+        });
+        stepperNativeEnvelopeAddress = null;
+        return true;
+      }
+
+      function updateStepperOutputsFromEnvelopes({
+        send = true,
+        sendDelayMs = STEPPER_ENVELOPE_SEND_DELAY_MS,
+      } = {}) {
+        let primaryOutput = stepperBasePositionPercent;
+        const primaryStepper = getPrimaryStepperConnection();
+
+        for (const mapped of getMappedStepperAddresses()) {
+          const level = getEnvelopeValueForAddress(mapped.address);
+          const percent =
+            stepperBasePositionPercent +
+            (100 - stepperBasePositionPercent) * level;
+          mapped.channel.positionPercent = percent;
+          if (mapped.connection === primaryStepper) {
+            primaryOutput = percent;
+          }
+        }
+
+        stepperPositionPercent = Math.min(Math.max(primaryOutput, 0), 100);
+        updateStepperReadout();
+        if (
+          send &&
+          canControlStepperPosition() &&
+          stepperNativeEnvelopeAddress === null
+        ) {
+          queueStepperPositionSend(sendDelayMs);
+        }
+      }
+
+      function runEnvelopeFrame(now) {
+        let hasActiveEnvelope = false;
+        for (const [address, envelope] of addressEnvelopes) {
+          syncEnvelopeParameters(envelope);
+          const result = tickAdsrEnvelope(envelope, now);
+          if (result.stopped) {
+            addressEnvelopes.delete(address);
+            continue;
+          }
+          if (result.active) {
+            hasActiveEnvelope = true;
+          }
+        }
+
+        syncActiveNodesFromEnvelopes();
+        updateStepperOutputsFromEnvelopes();
+        updateStepperEnvelopeUi(now);
+        renderConnections();
+        render();
+
+        if (hasActiveEnvelope || gateAddresses.size > 0) {
+          stepperEnvelopeFrameId = window.requestAnimationFrame(runEnvelopeFrame);
+        } else {
+          stepperEnvelopeFrameId = null;
+        }
+      }
+
+      function scheduleEnvelopeTick({ restart = false } = {}) {
+        if (restart && stepperEnvelopeFrameId !== null) {
+          window.cancelAnimationFrame(stepperEnvelopeFrameId);
+          stepperEnvelopeFrameId = null;
+        }
+        if (stepperEnvelopeFrameId === null) {
+          stepperEnvelopeFrameId = window.requestAnimationFrame(runEnvelopeFrame);
+        }
+      }
+
+      function openAddressGate(gateId, address, velocity = 127, triggerLabel = address) {
+        if (!address) {
+          return false;
+        }
+
+        const previousAddress = gateAddresses.get(gateId);
+        if (previousAddress && previousAddress !== address) {
+          closeAddressGate(gateId, previousAddress);
+        }
+
+        let gates = addressGateIds.get(address);
+        if (!gates) {
+          gates = new Set();
+          addressGateIds.set(address, gates);
+        }
+        const wasOpen = gates.size > 0;
+        gates.add(gateId);
+        gateAddresses.set(gateId, address);
+
+        const envelope = getAddressEnvelope(address);
+        stepperEnvelopeDisplayAddress = address;
+        stepperEnvelopeTriggerLabel = triggerLabel;
+        if (!wasOpen) {
+          triggerAdsrEnvelope(envelope, {
+            velocity,
+            originValue: 0,
+            targetValue: 1,
+            now: performance.now(),
+          });
+          sendNativeStepperEnvelopeStart(address, velocity);
+        }
+
+        syncActiveNodesFromEnvelopes();
+        updateStepperOutputsFromEnvelopes();
+        updateStepperEnvelopeUi();
+        scheduleEnvelopeTick({ restart: !wasOpen });
+        return true;
+      }
+
+      function closeAddressGate(gateId, triggerLabel = "Release") {
+        const address = gateAddresses.get(gateId);
+        if (!address) {
+          return;
+        }
+        gateAddresses.delete(gateId);
+        const gates = addressGateIds.get(address);
+        gates?.delete(gateId);
+        if (gates && gates.size > 0) {
+          return;
+        }
+
+        addressGateIds.delete(address);
+        const envelope = addressEnvelopes.get(address);
+        if (envelope) {
+          stepperEnvelopeDisplayAddress = address;
+          stepperEnvelopeTriggerLabel = triggerLabel;
+          sendNativeStepperEnvelopeRelease(address);
+          releaseAdsrEnvelope(envelope, performance.now());
+          updateStepperEnvelopeUi();
+          scheduleEnvelopeTick();
+        }
+      }
+
+      function closeAllGates(triggerLabel = "All Off") {
+        for (const gateId of [...gateAddresses.keys()]) {
+          closeAddressGate(gateId, triggerLabel);
+        }
+      }
+
+      function toggleAddressGate(gateId, address, velocity = 127, triggerLabel = address) {
+        if (gateAddresses.has(gateId)) {
+          closeAddressGate(gateId, triggerLabel);
+          return false;
+        }
+        openAddressGate(gateId, address, velocity, triggerLabel);
+        return true;
+      }
+
       function updateStepperEnvelopeUi(now = performance.now()) {
+        const displayEnvelope = getDisplayEnvelope();
         const sustainPercent = Math.round(stepperEnvelope.sustainLevel * 100);
 
         const {
@@ -480,17 +834,17 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
 
         const point = getStepperEnvelopeGraphPoint(now);
         const fillSegments = [`M ${graphLeft} ${graphBottom}`];
-        if (stepperEnvelope.active) {
-          if (stepperEnvelope.phase === "attack") {
+        if (displayEnvelope.active) {
+          if (displayEnvelope.phase === "attack") {
             fillSegments.push(`L ${point.x.toFixed(1)} ${point.y.toFixed(1)}`);
-          } else if (stepperEnvelope.phase === "decay") {
+          } else if (displayEnvelope.phase === "decay") {
             fillSegments.push(`L ${attackX.toFixed(1)} ${graphTop.toFixed(1)}`);
             fillSegments.push(`L ${point.x.toFixed(1)} ${point.y.toFixed(1)}`);
-          } else if (stepperEnvelope.phase === "sustain") {
+          } else if (displayEnvelope.phase === "sustain") {
             fillSegments.push(`L ${attackX.toFixed(1)} ${graphTop.toFixed(1)}`);
             fillSegments.push(`L ${decayX.toFixed(1)} ${sustainY.toFixed(1)}`);
             fillSegments.push(`L ${point.x.toFixed(1)} ${point.y.toFixed(1)}`);
-          } else if (stepperEnvelope.phase === "release") {
+          } else if (displayEnvelope.phase === "release") {
             fillSegments.push(`L ${attackX.toFixed(1)} ${graphTop.toFixed(1)}`);
             fillSegments.push(`L ${decayX.toFixed(1)} ${sustainY.toFixed(1)}`);
             fillSegments.push(`L ${sustainEndX.toFixed(1)} ${sustainY.toFixed(1)}`);
@@ -502,10 +856,10 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
         fillSegments.push(`L ${point.x.toFixed(1)} ${graphBottom.toFixed(1)}`);
         fillSegments.push("Z");
 
-        const envelopeLevel = stepperEnvelope.active
-          ? stepperEnvelope.currentLevel
+        const envelopeLevel = displayEnvelope.active
+          ? displayEnvelope.currentLevel
           : 0;
-        const actualLevel = envelopeLevel * stepperEnvelope.velocityScale;
+        const actualLevel = envelopeLevel * displayEnvelope.velocityScale;
         const markerY = graphBottom - graphHeight * actualLevel;
         setEnvelopeSnapshot({
           attackLabel: `A ${formatEnvelopeTime(stepperEnvelope.attackMs)}`,
@@ -513,6 +867,7 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
           fillPath: fillSegments.join(" "),
           markerX: point.x.toFixed(1),
           markerY: markerY.toFixed(1),
+          noteLabel: stepperEnvelopeTriggerLabel,
           path,
           releaseLabel: `R ${formatEnvelopeTime(stepperEnvelope.releaseMs)}`,
           sustainLabel: `S ${sustainPercent}%`,
@@ -539,151 +894,24 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
         }
       }
 
-      function applyCenterEnvelopeOutput(
-        send = true,
-        sendDelayMs = STEPPER_ENVELOPE_SEND_DELAY_MS,
-      ) {
-        // The ADSR module is controller-agnostic; this adapter maps it to
-        // the current center-spoke actuator, which is still Stepper 1 today.
-        applyStepperOutputPosition(getAdsrOutputValue(stepperEnvelope), {
-          send,
-          save: false,
-          sendDelayMs,
-        });
-      }
-
       function setStepperBasePosition(
         percent,
         { send = true, sendDelayMs = STEPPER_SEND_DELAY_MS } = {},
       ) {
         stepperBasePositionPercent = Math.min(Math.max(percent, 0), 100);
-        if (!stepperEnvelope.active) {
+        const envelopeActive = [...addressEnvelopes.values()].some(
+          (envelope) => envelope.active,
+        );
+        if (!envelopeActive) {
           applyStepperOutputPosition(stepperBasePositionPercent, {
             send,
             save: false,
             sendDelayMs,
           });
+        } else {
+          updateStepperOutputsFromEnvelopes({ send, sendDelayMs });
         }
         saveState();
-      }
-
-      function tickCenterEnvelope(now) {
-        const result = tickAdsrEnvelope(stepperEnvelope, now);
-        if (!result.active && !result.stopped) {
-          stepperEnvelopeFrameId = null;
-          return;
-        }
-
-        if (result.stopped) {
-          stepperEnvelopeFrameId = null;
-          applyStepperOutputPosition(stepperEnvelope.originValue, {
-            send: false,
-            save: false,
-            sendDelayMs: STEPPER_ENVELOPE_SEND_DELAY_MS,
-          });
-          updateStepperEnvelopeUi(now);
-          saveState();
-          return;
-        }
-
-        applyCenterEnvelopeOutput(false, STEPPER_ENVELOPE_SEND_DELAY_MS);
-        updateStepperEnvelopeUi(now);
-        stepperEnvelopeFrameId = window.requestAnimationFrame(tickCenterEnvelope);
-      }
-
-      function getCenterEnvelopeOutputForLevel(level) {
-        return (
-          stepperEnvelope.originValue +
-          (stepperEnvelope.targetValue - stepperEnvelope.originValue) *
-            stepperEnvelope.velocityScale *
-            level
-        );
-      }
-
-      async function sendCenterAdsrCommand() {
-        if (!canControlStepperPosition()) {
-          return false;
-        }
-
-        cancelStepperPositionQueue();
-        const command = buildStepperAdsrCommand({
-          attackPercent: getCenterEnvelopeOutputForLevel(1),
-          attackMs: stepperEnvelope.attackMs,
-          decayPercent: getCenterEnvelopeOutputForLevel(
-            stepperEnvelope.sustainLevel,
-          ),
-          decayMs: stepperEnvelope.decayMs,
-          sustainMs: 0,
-          releasePercent: stepperEnvelope.originValue,
-          releaseMs: stepperEnvelope.releaseMs,
-        });
-
-        try {
-          await writeStepperCommand(command);
-          stepperStatusMessage = "Stepper ADSR started";
-          updateStepperUi();
-          return true;
-        } catch (error) {
-          console.error(error);
-          stepperStatusMessage = "Stepper ADSR failed";
-          updateStepperUi();
-          return false;
-        }
-      }
-
-      async function sendCenterReleaseCommand() {
-        if (!canControlStepperPosition()) {
-          return false;
-        }
-
-        cancelStepperPositionQueue();
-        const command = buildStepperReleaseCommand(
-          stepperEnvelope.originValue,
-          stepperEnvelope.releaseMs,
-        );
-
-        try {
-          await writeStepperCommand(command);
-          stepperStatusMessage = "Stepper release started";
-          updateStepperUi();
-          return true;
-        } catch (error) {
-          console.error(error);
-          stepperStatusMessage = "Stepper release failed";
-          updateStepperUi();
-          return false;
-        }
-      }
-
-      function startCenterEnvelope(velocity = 127) {
-        const now = performance.now();
-        triggerAdsrEnvelope(stepperEnvelope, {
-          velocity,
-          originValue: stepperBasePositionPercent,
-          targetValue: 100,
-          now,
-        });
-        updateStepperEnvelopeUi(now);
-        applyCenterEnvelopeOutput(false, STEPPER_ENVELOPE_SEND_DELAY_MS);
-        void sendCenterAdsrCommand();
-        if (stepperEnvelopeFrameId === null) {
-          stepperEnvelopeFrameId = window.requestAnimationFrame(
-            tickCenterEnvelope,
-          );
-        }
-        midiStatus.textContent =
-          `Center ADSR ${Math.round(stepperEnvelope.velocityScale * 100)}%`;
-        return canControlStepperPosition();
-      }
-
-      function releaseCenterEnvelope() {
-        if (!releaseAdsrEnvelope(stepperEnvelope, performance.now())) {
-          return;
-        }
-
-        updateStepperEnvelopeUi();
-        void sendCenterReleaseCommand();
-        midiStatus.textContent = "Center Release";
       }
 
       function updateStepperUi() {
@@ -705,12 +933,87 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
       }
 
       function renderConnections() {
+        const activeNodeIds = new Set(activeNodes);
+        if (scene) {
+          for (const node of scene.nodes) {
+            if (activeNodes.has(node.id)) {
+              activeNodeIds.add(node.address);
+            }
+          }
+        }
         setConnectionsSnapshot({
-          activeNodeIds: new Set(activeNodes),
+          activeNodeIds,
           connections: [...connections],
           mappingTarget,
           serialSupported: "serial" in navigator,
         });
+      }
+
+      function resolveNodeId(currentScene, addressOrId) {
+        if (!addressOrId) {
+          return null;
+        }
+        return (
+          currentScene.nodes.find(
+            (node) => node.address === addressOrId || node.id === addressOrId,
+          )?.id || null
+        );
+      }
+
+      function normalizeMappedAddress(currentScene, addressOrId) {
+        if (!addressOrId) {
+          return null;
+        }
+        return (
+          currentScene.nodes.find(
+            (node) => node.address === addressOrId || node.id === addressOrId,
+          )?.address || addressOrId
+        );
+      }
+
+      function saveMidiMappings(mappings) {
+        setMidiSnapshot({ mappings });
+      }
+
+      function getPrimaryStepperMappedNodeId(currentScene) {
+        const stepper = getPrimaryStepperConnection();
+        const channel = stepper?.channels[0];
+        return channel ? resolveNodeId(currentScene, channel.jetId) : null;
+      }
+
+      function getPrimaryStepperMappedAddress(currentScene) {
+        const stepper = getPrimaryStepperConnection();
+        const channel = stepper?.channels[0];
+        return channel ? normalizeMappedAddress(currentScene, channel.jetId) : null;
+      }
+
+      function normalizeAllMappingAddresses(currentScene) {
+        let changed = false;
+        for (const connection of connections) {
+          for (const channel of connection.channels) {
+            const normalized = normalizeMappedAddress(currentScene, channel.jetId);
+            if (normalized !== channel.jetId) {
+              channel.jetId = normalized;
+              changed = true;
+            }
+          }
+        }
+
+        const midiSnapshot = getMidiSnapshot();
+        let midiChanged = false;
+        const midiMappings = midiSnapshot.mappings.map((mapping) => {
+          const normalized = normalizeMappedAddress(currentScene, mapping.jetId);
+          if (normalized !== mapping.jetId) {
+            changed = true;
+            midiChanged = true;
+            return { ...mapping, jetId: normalized };
+          }
+          return mapping;
+        });
+        if (midiChanged) {
+          setMidiSnapshot({ mappings: midiMappings });
+        }
+        return changed;
       }
 
       function updateConnectionDom() {
@@ -718,13 +1021,19 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
       }
 
       setConnectionCallbacks({
-        onAddRelay: () => {
-          connections.push(createConnection("relay"));
-          saveState();
-          renderConnections();
-        },
-        onAddStepper: () => {
-          connections.push(createConnection("stepper"));
+        onAddDevice: (device) => {
+          if (device.type === "midi") {
+            setMidiDeviceName(device.name);
+            setMidiSnapshot({ enabled: true, expanded: true });
+            saveState();
+            void initMidi();
+            return;
+          }
+
+          connections.push(createConnection(device.type, {
+            name: device.name,
+            portKey: device.portKey,
+          }));
           saveState();
           renderConnections();
         },
@@ -734,6 +1043,28 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
           } else {
             void connectStepper(connection);
           }
+        },
+        onDelete: (connection) => {
+          if (!window.confirm(`Delete ${connection.name}?`)) {
+            return;
+          }
+          void (async () => {
+            if (connection.type === "relay") {
+              await disconnectRelay(connection);
+            } else if (connection.port !== null || activeStepperConnectionId === connection.id) {
+              await disconnectStepper();
+            }
+            const index = connections.findIndex((candidate) => candidate.id === connection.id);
+            if (index >= 0) {
+              connections.splice(index, 1);
+            }
+            if (activeStepperConnectionId === connection.id) {
+              activeStepperConnectionId = getPrimaryStepperConnection()?.id || null;
+            }
+            saveState();
+            renderConnections();
+            render();
+          })();
         },
         onDisconnect: (connection) => {
           if (connection.type === "relay") {
@@ -768,6 +1099,11 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
           }
           renderConnections();
         },
+        onRename: (connection, name) => {
+          connection.name = name;
+          saveState();
+          renderConnections();
+        },
         onToggleConfig: (connection) => {
           connection.expanded = !connection.expanded;
           saveState();
@@ -778,17 +1114,20 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
       setGridCallbacks({
         onAllOff: () => {
           stopAnimation();
-          activeNodes.clear();
+          closeAllGates("All Off");
+          syncActiveNodesFromEnvelopes();
           saveState();
+          renderConnections();
           render();
         },
         onAllOn: () => {
           if (!scene) return;
           stopAnimation();
           for (const node of scene.nodes) {
-            activeNodes.add(node.id);
+            openAddressGate(`manual:all:${node.address}`, node.address, 127, "All On");
           }
           saveState();
+          renderConnections();
           render();
         },
         onJetModeChange: (nextJetMode) => {
@@ -876,11 +1215,65 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
       });
 
       setMidiCallbacks({
+        onAddMapping: () => {
+          const snapshot = getMidiSnapshot();
+          const id = `midi-note-${Date.now().toString(36)}`;
+          saveMidiMappings([
+            ...snapshot.mappings,
+            {
+              id,
+              note: null,
+              jetId: null,
+            },
+          ]);
+          setMidiSnapshot({ learningMappingId: id, mappingTargetId: null });
+        },
         onConnect: () => {
           void initMidi();
         },
+        onDelete: () => {
+          if (!window.confirm(`Delete ${getMidiSnapshot().deviceName}?`)) {
+            return;
+          }
+          disconnectMidi();
+          setMidiSnapshot({
+            enabled: false,
+            expanded: false,
+            learningMappingId: null,
+            mappingTargetId: null,
+          });
+        },
         onDisconnect: () => {
           disconnectMidi();
+        },
+        onMap: (mapping) => {
+          setMidiSnapshot({
+            learningMappingId: mapping.note === null ? mapping.id : null,
+            mappingTargetId: mapping.note === null ? null : mapping.id,
+          });
+        },
+        onRemoveMapping: (mapping) => {
+          const snapshot = getMidiSnapshot();
+          const mappings = snapshot.mappings.filter(
+            (candidate) => candidate.id !== mapping.id,
+          );
+          setMidiSnapshot({
+            learningMappingId:
+              snapshot.learningMappingId === mapping.id
+                ? null
+                : snapshot.learningMappingId,
+            mappingTargetId:
+              snapshot.mappingTargetId === mapping.id
+                ? null
+                : snapshot.mappingTargetId,
+            mappings,
+          });
+        },
+        onRename: (name) => {
+          setMidiDeviceName(name);
+        },
+        onToggleConfig: () => {
+          setMidiSnapshot({ expanded: !getMidiSnapshot().expanded });
         },
       });
 
@@ -919,9 +1312,10 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
 
       function syncStepperPositionFromBoard(percent) {
         const clampedPercent = Math.min(Math.max(percent, 0), 100);
-        if (!stepperEnvelope.active) {
-          stepperBasePositionPercent = clampedPercent;
+        if ([...addressEnvelopes.values()].some((envelope) => envelope.active)) {
+          return;
         }
+        stepperBasePositionPercent = clampedPercent;
         applyStepperOutputPosition(clampedPercent, {
           send: false,
           save: false,
@@ -937,8 +1331,11 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
           stepperHomed = update.homed;
           if (connection) {
             connection.channels[0].homed = update.homed;
-            connection.channels[0].state = update.homed ? "Homed" : "Not homed";
           }
+        }
+
+        if (update.motionState !== undefined && connection) {
+          connection.channels[0].motionState = update.motionState;
         }
 
         if (update.travelSteps !== undefined) {
@@ -967,9 +1364,29 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
       }
 
       function setActiveFromFrame(frame) {
-        activeNodes.clear();
+        if (!scene) {
+          return;
+        }
+        const nextGateIds = new Set();
         for (const nodeId of frame) {
-          activeNodes.add(nodeId);
+          const node = scene.nodes.find((candidate) => candidate.id === nodeId);
+          if (!node) {
+            continue;
+          }
+          const gateId = `animation:${node.address}`;
+          nextGateIds.add(gateId);
+          if (!animationGateIds.has(gateId)) {
+            openAddressGate(gateId, node.address, 127, "Animation");
+          }
+        }
+        for (const gateId of [...animationGateIds]) {
+          if (!nextGateIds.has(gateId)) {
+            closeAddressGate(gateId, "Animation");
+          }
+        }
+        animationGateIds.clear();
+        for (const gateId of nextGateIds) {
+          animationGateIds.add(gateId);
         }
       }
 
@@ -1137,10 +1554,11 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
         for (const node of nodes) {
           if (!knownNodeIds.has(node.id)) {
             knownNodeIds.add(node.id);
-            activeNodes.add(node.id);
             changed = true;
           }
         }
+
+        syncActiveNodesFromEnvelopes();
 
         if (changed) {
           saveState();
@@ -1235,8 +1653,9 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
         const mapped = [];
         for (const connection of getRelayConnections()) {
           for (const channel of connection.channels) {
-            if (channel.jetId) {
-              mapped.push(channel.jetId);
+            const nodeId = resolveNodeId(currentScene, channel.jetId);
+            if (nodeId) {
+              mapped.push(nodeId);
             }
           }
         }
@@ -1253,13 +1672,19 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
 
       function getRelayStateSnapshot(connection) {
         const states = Array(RELAY_CHANNEL_COUNT).fill(false);
+        const mappedNodeIds = [];
         for (const channel of connection.channels) {
-          states[channel.index] = channel.jetId ? activeNodes.has(channel.jetId) : false;
+          const nodeId = scene ? resolveNodeId(scene, channel.jetId) : null;
+          const address = scene ? normalizeMappedAddress(scene, channel.jetId) : null;
+          states[channel.index] = address
+            ? getEnvelopeValueForAddress(address) > 0
+            : false;
+          if (nodeId) {
+            mappedNodeIds.push(nodeId);
+          }
         }
         return {
-          mappedNodeIds: connection.channels
-            .filter((channel) => channel.jetId)
-            .map((channel) => channel.jetId),
+          mappedNodeIds,
           states,
         };
       }
@@ -1442,13 +1867,27 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
 
         try {
           const ports = await navigator.serial.getPorts();
+          const preferredPort = findPreferredSerialPort(
+            ports,
+            "relay",
+            RELAY_PORT_KEY,
+            STEPPER_PORT_KEY,
+          );
           for (const connection of getRelayConnections()) {
-            if (connection.port !== null || !connection.portKey) {
+            if (connection.port !== null) {
               continue;
             }
-            const port = ports.find((candidate) => getSerialPortKey(candidate) === connection.portKey);
+            const port =
+              (connection.portKey
+                ? ports.find((candidate) => getSerialPortKey(candidate) === connection.portKey)
+                : null) ||
+              (connection === getPrimaryRelayConnection() ? preferredPort : null);
             if (port) {
               await openRelayPort(port, connection);
+            } else if (connection.portKey) {
+              connection.status = "Relay permission needed";
+              relayStatusMessage = connection.status;
+              updateSerialUi(scene ? getMappedRelayNodeIds(scene).length : 0);
             }
           }
         } catch (error) {
@@ -1676,7 +2115,7 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
           updateStepperTravelReadout();
           stepperStatusMessage = "Checking stepper status...";
           connection.status = stepperStatusMessage;
-          connection.channels[0].state = "Checking";
+          connection.channels[0].motionState = "Checking";
           appendDeviceLog("stepper", "event", "connected");
           updateStepperUi();
           readStepperLoop(stepperPort, connection);
@@ -1768,9 +2207,11 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
               : null) ||
             findPreferredSerialPort(ports, "stepper", RELAY_PORT_KEY, STEPPER_PORT_KEY);
           if (port) {
-            await openStepperPort(port);
+            await openStepperPort(port, connection);
           } else {
-            stepperStatusMessage = "Stepper disconnected";
+            stepperStatusMessage = connection.portKey
+              ? "Stepper permission needed"
+              : "Stepper disconnected";
             connection.status = stepperStatusMessage;
             updateStepperUi();
           }
@@ -1784,6 +2225,16 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
           stepperConnectInProgress = false;
           updateStepperUi();
         }
+      }
+
+      async function autoConnectDevices() {
+        if (getMidiSnapshot().enabled) {
+          void initMidi();
+        } else {
+          updateMidiUi();
+        }
+        void autoConnectRelay();
+        void autoConnectStepper();
       }
 
       async function disconnectStepper() {
@@ -1815,6 +2266,7 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
 
         stepperPort = null;
         stepperReader = null;
+        stepperNativeEnvelopeAddress = null;
         if (connection) {
           connection.port = null;
           connection.reader = null;
@@ -1826,7 +2278,7 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
         stepperStatusMessage = "Stepper disconnected";
         if (connection) {
           connection.status = stepperStatusMessage;
-          connection.channels[0].state = "Unknown";
+          connection.channels[0].motionState = "Unknown";
           connection.channels[0].homed = false;
         }
         if (wasConnected) {
@@ -2622,62 +3074,92 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
 
         // Note On
         if (type === 0x90 && data2 > 0) {
-          if (data1 === MIDI_NOTE_STEPPER_1_ENV) {
-            const sendsToStepper = startCenterEnvelope(data2);
-            midiStatus.textContent = sendsToStepper
-              ? `Center ADSR on (note ${data1}, vel ${data2})`
-              : `Center ADSR visual only (note ${data1}, vel ${data2})`;
+          const midiSnapshot = getMidiSnapshot();
+          if (midiSnapshot.learningMappingId !== null) {
+            const mappings = midiSnapshot.mappings.map((mapping) =>
+              mapping.id === midiSnapshot.learningMappingId
+                ? { ...mapping, note: data1 }
+                : mapping,
+            );
+            setMidiSnapshot({
+              learningMappingId: null,
+              mappingTargetId: midiSnapshot.learningMappingId,
+              mappings,
+            });
+            midiStatus.textContent = `Note ${data1} learned; click a jet`;
             return;
           }
-          if (data1 === MIDI_NOTE_ALL_OFF && scene) {
+
+          const midiMapping = getMidiSnapshot().mappings.find(
+            (mapping) => mapping.note === data1,
+          );
+
+          if (data1 === MIDI_NOTE_ALL_OFF && !midiMapping && scene) {
             stopAnimation();
-            activeNodes.clear();
+            midiHeldNotes.clear();
+            setMidiSnapshot({ heldNotes: new Set(midiHeldNotes) });
+            closeAllGates("All Off");
+            syncActiveNodesFromEnvelopes();
             saveState();
+            renderConnections();
             render();
             midiStatus.textContent = "All Off";
             return;
           }
-          if (data1 === MIDI_NOTE_ALL_ON && scene) {
+          if (data1 === MIDI_NOTE_ALL_ON && !midiMapping && scene) {
             stopAnimation();
-            for (const node of scene.nodes) activeNodes.add(node.id);
+            for (const node of scene.nodes) {
+              openAddressGate(`midi:all-on:${node.address}`, node.address, data2, "All On");
+            }
             saveState();
+            renderConnections();
             render();
             midiStatus.textContent = "All On";
             return;
           }
-          const chIndex = MIDI_PAD_MAP.get(data1);
-          if (chIndex !== undefined && scene) {
-            const mappedIds = getMappedRelayNodeIds(scene);
-            if (chIndex < mappedIds.length) {
-              midiHeldNotes.add(data1);
-              stopAnimation();
-              activeNodes.add(mappedIds[chIndex]);
-              saveState();
-              render();
+          const wasNoteHeld = midiHeldNotes.has(data1);
+          if (midiMapping) {
+            midiHeldNotes.add(data1);
+            setMidiSnapshot({ heldNotes: new Set(midiHeldNotes) });
+          }
+          const mappedNodeId = scene ? resolveNodeId(scene, midiMapping?.jetId) : null;
+          const mappedAddress = scene
+            ? normalizeMappedAddress(scene, midiMapping?.jetId)
+            : null;
+          if (mappedNodeId && mappedAddress) {
+            stopAnimation();
+            if (!wasNoteHeld) {
+              openAddressGate(`midi:${data1}`, mappedAddress, data2, `Note ${data1}`);
             }
+            saveState();
+            renderConnections();
+            render();
           }
           midiStatus.textContent =
-            chIndex !== undefined
-              ? `Ch ${chIndex + 1} on (note ${data1})`
+            midiMapping
+              ? `${midiMapping.jetId || "Unmapped"} on (note ${data1})`
               : `Note ${data1} vel ${data2}`;
           return;
         }
 
         // Note Off
         if (type === 0x80 || (type === 0x90 && data2 === 0)) {
-          if (data1 === MIDI_NOTE_STEPPER_1_ENV) {
-            releaseCenterEnvelope();
-            return;
+          const midiMapping = getMidiSnapshot().mappings.find(
+            (mapping) => mapping.note === data1,
+          );
+          const wasNoteHeld = midiHeldNotes.has(data1);
+          if (midiMapping) {
+            midiHeldNotes.delete(data1);
+            setMidiSnapshot({ heldNotes: new Set(midiHeldNotes) });
           }
-          const chIndex = MIDI_PAD_MAP.get(data1);
-          if (chIndex !== undefined && scene) {
-            const mappedIds = getMappedRelayNodeIds(scene);
-            if (chIndex < mappedIds.length) {
-              midiHeldNotes.delete(data1);
-              activeNodes.delete(mappedIds[chIndex]);
-              saveState();
-              render();
+          const mappedNodeId = scene ? resolveNodeId(scene, midiMapping?.jetId) : null;
+          if (mappedNodeId) {
+            if (wasNoteHeld) {
+              closeAddressGate(`midi:${data1}`, `Note ${data1}`);
             }
+            saveState();
+            renderConnections();
+            render();
           }
           return;
         }
@@ -2795,6 +3277,7 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
           midiAccess,
           midiInputs,
           handleMidiMessage,
+          getMidiSnapshot().deviceName === "MIDI" ? "" : getMidiSnapshot().deviceName,
         );
         appendDeviceLog(
           "midi",
@@ -2856,6 +3339,10 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
           animationTimerId = null;
           updatePlayPauseButton();
         }
+        for (const gateId of [...animationGateIds]) {
+          closeAddressGate(gateId, "Animation");
+        }
+        animationGateIds.clear();
       }
 
       function scheduleNextAnimationFrame() {
@@ -2926,11 +3413,8 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
         stopAnimation();
         rings = DEFAULT_RINGS;
         updateGridControls();
-        activeNodes.clear();
-
-        for (const nodeId of knownNodeIds) {
-          activeNodes.add(nodeId);
-        }
+        closeAllGates("Reset");
+        syncActiveNodesFromEnvelopes();
 
         saveState();
         render();
@@ -2955,16 +3439,20 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
         context.clearRect(0, 0, width, height);
 
         scene = buildScene(totalRings, width, height, jetMode);
+        const mappingAddressesChanged = normalizeAllMappingAddresses(scene);
         syncActiveNodes(scene.nodes);
-
-        for (const jet of scene.jets) {
-          const active = activeNodes.has(jet.controllerId);
-          const hovered = jet.controllerId === hoveredNodeId;
-          drawJet(context, jet, active, hovered);
+        const nodeLevels = new Map();
+        for (const node of scene.nodes) {
+          nodeLevels.set(node.id, getEnvelopeValueForAddress(node.address));
         }
 
-        drawOutlineGlow(context, scene, activeNodes);
-        drawStepperGlow(context, scene, stepperPositionPercent);
+        for (const jet of scene.jets) {
+          const level = nodeLevels.get(jet.controllerId) || 0;
+          const hovered = jet.controllerId === hoveredNodeId;
+          drawJet(context, jet, level, hovered);
+        }
+
+        drawEnvelopeGlow(context, scene, nodeLevels);
 
         updateStats();
         drawDistanceLabels(context, scene.nodes, buildDistanceMap(scene), labelMode);
@@ -2975,6 +3463,9 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
           scene.nodes.find((node) => node.id === hoveredNodeId) || null,
         );
         syncRelayOutputs(scene);
+        if (mappingAddressesChanged) {
+          saveState();
+        }
       }
 
       setDeviceCommandHandler("relay", async (command) => {
@@ -3125,6 +3616,4 @@ import { setLifecycleCallbacks } from "./features/lifecycle/lifecycle-store";
       updateSerialUi(0);
       updateStepperUi();
       render();
-      autoConnectRelay();
-      autoConnectStepper();
-      initMidi();
+      void autoConnectDevices();

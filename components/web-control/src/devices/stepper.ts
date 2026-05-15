@@ -6,6 +6,7 @@ export const STEPPER_HOME_RATE_HZ = 400;
 export interface StepperProtocolUpdate {
   statusMessage?: string;
   homed?: boolean;
+  motionState?: string;
   travelSteps?: number | null;
   positionPercent?: number;
 }
@@ -152,6 +153,14 @@ export function parseStepperProtocolLine(line: string): StepperProtocolUpdate {
     };
   }
 
+  const motionStateMatch = line.match(/^Motion state:\s*(.+)$/i);
+  if (motionStateMatch) {
+    return {
+      statusMessage: line,
+      motionState: motionStateMatch[1],
+    };
+  }
+
   return { statusMessage: line };
 }
 
@@ -194,12 +203,19 @@ function applyStepperResult(
     update.positionPercent = positionPercent;
   }
 
+  if (typeof result.motion_state === "string") {
+    update.motionState = result.motion_state;
+  }
+
   return update;
 }
 
 function parseResponseEvent(data: Record<string, unknown>): StepperProtocolUpdate {
   const message = typeof data.message === "string" ? data.message : "Stepper response";
   const update: StepperProtocolUpdate = { statusMessage: message };
+  if (typeof data.motion_state === "string") {
+    update.motionState = data.motion_state;
+  }
   const percentMatch = message.match(/\bpercent=([0-9]+(?:\.[0-9]+)?)/i);
   if (percentMatch) {
     update.positionPercent = Number(percentMatch[1]);
@@ -237,9 +253,10 @@ function parseStepperJsonRpcMessage(message: Record<string, unknown>): StepperPr
       params.data && typeof params.data === "object"
         ? (params.data as Record<string, unknown>)
         : {};
+    const motionState = typeof data.motion_state === "string" ? data.motion_state : null;
 
     if (event === "ready") {
-      return { statusMessage: "Stepper ready" };
+      return { statusMessage: "Stepper ready", motionState: motionState || undefined };
     }
 
     if (event === "response") {
@@ -247,23 +264,35 @@ function parseStepperJsonRpcMessage(message: Record<string, unknown>): StepperPr
     }
 
     if (event === "move-started") {
-      return { statusMessage: "Stepper move started" };
+      return {
+        statusMessage: "Stepper move started",
+        motionState: motionState || "moving",
+      };
     }
 
     if (event === "envelope-phase") {
       const phase = typeof data.phase === "string" ? data.phase : "phase";
-      return { statusMessage: `Stepper envelope ${phase}` };
+      return {
+        statusMessage: `Stepper envelope ${phase}`,
+        motionState: motionState || `envelope ${phase}`,
+      };
     }
 
     if (event === "envelope-hold") {
-      return { statusMessage: "Stepper envelope sustain" };
+      return {
+        statusMessage: "Stepper envelope sustain",
+        motionState: motionState || "envelope sustain",
+      };
     }
 
     if (event === "command-received") {
       return {};
     }
 
-    return { statusMessage: `Stepper ${event}` };
+    return {
+      statusMessage: `Stepper ${event}`,
+      motionState: motionState || undefined,
+    };
   }
 
   return { statusMessage: lineSummary(message) };

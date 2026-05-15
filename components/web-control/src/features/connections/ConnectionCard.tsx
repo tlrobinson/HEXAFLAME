@@ -1,6 +1,7 @@
 import { ActionButton } from "../../components/ui/common";
 import { ChannelRow } from "./ChannelRow";
 import type { Channel, Connection, MappingTarget } from "./connection-model";
+import { DeviceNameEditor } from "./DeviceNameEditor";
 
 function ConnectionHeader({
   connection,
@@ -8,6 +9,7 @@ function ConnectionHeader({
   serialSupported,
   onConnect,
   onDisconnect,
+  onRename,
   onToggleConfig,
 }: {
   connection: Connection;
@@ -15,6 +17,7 @@ function ConnectionHeader({
   serialSupported: boolean;
   onConnect: () => void;
   onDisconnect: () => void;
+  onRename: (name: string) => void;
   onToggleConfig: () => void;
 }) {
   const connected = connection.port !== null;
@@ -22,7 +25,14 @@ function ConnectionHeader({
   return (
     <div className="connection-card-header">
       <div className="connection-title">
-        <div className="connection-name">{connection.name}</div>
+        <div className="connection-name-row">
+          <span
+            aria-label={connected ? "Connected" : "Disconnected"}
+            className={`connection-state-dot${connected ? " connected" : ""}`}
+            role="img"
+          />
+          <DeviceNameEditor name={connection.name} onRename={onRename} />
+        </div>
         <div className="connection-meta">
           {connection.status} · {mappedCount}/{connection.channels.length} mapped
         </div>
@@ -34,7 +44,9 @@ function ConnectionHeader({
       >
         {connected ? "Disconnect" : "Connect"}
       </ActionButton>
-      <ActionButton onClick={onToggleConfig}>Config</ActionButton>
+      <ActionButton onClick={onToggleConfig}>
+        {connection.expanded ? "Close" : "Edit"}
+      </ActionButton>
     </div>
   );
 }
@@ -45,11 +57,13 @@ export function ConnectionCard({
   mappingTarget,
   serialSupported,
   onConnect,
+  onDelete,
   onDisconnect,
   onHome,
   onMap,
   onPositionCommit,
   onPositionInput,
+  onRename,
   onToggleConfig,
 }: {
   activeNodeIds: Set<string>;
@@ -57,11 +71,13 @@ export function ConnectionCard({
   mappingTarget: MappingTarget;
   serialSupported: boolean;
   onConnect: () => void;
+  onDelete: () => void;
   onDisconnect: () => void;
   onHome: (channel: Channel) => void;
   onMap: (channel: Channel) => void;
   onPositionCommit: (channel: Channel, positionPercent: number) => void;
   onPositionInput: (channel: Channel, positionPercent: number) => void;
+  onRename: (name: string) => void;
   onToggleConfig: () => void;
 }) {
   const mappedCount = connection.channels.filter((channel) => channel.jetId).length;
@@ -74,6 +90,7 @@ export function ConnectionCard({
         serialSupported={serialSupported}
         onConnect={onConnect}
         onDisconnect={onDisconnect}
+        onRename={onRename}
         onToggleConfig={onToggleConfig}
       />
       {connection.expanded ? (
@@ -95,6 +112,11 @@ export function ConnectionCard({
               }
             />
           ))}
+          <div className="connection-card-actions">
+            <button className="btn-danger-compact" type="button" onClick={onDelete}>
+              Delete
+            </button>
+          </div>
         </div>
       ) : null}
     </div>

@@ -1,7 +1,8 @@
-import type { MouseEvent } from "react";
+import type { MouseEvent, PointerEvent } from "react";
 
 type CanvasCallbacks = {
-  onClick: (event: MouseEvent<HTMLCanvasElement>) => void;
+  onPointerDown: (event: PointerEvent<HTMLCanvasElement>) => void;
+  onPointerUp: () => void;
   onMouseLeave: () => void;
   onMouseMove: (event: MouseEvent<HTMLCanvasElement>) => void;
 };
@@ -10,7 +11,8 @@ const noop = () => {};
 
 let canvasElement: HTMLCanvasElement | null = null;
 let callbacks: CanvasCallbacks = {
-  onClick: noop,
+  onPointerDown: noop,
+  onPointerUp: noop,
   onMouseLeave: noop,
   onMouseMove: noop,
 };

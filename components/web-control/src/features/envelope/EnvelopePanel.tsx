@@ -7,10 +7,10 @@ export function EnvelopePanel() {
   return (
     <Section label="Envelope">
       <svg
-        aria-label="Center ADSR envelope"
+        aria-label="Stepper ADSR envelope"
         className="envelope-graph"
         id="stepper-envelope-graph"
-        preserveAspectRatio="none"
+        preserveAspectRatio="xMidYMid meet"
         viewBox="0 0 260 92"
       >
         <path className="envelope-grid" d="M0 70.5H260" />
@@ -32,6 +32,7 @@ export function EnvelopePanel() {
           r="3.5"
         />
       </svg>
+      <div className="envelope-note-label">{envelope.noteLabel}</div>
       <div className="param-row">
         <div className="param-text">{envelope.attackLabel}</div>
         <div className="param-text">{envelope.decayLabel}</div>

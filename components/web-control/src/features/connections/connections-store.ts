@@ -1,5 +1,16 @@
 import { useSyncExternalStore } from "react";
-import type { Channel, Connection, MappingTarget } from "./connection-model";
+import type { Channel, Connection, ConnectionType, MappingTarget } from "./connection-model";
+
+export type AddDeviceRequest =
+  | {
+      name: string;
+      portKey: string | null;
+      type: ConnectionType;
+    }
+  | {
+      name: string;
+      type: "midi";
+    };
 
 type ConnectionsSnapshot = {
   activeNodeIds: Set<string>;
@@ -9,9 +20,9 @@ type ConnectionsSnapshot = {
 };
 
 type ConnectionCallbacks = {
-  onAddRelay: () => void;
-  onAddStepper: () => void;
+  onAddDevice: (device: AddDeviceRequest) => void;
   onConnect: (connection: Connection) => void;
+  onDelete: (connection: Connection) => void;
   onDisconnect: (connection: Connection) => void;
   onHome: (connection: Connection, channel: Channel) => void;
   onMap: (connection: Connection, channel: Channel) => void;
@@ -25,6 +36,7 @@ type ConnectionCallbacks = {
     channel: Channel,
     positionPercent: number,
   ) => void;
+  onRename: (connection: Connection, name: string) => void;
   onToggleConfig: (connection: Connection) => void;
 };
 
@@ -39,14 +51,15 @@ let snapshot: ConnectionsSnapshot = {
 };
 
 let callbacks: ConnectionCallbacks = {
-  onAddRelay: noop,
-  onAddStepper: noop,
+  onAddDevice: noop,
   onConnect: noop,
+  onDelete: noop,
   onDisconnect: noop,
   onHome: noop,
   onMap: noop,
   onPositionCommit: noop,
   onPositionInput: noop,
+  onRename: noop,
   onToggleConfig: noop,
 };
 

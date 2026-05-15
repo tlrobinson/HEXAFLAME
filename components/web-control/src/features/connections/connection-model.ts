@@ -6,6 +6,7 @@ export type Channel = {
   index: number;
   jetId: string | null;
   state?: string;
+  motionState?: string;
   homed?: boolean;
   travelSteps?: number | null;
   positionPercent?: number;
@@ -44,6 +45,7 @@ export function makeChannels(type: ConnectionType): Channel[] {
     index,
     jetId: null,
     state: "Unknown",
+    motionState: "Unknown",
     homed: false,
     travelSteps: null,
     positionPercent: 50,

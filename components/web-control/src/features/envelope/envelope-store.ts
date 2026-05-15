@@ -6,6 +6,7 @@ type EnvelopeSnapshot = {
   fillPath: string;
   markerX: string;
   markerY: string;
+  noteLabel: string;
   path: string;
   releaseLabel: string;
   sustainLabel: string;
@@ -22,6 +23,7 @@ let snapshot: EnvelopeSnapshot = {
   fillPath: "M14 78 L14 78 L14 78 Z",
   markerX: "14",
   markerY: "78",
+  noteLabel: "No note",
   path: "M14 78 L70 14 L124 40 L190 40 L246 78",
   releaseLabel: "R 320ms",
   sustainLabel: "S 55%",

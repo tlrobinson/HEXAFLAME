@@ -1,4 +1,3 @@
-export const MIDI_NOTE_STEPPER_1_ENV = 36;
 export const MIDI_NOTE_ALL_OFF = 48;
 export const MIDI_NOTE_ALL_ON = 51;
 
@@ -12,16 +11,6 @@ export const MIDI_CC_BACK = 25;
 export const MIDI_CC_NEXT = 26;
 export const MIDI_CC_PLAY = 27;
 export const MIDI_CC_PAUSE = 28;
-
-// M-VAVE SMC-PAD: pad note -> relay channel index.
-export const MIDI_PAD_MAP = new Map<number, number>([
-  [49, 0],
-  [50, 1],
-  [47, 2],
-  [42, 3],
-  [41, 4],
-  [44, 5],
-]);
 
 export interface MidiInputLike {
   id: string;
@@ -115,15 +104,25 @@ export function connectAllMidiInputs(
   midiAccess: MidiAccessLike,
   connectedInputs: Map<string, MidiInputLike>,
   handleMessage: (event: unknown) => void,
+  preferredName = "",
 ) {
-  const availableInputs = [...midiAccess.inputs.values()].map(
-    (input) => `${getMidiInputLabel(input)} [${input.state || "unknown"}]`,
-  );
+  const normalizedPreferredName = preferredName.trim().toLowerCase();
+  const availableInputs = [...midiAccess.inputs.values()].map((input) => {
+    const label = getMidiInputLabel(input);
+    return `${label} [${input.state || "unknown"}]`;
+  });
   const connectedLabels: string[] = [];
   let connectableCount = 0;
 
   for (const input of midiAccess.inputs.values()) {
+    const label = getMidiInputLabel(input);
     if (input.state !== "connected" && input.state !== undefined) {
+      continue;
+    }
+    if (
+      normalizedPreferredName &&
+      !label.toLowerCase().includes(normalizedPreferredName)
+    ) {
       continue;
     }
 

@@ -5,41 +5,96 @@ export type LabelMode = "address" | "distance" | "channel" | "none";
 export function drawJet(
   context: CanvasRenderingContext2D,
   jet: Jet,
-  active: boolean,
+  level: number,
   hovered: boolean,
 ) {
+  const intensity = Math.min(Math.max(level, 0), 1);
   context.beginPath();
   context.moveTo(jet.x1, jet.y1);
   context.lineTo(jet.x2, jet.y2);
   context.lineCap = "round";
   context.strokeStyle = jet.color;
-  context.lineWidth = hovered ? 3 : 2;
-  context.globalAlpha = active ? 1 : 0.12;
+  context.lineWidth = hovered ? 3 : 2 + intensity * 1.5;
+  context.globalAlpha = 0.12 + intensity * 0.88;
   context.stroke();
   context.globalAlpha = 1;
+}
+
+export function drawEnvelopeGlow(
+  context: CanvasRenderingContext2D,
+  currentScene: Scene,
+  nodeLevels: Map<string, number>,
+) {
+  const activeJets = currentScene.jets
+    .map((jet) => ({
+      jet,
+      intensity: Math.min(Math.max(nodeLevels.get(jet.controllerId) || 0, 0), 1),
+    }))
+    .filter(({ intensity }) => intensity > 0.001);
+
+  if (activeJets.length === 0) {
+    return;
+  }
+
+  context.save();
+  context.globalCompositeOperation = "screen";
+
+  for (const { jet, intensity } of activeJets) {
+    const baseColor = jet.color || "#ff3860";
+    const outerWidth = 4 + intensity * 14;
+    const innerWidth = 2 + intensity * 5.5;
+
+    context.beginPath();
+    context.moveTo(jet.x1, jet.y1);
+    context.lineTo(jet.x2, jet.y2);
+    context.lineCap = "round";
+    context.lineWidth = outerWidth;
+    context.strokeStyle = baseColor;
+    context.globalAlpha = 0.08 + intensity * 0.42;
+    context.shadowColor = baseColor;
+    context.shadowBlur = 8 + intensity * 24;
+    context.stroke();
+
+    context.beginPath();
+    context.moveTo(jet.x1, jet.y1);
+    context.lineTo(jet.x2, jet.y2);
+    context.lineCap = "round";
+    context.lineWidth = innerWidth;
+    context.strokeStyle = baseColor;
+    context.globalAlpha = 0.18 + intensity * 0.72;
+    context.shadowBlur = 0;
+    context.stroke();
+  }
+
+  context.restore();
 }
 
 export function drawStepperGlow(
   context: CanvasRenderingContext2D,
   currentScene: Scene,
   positionPercent: number,
+  controllerId: string | null = null,
 ) {
+  if (!controllerId) {
+    return;
+  }
+
   const intensity = Math.min(Math.max(positionPercent / 100, 0), 1);
   if (intensity <= 0.001) {
     return;
   }
 
-  const centerNode = currentScene.nodes.find(
-    (node) => node.type === "center" && node.id === "c:0,0",
+  const controllerNode = currentScene.nodes.find(
+    (node) => node.id === controllerId,
   );
-  if (!centerNode) {
+  if (!controllerNode) {
     return;
   }
 
-  const spokeJets = currentScene.jets.filter(
-    (jet) => jet.kind === "spoke" && jet.controllerId === centerNode.id,
+  const controlledJets = currentScene.jets.filter(
+    (jet) => jet.controllerId === controllerNode.id,
   );
-  if (spokeJets.length === 0) {
+  if (controlledJets.length === 0) {
     return;
   }
 
@@ -48,12 +103,12 @@ export function drawStepperGlow(
   const glowAlpha = 0.14 + intensity * 0.42;
   const coreAlpha = 0.35 + intensity * 0.55;
   const centerRadius = 6 + intensity * 24;
-  const baseColor = spokeJets[0].color || "#ff3860";
+  const baseColor = controlledJets[0].color || "#ff3860";
 
   context.save();
   context.globalCompositeOperation = "screen";
 
-  for (const jet of spokeJets) {
+  for (const jet of controlledJets) {
     context.beginPath();
     context.moveTo(jet.x1, jet.y1);
     context.lineTo(jet.x2, jet.y2);
@@ -77,18 +132,18 @@ export function drawStepperGlow(
   }
 
   const radial = context.createRadialGradient(
-    centerNode.x,
-    centerNode.y,
+    controllerNode.x,
+    controllerNode.y,
     0,
-    centerNode.x,
-    centerNode.y,
+    controllerNode.x,
+    controllerNode.y,
     centerRadius,
   );
   radial.addColorStop(0, "rgba(255, 255, 255, 0.28)");
   radial.addColorStop(0.28, baseColor);
   radial.addColorStop(1, "rgba(0, 0, 0, 0)");
   context.beginPath();
-  context.arc(centerNode.x, centerNode.y, centerRadius, 0, Math.PI * 2);
+  context.arc(controllerNode.x, controllerNode.y, centerRadius, 0, Math.PI * 2);
   context.fillStyle = radial;
   context.globalAlpha = 0.18 + intensity * 0.28;
   context.fill();
