@@ -1,0 +1,51 @@
+{
+  "name": "firmware-4",
+  "root": "firmware-4",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": [
+        "{projectRoot}/.pio/build"
+      ],
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pio run"
+      }
+    },
+    "build-rp2040": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pio run -e rp2040"
+      }
+    },
+    "build-octopus": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pio run -e octopus_pro_h723"
+      }
+    },
+    "clean": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pio run -t clean"
+      }
+    },
+    "upload": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pio run -t upload"
+      }
+    },
+    "monitor": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pio device monitor -b 115200"
+      }
+    }
+  }
+}
