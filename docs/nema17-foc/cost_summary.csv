@@ -1,0 +1,37 @@
+variant,item,usd_per_board,usd_per_100
+can,Electronic BOM,16.4674,1646.74
+can,Parts attrition/procurement allowance (3%),0.4940,49.40
+can,4-layer PCB fabrication allowance,1.5000,150.00
+can,Assembly setup (two sides),0.5112,51.12
+can,Stencil (two sides),0.1642,16.42
+can,Feeder loading (50 types),0.7650,76.50
+can,SMT joints (330 per board),0.5280,52.80
+can,THT joints (16 per board),0.2624,26.24
+can,Hand solder labor per order,0.0358,3.58
+can,Rigid-board fixtures (100-199 tier),0.4104,41.04
+can,X-ray allowance (200 packages),0.9800,98.00
+can,Packing and handling allowance,0.1000,10.00
+can,Magnet and mounting hardware,0.9000,90.00
+can,Program mount calibrate and functional test allowance,1.5000,150.00
+can,Rework reserve (2% of assembled board cost),0.4444,44.44
+can,Shipping allowance (destination unspecified),1.0000,100.00
+can,ASSEMBLED BOARD SUBTOTAL,22.2184,2221.84
+can,TESTED KIT DELIVERED TOTAL,26.0628,2606.28
+rs485,Electronic BOM,15.7693,1576.93
+rs485,Parts attrition/procurement allowance (3%),0.4731,47.31
+rs485,4-layer PCB fabrication allowance,1.5000,150.00
+rs485,Assembly setup (two sides),0.5112,51.12
+rs485,Stencil (two sides),0.1642,16.42
+rs485,Feeder loading (50 types),0.7650,76.50
+rs485,SMT joints (330 per board),0.5280,52.80
+rs485,THT joints (16 per board),0.2624,26.24
+rs485,Hand solder labor per order,0.0358,3.58
+rs485,Rigid-board fixtures (100-199 tier),0.4104,41.04
+rs485,X-ray allowance (200 packages),0.9800,98.00
+rs485,Packing and handling allowance,0.1000,10.00
+rs485,Magnet and mounting hardware,0.9000,90.00
+rs485,Program mount calibrate and functional test allowance,1.5000,150.00
+rs485,Rework reserve (2% of assembled board cost),0.4300,43.00
+rs485,Shipping allowance (destination unspecified),1.0000,100.00
+rs485,ASSEMBLED BOARD SUBTOTAL,21.4994,2149.94
+rs485,TESTED KIT DELIVERED TOTAL,25.3294,2532.94

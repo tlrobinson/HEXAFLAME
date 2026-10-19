@@ -1,0 +1,26 @@
+group,reference,description,mpn,lcsc,quantity_per_board,unit_usd,price_basis,source,notes
+electronics,U1,MCU 128KB flash LQFP48,STM32G474CBT6,C730123,1,3.0485,Observed JLCPCB page data; applicable tier for 100 pieces,https://jlcpcb.com/partdetail/STM32G474CBT6/C730123,Lower current sourcing price than G431; 30-249 tier applies to 100 units
+electronics,U2 U3,Full H-bridge HTSSOP16,DRV8874PWPR,C1855818,2,0.8090,Observed JLCPCB page data; applicable tier for 200 pieces,https://jlcpcb.com/partdetail/DRV8874PWPR/C1855818,One full bridge per winding
+electronics,U4 U5,Bidirectional inline current amplifier gain 20,INA240A1PWR,C93965,2,1.9646,Observed JLCPCB page data; applicable tier for 200 pieces,https://jlcpcb.com/partdetail/INA240A1PWR/C93965,PWM rejection and signed phase-current measurement
+electronics,U6,14-bit magnetic encoder SOP8 reel,MT6701CT-STD-R,C3003196,1,1.2875,Observed JLCPCB page data; applicable tier for 100 pieces,https://jlcpcb.com/partdetail/MT6701CT-STD-R/C3003196,Reel suffix selected; tube C2856764 has limited stock
+can,U7,CAN transceiver SOIC8,TCAN332DR,C73651,1,1.0661,Observed JLCPCB page data; applicable tier for 100 pieces,https://jlcpcb.com/partdetail/TCAN332DR/C73651,3.3V; base design uses Classical CAN
+rs485,U7R,RS-485 alternative SOIC8,SN65HVD75DR,C57928,1,0.3680,Observed 100+ tier,https://www.lcsc.com/product-detail/C57928.html,Replaces CAN population; different pinout and routing
+electronics,U8,60V 600mA buck regulator,LMR16006XDDCR,C87080,1,0.3596,Observed 100+ tier,https://www.lcsc.com/product-detail/C87080.html,Configured for 3.3V; not a 60V motor-board rating
+electronics,Q1,Reverse-polarity P-channel MOSFET,DMP6023LE-13,C154901,1,0.3565,Observed JLCPCB page data; applicable tier for 100 pieces,https://jlcpcb.com/partdetail/DMP6023LE-13/C154901,Gate-source clamp required
+electronics,RA RB,20mohm 1% 0.5W or greater Kelvin-routed shunts,TBD 1206 metal element,,2,0.1000,Engineering allowance,,Final pulse rating and supplier selection at schematic capture
+electronics,L1,22uH shielded power inductor at least 1.5A saturation,TBD,,1,0.1400,Engineering allowance,,Check inductance retention and saturation against buck fault current
+electronics,D1,60V 1A buck catch diode,SS16 or equivalent,,1,0.0600,Engineering allowance,,Separate from input reverse-polarity protection
+electronics,CBULK,220uF 50V low-ESR electrolytic,TBD,,1,0.4000,Engineering allowance,,Check ripple-current rating and mechanical height
+electronics,F1 DZ1 DTVS,Input fuse and gate clamp and transient suppression group,TBD,,1,0.3000,Engineering allowance,,TVS selection requires actual clamping-voltage coordination; see design
+electronics,BUCK_PASSIVES,Buck input output bootstrap and feedback components,TBD group,,1,0.1600,Engineering allowance,,Includes feedback divider and ceramic input/output capacitors
+electronics,BRIDGE_CAPS,Bridge local bypass bulk and charge-pump capacitors,TBD group,,8,0.0450,Engineering allowance,,Per bridge 100nF 50V plus 4.7uF 50V plus 22nF 50V plus 100nF 16V
+electronics,DECOUPLING,MCU encoder amplifier and bus decoupling capacitors,TBD group,,12,0.0150,Engineering allowance,,0603 mainly; MCU VDDA/VREF decoupling included
+electronics,RESISTORS,Control sensing divider pull-up and RC resistors,TBD group,,28,0.0040,Engineering allowance,,Final count depends on schematic; precision divider values may cost more
+electronics,Y1_GROUP,8MHz crystal and load capacitors,TBD group,,1,0.1600,Engineering allowance,,Select load capacitors for the actual crystal and board stray capacitance
+electronics,BUS_PASSIVES,Bus ESD protection and termination jumper group,TBD group,,1,0.2800,Engineering allowance,,Select CAN or RS-485-specific ESD and termination population
+electronics,JPOWER JMOTOR,Power 2-pin and motor 4-pin connectors,TBD group,,1,0.8000,Engineering allowance,,Locking or screw terminals rated at least 3A per motor contact
+electronics,JBUS1 JBUS2,Three-pin bus connector,TBD,,2,0.2000,Engineering allowance,,Signal pair plus ground; power distributed separately
+electronics,IO_GROUP,NTC LED limit-input protection and debug pads,TBD group,,1,0.3000,Engineering allowance,,No display or USB connector
+electronics,BRAKE_GROUP,Brake P-FET comparator reference NPN passives and resistor connector,DMP6023LE-13 plus LMV331IDBVR plus TLV431A and MMBT3904,,1,0.9500,Engineering allowance,,On-board control electronics; external power resistor separately costed
+mechanical,MAGNET,Diametrically magnetized 6x2mm magnet,TBD,,1,0.2500,Engineering allowance,,Not axially magnetized; verify field and temperature grade
+mechanical,MOUNT,Standoffs screws and simple magnet carrier,TBD group,,1,0.6500,Engineering allowance,,Motor-specific adapter may cost more; no enclosure or heatsink included
