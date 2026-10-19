@@ -1,0 +1,59 @@
+refs,qty,value,description,mfr_part,lcsc,side,mount,pads,block
+U7,1,STM32G431CBT6,"MCU Cortex-M4F 170MHz, FDCAN, USB FS, 3x opamp/PGA, 2x ADC, LQFP-48",STM32G431CBT6,C529355,top,smd,48,mcu
+Y1,1,8MHz,"Crystal 3225 4-pin (CAN bit timing accuracy)",XL2EL89CSI-KPIYLC-8M,C42400161,top,smd,4,mcu
+U8,1,MT6701CT,"14-bit magnetic angle encoder, SSI/I2C/ABZ, SOP-8 (faces shaft magnet)",MT6701CT-STD-R,C3003196,bottom,smd,8,encoder
+U3 U4 U5 U6,4,EG2132,"Half-bridge gate driver, HIN/LIN active-high, 8-20V, UVLO 7V, 250ns dead time + shoot-through lockout",EG2132,C480660,top,smd,8,bridge
+Q3 Q4 Q5 Q6,4,AP50N04QD,"Dual N-MOSFET 40V 20A 13mOhm PDFN3x3-8, one package per half-bridge (alt: AP4008QD C2828588)",AP50N04QD,C5443706,top,smd,8,bridge
+R40 R41,2,20mOhm 1W,"Current-sense shunt 1206 1% (low side of one leg per H-bridge)",HoYLR1206-1W-20mR-1%,C5375397,top,smd,2,bridge
+D7 D8 D9 D10,4,1N4148W,"Bootstrap diode SOD-123 (EG2132 has no internal diode)",1N4148W,C81598,top,smd,2,bridge
+R20 R21 R22 R23 R24 R25 R26 R27,8,22R,"Gate resistor 0402",0402WGF220JTCE,C25092,top,smd,2,bridge
+U9,1,SIT1051AT/3,"CAN transceiver 5V with 3.3V VIO (TJA1051T/3 pin-compatible), SOP-8",SIT1051AT/3,C5382551,top,smd,8,bus
+U10,1,SP3485EN,"RS-485 half-duplex transceiver 3.3V SOIC-8",SP3485EN-L/TR,C8963,top,smd,8,bus
+D11,1,NUP2105L,"Dual bidirectional bus TVS SOT-23 (CANH/A, CANL/B)",NUP2105L,C284104,top,smd,3,bus
+R60,1,120R,"Bus termination 0603 (enabled by solder jumper JP1)",0603WAF1200T5E,C22787,top,smd,2,bus
+U1,1,LGS5145EP,"60V 1.2A async buck converter ESOP-8 (VM to 5.3V)",LGS5145EP,C22470481,top,smd,9,power
+L1,1,10uH,"Shielded power inductor 4x4x3mm >=1A",FNR4030S100MT,C167879,top,smd,2,power
+D3,1,SS16,"Schottky 60V 1A SMA, buck catch diode",SS16,C18199176,top,smd,2,power
+D4 D5,2,B5819W,"Schottky 40V 1A SOD-123, 5V rail OR-ing (buck / USB VBUS)",B5819W,C2943878,top,smd,2,power
+U2,1,XC6206P332MR,"LDO 3.3V 200mA SOT-23",XC6206P332MR,C5148692,top,smd,3,power
+FB1,1,600R@100MHz,"Ferrite bead 0603 for VDDA",GZ1608D601TF,C1002,top,smd,2,power
+Q1,1,AP40P04Q,"P-MOSFET 40V 30A 10mOhm PDFN3x3-8, reverse-polarity protection",AP40P04Q,C5443650,top,smd,8,power
+Q2,1,MMBT5551,"NPN 160V SOT-23, gate-rail emitter follower",MMBT5551,C7420357,top,smd,3,power
+D1 D6,2,BZT52C12,"Zener 12V SOD-123 (Q1 gate clamp, gate-rail reference)",BZT52C12,C19077410,top,smd,2,power
+D2,1,SMBJ26A,"TVS 600W 26V standoff SMB, supply clamp",SMBJ26A,C19077580,top,smd,2,power
+F1,1,4A 63V,"Fuse 1206 fast-acting",JFC1206-1400FS,C136349,top,smd,2,power
+C1,1,220uF 35V,"Aluminium electrolytic SMD 8x10mm, bulk VM",RVT220UF35V67RV0024,C2836441,top,smd,2,power
+C2 C3 C4 C5,4,10uF 50V,"MLCC X5R 1206, VM bypass at each half-bridge",FCC1206X106K500HT,C7467044,top,smd,2,power
+C6 C7 C8 C9 C10,5,100nF 50V,"MLCC X7R 0402 (HF bypass at bridges, buck bootstrap)",CL05B104KB54PNC,C307331,top,smd,2,power
+C11,1,2.2uF 50V,"MLCC X7R 0805, buck input",TCC0805X7R225M500FT,C7393943,top,smd,2,power
+C12 C13,2,22uF 10V,"MLCC X5R 0805, buck output",CGA0805X5R226M100MT,C6119897,top,smd,2,power
+C14,1,10uF 25V,"MLCC X5R 0805, gate rail bulk",TCC0805X5R106K250FT,C5448891,top,smd,2,power
+C15 C16 C17 C18 C19 C20 C21 C22 C23 C24 C25 C26,12,1uF 50V,"MLCC X7R 0603 (4x bootstrap, 4x driver VCC, VDDA, VREF+, encoder, LDO in)",TCC0603X7R105K500CT,C5360793,top,smd,2,decoupling
+C27 C28 C29,3,10uF 10V,"MLCC X5R 0603 (LDO out, MCU bulk, 5V rail)",FCC0603X106K100CT,C5137565,top,smd,2,decoupling
+C30 C31 C32 C33 C34 C35 C36 C37 C38 C39 C40 C41 C42 C43 C44,15,100nF 16V,"MLCC X7R 0402 general decoupling / filters",CL05B104KO5NNNC,C1525,top,smd,2,decoupling
+C45 C46,2,220pF C0G,"MLCC 0402, current-sense input filter (tau 0.2 us with 1k)",TCC0402COG221J500AT,C2994655,top,smd,2,sense
+C47 C48,2,20pF C0G,"MLCC 0402, crystal load",0402CG200J500NT,C1554,top,smd,2,mcu
+C49 C50 C51 C52 C53,5,100pF C0G,"MLCC 0402, digital input filters",0402CG101J500NT,C1546,top,smd,2,io
+R1 R2 R3,3,10k,"0402 1% (ENC_CS pullup, NTC divider, RS-485 RO pullup)",0402WGF1002TCE,C25744,top,smd,2,misc
+R9 R10 R11 R12 R13 R14 R15 R16 R17 R18,10,100k,"0402 1% (8x gate-source bleed, Q1 gate, buck EN)",0402WGF1003TCE,C25741,top,smd,2,misc
+R30 R31 R32 R33,4,1k,"0402 1% (2x current-sense series, 2x LED)",0402WGF1001TCE,C11702,top,smd,2,misc
+R34 R35,2,30k,"0402 1% current-sense bias to VDDA (sets ~1.7V mid-scale offset after PGA x16)",FRC0402F3002TS,C2909347,top,smd,2,sense
+R36 R37,2,0R,"0402 Kelvin return links to OPAMP VINM0",0402WGF0000TCE,C17168,top,smd,2,sense
+R38,1,47k,"0402 1% VBUS divider top",0402WGF4702TCE,C25792,top,smd,2,sense
+R39,1,4.7k,"0402 1% VBUS divider bottom",0402WGF4701TCE,C25900,top,smd,2,sense
+R52 R53 R54 R55 R56 R57 R58 R59,8,4.7k,"0402 pulldowns on the 8 gate-driver inputs (all FETs off while MCU is in reset/bootloader)",0402WGF4701TCE,C25900,top,smd,2,bridge
+R42,1,4.7k 0603,"0603 gate-rail zener bias (42 mW at 26 V)",0603WAF4701T5E,C23162,top,smd,2,power
+R43,1,56k,"0402 1% buck feedback top",0402WGF5602TCE,C25796,top,smd,2,power
+R44,1,10k,"0402 1% buck feedback bottom (shares reel with R1..R3)",0402WGF1002TCE,C25744,top,smd,2,power
+R45 R46,2,5.1k,"0402 USB-C CC pulldowns",0402WGF5101TCE,C25905,top,smd,2,usb
+R47 R48 R49 R50 R51,5,2.2k,"0402 series protection on STEP/DIR/EN/LIM1/LIM2",0402WGF2201TCE,C25879,top,smd,2,io
+RT1,1,10k NTC,"NTC 0402 B3435 next to the bridges",SDNT1005X103F3435FTF,C279801,top,smd,2,sense
+J6,1,USB-C 16P,"USB Type-C receptacle, USB 2.0, SMD",TYPE-C 16PIN 2MD(073),C2765186,top,smd,16,usb
+U11 U12,2,SRV05-4,"4-line ESD array SOT-23-6 (USB D+/D-/VBUS, IO header)",SRV05-4,C558418,top,smd,6,io
+SW1,1,Tactile 4x3mm,"User button (hold at power-up: calibrate / restore defaults)",TS-1088-AR02016,C720477,top,smd,2,mcu
+LED1,1,Green 0603,"Status LED (pin high); shares PC13 with LED2",XL-1608UGC-04,C965804,top,smd,2,mcu
+LED2,1,Red 0603,"Fault LED (pin low); pin hi-Z = both off",KT-0603R,C2286,top,smd,2,mcu
+J4,1,PH2.0 6P RA SMD,"IO header: 5V, GND, STEP, DIR, EN, AUX",HX PH2.0-6PWT,C22461289,top,smd,8,io
+J5,1,PH2.0 4P RA SMD,"Limit switches: 3V3, GND, LIM1, LIM2",HX PH2.0-4PWT,C22461287,top,smd,6,io
+J1 J2,2,MX3.0 2x2 RA,"Micro-Fit-compatible 3.0mm 2x2 right-angle, power + bus in/out (V+, GND, H/A, L/B), 5A/pin",HC-MX3.0-2*2AW,C3294383,top,tht,4,bus
+J3,1,XH2.54 4P,"Motor connector JST-XH 4-pin vertical (A+, A-, B+, B-)",B4B-XH-A(LF)(SN),C144395,top,tht,4,bridge
