@@ -1,0 +1,1185 @@
+{"type": "zerodiag", "t": 1791852144.3499043, "label": "after 82 02", "dt": 0.008, "enc": 27410, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.3637195, "label": "after 82 02", "dt": 0.021, "enc": 27410, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.3765364, "label": "after 82 02", "dt": 0.034, "enc": 27410, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.3893657, "label": "after 82 02", "dt": 0.047, "enc": 27410, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.402175, "label": "after 82 02", "dt": 0.06, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.415064, "label": "after 82 02", "dt": 0.073, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.4279711, "label": "after 82 02", "dt": 0.086, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.4408135, "label": "after 82 02", "dt": 0.098, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.4536953, "label": "after 82 02", "dt": 0.111, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.4664195, "label": "after 82 02", "dt": 0.124, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.4792926, "label": "after 82 02", "dt": 0.137, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.4922457, "label": "after 82 02", "dt": 0.15, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.5048628, "label": "after 82 02", "dt": 0.162, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.5176048, "label": "after 82 02", "dt": 0.175, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.5308018, "label": "after 82 02", "dt": 0.188, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.5435176, "label": "after 82 02", "dt": 0.201, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.5563307, "label": "after 82 02", "dt": 0.214, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.5690517, "label": "after 82 02", "dt": 0.227, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.5819926, "label": "after 82 02", "dt": 0.24, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.594663, "label": "after 82 02", "dt": 0.252, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.6095905, "label": "after 82 02", "dt": 0.267, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.6236494, "label": "after 82 02", "dt": 0.281, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.6387525, "label": "after 82 02", "dt": 0.296, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.6522837, "label": "after 82 02", "dt": 0.31, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.6654694, "label": "after 82 02", "dt": 0.323, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.6782923, "label": "after 82 02", "dt": 0.336, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.6923933, "label": "after 82 02", "dt": 0.35, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.706105, "label": "after 82 02", "dt": 0.364, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.719764, "label": "after 82 02", "dt": 0.377, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.7328403, "label": "after 82 02", "dt": 0.39, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.747677, "label": "after 82 02", "dt": 0.405, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.7604597, "label": "after 82 02", "dt": 0.418, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.7731984, "label": "after 82 02", "dt": 0.431, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.7862227, "label": "after 82 02", "dt": 0.444, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.799025, "label": "after 82 02", "dt": 0.457, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.8117146, "label": "after 82 02", "dt": 0.469, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.8246236, "label": "after 82 02", "dt": 0.482, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.837585, "label": "after 82 02", "dt": 0.495, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.8506112, "label": "after 82 02", "dt": 0.508, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.863555, "label": "after 82 02", "dt": 0.521, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.8764048, "label": "after 82 02", "dt": 0.534, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.8895144, "label": "after 82 02", "dt": 0.547, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.9032094, "label": "after 82 02", "dt": 0.561, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.916276, "label": "after 82 02", "dt": 0.574, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.9292977, "label": "after 82 02", "dt": 0.587, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.9422395, "label": "after 82 02", "dt": 0.6, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.955127, "label": "after 82 02", "dt": 0.613, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.9686587, "label": "after 82 02", "dt": 0.626, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.9831712, "label": "after 82 02", "dt": 0.641, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852144.9969525, "label": "after 82 02", "dt": 0.655, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.0109727, "label": "after 82 02", "dt": 0.669, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.024374, "label": "after 82 02", "dt": 0.682, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.0373278, "label": "after 82 02", "dt": 0.695, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.050291, "label": "after 82 02", "dt": 0.708, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.0631168, "label": "after 82 02", "dt": 0.721, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.076034, "label": "after 82 02", "dt": 0.734, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.0886579, "label": "after 82 02", "dt": 0.746, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.101466, "label": "after 82 02", "dt": 0.759, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.1147995, "label": "after 82 02", "dt": 0.772, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.1276462, "label": "after 82 02", "dt": 0.785, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.1407883, "label": "after 82 02", "dt": 0.798, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.1538239, "label": "after 82 02", "dt": 0.811, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.1666625, "label": "after 82 02", "dt": 0.824, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.1793528, "label": "after 82 02", "dt": 0.837, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.1922047, "label": "after 82 02", "dt": 0.85, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.2052257, "label": "after 82 02", "dt": 0.863, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.2199557, "label": "after 82 02", "dt": 0.878, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.232924, "label": "after 82 02", "dt": 0.891, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.2460403, "label": "after 82 02", "dt": 0.904, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.2608619, "label": "after 82 02", "dt": 0.918, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.2765837, "label": "after 82 02", "dt": 0.934, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.2896621, "label": "after 82 02", "dt": 0.947, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.3031201, "label": "after 82 02", "dt": 0.961, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.3161352, "label": "after 82 02", "dt": 0.974, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.3291976, "label": "after 82 02", "dt": 0.987, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.3444202, "label": "after 82 02", "dt": 1.002, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.3585064, "label": "after 82 02", "dt": 1.016, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.3729613, "label": "after 82 02", "dt": 1.031, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.386893, "label": "after 82 02", "dt": 1.045, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.4004142, "label": "after 82 02", "dt": 1.058, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.4137378, "label": "after 82 02", "dt": 1.071, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.4270163, "label": "after 82 02", "dt": 1.085, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.4402945, "label": "after 82 02", "dt": 1.098, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.4535847, "label": "after 82 02", "dt": 1.111, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.4668849, "label": "after 82 02", "dt": 1.125, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.4822652, "label": "after 82 02", "dt": 1.14, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.4959733, "label": "after 82 02", "dt": 1.154, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.509454, "label": "after 82 02", "dt": 1.167, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.5232701, "label": "after 82 02", "dt": 1.181, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.5367522, "label": "after 82 02", "dt": 1.194, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.550476, "label": "after 82 02", "dt": 1.208, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.5636559, "label": "after 82 02", "dt": 1.221, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.5777066, "label": "after 82 02", "dt": 1.235, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.5930574, "label": "after 82 02", "dt": 1.251, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.606615, "label": "after 82 02", "dt": 1.264, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.6217647, "label": "after 82 02", "dt": 1.279, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.637149, "label": "after 82 02", "dt": 1.295, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.6510744, "label": "after 82 02", "dt": 1.309, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.6667948, "label": "after 82 02", "dt": 1.324, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.6802616, "label": "after 82 02", "dt": 1.338, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.6960928, "label": "after 82 02", "dt": 1.354, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.7099354, "label": "after 82 02", "dt": 1.368, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.7239244, "label": "after 82 02", "dt": 1.382, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.7378662, "label": "after 82 02", "dt": 1.395, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.7517827, "label": "after 82 02", "dt": 1.409, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.7647743, "label": "after 82 02", "dt": 1.422, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.7779398, "label": "after 82 02", "dt": 1.436, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.7916176, "label": "after 82 02", "dt": 1.449, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.8068833, "label": "after 82 02", "dt": 1.465, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.8208203, "label": "after 82 02", "dt": 1.478, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.8343883, "label": "after 82 02", "dt": 1.492, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.8498092, "label": "after 82 02", "dt": 1.507, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.8632727, "label": "after 82 02", "dt": 1.521, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.8779776, "label": "after 82 02", "dt": 1.536, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.8931308, "label": "after 82 02", "dt": 1.551, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.9060388, "label": "after 82 02", "dt": 1.564, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.9193301, "label": "after 82 02", "dt": 1.577, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.9351606, "label": "after 82 02", "dt": 1.593, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.9486303, "label": "after 82 02", "dt": 1.606, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.9616752, "label": "after 82 02", "dt": 1.619, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.974987, "label": "after 82 02", "dt": 1.633, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852145.9887362, "label": "after 82 02", "dt": 1.646, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.0017323, "label": "after 82 02", "dt": 1.659, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.014773, "label": "after 82 02", "dt": 1.672, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.0281203, "label": "after 82 02", "dt": 1.686, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.0416558, "label": "after 82 02", "dt": 1.699, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.0547192, "label": "after 82 02", "dt": 1.712, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.0692337, "label": "after 82 02", "dt": 1.727, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.0829859, "label": "after 82 02", "dt": 1.741, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.097247, "label": "after 82 02", "dt": 1.755, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.1109455, "label": "after 82 02", "dt": 1.769, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.1254969, "label": "after 82 02", "dt": 1.783, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.1401591, "label": "after 82 02", "dt": 1.798, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.1542897, "label": "after 82 02", "dt": 1.812, "enc": 27418, "err": -1, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.1689913, "label": "after 82 02", "dt": 1.827, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.1840198, "label": "after 82 02", "dt": 1.842, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.1981537, "label": "after 82 02", "dt": 1.856, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.2126586, "label": "after 82 02", "dt": 1.87, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.2277777, "label": "after 82 02", "dt": 1.885, "enc": 27418, "err": -1, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.2417579, "label": "after 82 02", "dt": 1.899, "enc": 27418, "err": -1, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.256936, "label": "after 82 02", "dt": 1.915, "enc": 27418, "err": -1, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.2713964, "label": "after 82 02", "dt": 1.929, "enc": 27414, "err": -1, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.2845278, "label": "after 82 02", "dt": 1.942, "enc": 27414, "err": -1, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.298203, "label": "after 82 02", "dt": 1.956, "enc": 27414, "err": -1, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.3114326, "label": "after 82 02", "dt": 1.969, "enc": 27414, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.324689, "label": "after 82 02", "dt": 1.982, "enc": 27414, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.338031, "label": "after 82 02", "dt": 1.996, "enc": 27418, "err": -5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.6321952, "label": "after F3 00 / F3 01", "dt": 0.008, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.6481092, "label": "after F3 00 / F3 01", "dt": 0.023, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.6613808, "label": "after F3 00 / F3 01", "dt": 0.037, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.674686, "label": "after F3 00 / F3 01", "dt": 0.05, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.6881826, "label": "after F3 00 / F3 01", "dt": 0.064, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.7017074, "label": "after F3 00 / F3 01", "dt": 0.077, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.7176816, "label": "after F3 00 / F3 01", "dt": 0.093, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.7317417, "label": "after F3 00 / F3 01", "dt": 0.107, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.7461832, "label": "after F3 00 / F3 01", "dt": 0.122, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.761454, "label": "after F3 00 / F3 01", "dt": 0.137, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.7767527, "label": "after F3 00 / F3 01", "dt": 0.152, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.7909544, "label": "after F3 00 / F3 01", "dt": 0.166, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.8075986, "label": "after F3 00 / F3 01", "dt": 0.183, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.8227093, "label": "after F3 00 / F3 01", "dt": 0.198, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.836362, "label": "after F3 00 / F3 01", "dt": 0.212, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.849517, "label": "after F3 00 / F3 01", "dt": 0.225, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.8647296, "label": "after F3 00 / F3 01", "dt": 0.24, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.8803449, "label": "after F3 00 / F3 01", "dt": 0.256, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.8960867, "label": "after F3 00 / F3 01", "dt": 0.271, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.9099002, "label": "after F3 00 / F3 01", "dt": 0.285, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.925048, "label": "after F3 00 / F3 01", "dt": 0.3, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.938197, "label": "after F3 00 / F3 01", "dt": 0.314, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.9510055, "label": "after F3 00 / F3 01", "dt": 0.326, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.9638507, "label": "after F3 00 / F3 01", "dt": 0.339, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.9766583, "label": "after F3 00 / F3 01", "dt": 0.352, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852146.9895506, "label": "after F3 00 / F3 01", "dt": 0.365, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.0021753, "label": "after F3 00 / F3 01", "dt": 0.378, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.0150492, "label": "after F3 00 / F3 01", "dt": 0.39, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.0294325, "label": "after F3 00 / F3 01", "dt": 0.405, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.0437133, "label": "after F3 00 / F3 01", "dt": 0.419, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.0579386, "label": "after F3 00 / F3 01", "dt": 0.433, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.0714324, "label": "after F3 00 / F3 01", "dt": 0.447, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.0842705, "label": "after F3 00 / F3 01", "dt": 0.46, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.0970814, "label": "after F3 00 / F3 01", "dt": 0.472, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.1099935, "label": "after F3 00 / F3 01", "dt": 0.485, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.1230092, "label": "after F3 00 / F3 01", "dt": 0.498, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.135832, "label": "after F3 00 / F3 01", "dt": 0.511, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.150063, "label": "after F3 00 / F3 01", "dt": 0.525, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.1627395, "label": "after F3 00 / F3 01", "dt": 0.538, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.175482, "label": "after F3 00 / F3 01", "dt": 0.551, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.1880872, "label": "after F3 00 / F3 01", "dt": 0.563, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.2010398, "label": "after F3 00 / F3 01", "dt": 0.576, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.2143767, "label": "after F3 00 / F3 01", "dt": 0.59, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.2272573, "label": "after F3 00 / F3 01", "dt": 0.603, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.2405689, "label": "after F3 00 / F3 01", "dt": 0.616, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.253513, "label": "after F3 00 / F3 01", "dt": 0.629, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.2665658, "label": "after F3 00 / F3 01", "dt": 0.642, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.2795289, "label": "after F3 00 / F3 01", "dt": 0.655, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.2924976, "label": "after F3 00 / F3 01", "dt": 0.668, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.305404, "label": "after F3 00 / F3 01", "dt": 0.681, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.3182554, "label": "after F3 00 / F3 01", "dt": 0.694, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.3311844, "label": "after F3 00 / F3 01", "dt": 0.707, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.3441312, "label": "after F3 00 / F3 01", "dt": 0.719, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.356942, "label": "after F3 00 / F3 01", "dt": 0.732, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.3702364, "label": "after F3 00 / F3 01", "dt": 0.746, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.3857973, "label": "after F3 00 / F3 01", "dt": 0.761, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.4026642, "label": "after F3 00 / F3 01", "dt": 0.778, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.4195294, "label": "after F3 00 / F3 01", "dt": 0.795, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.4336567, "label": "after F3 00 / F3 01", "dt": 0.809, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.4467778, "label": "after F3 00 / F3 01", "dt": 0.822, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.4600642, "label": "after F3 00 / F3 01", "dt": 0.835, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.4736168, "label": "after F3 00 / F3 01", "dt": 0.849, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.486876, "label": "after F3 00 / F3 01", "dt": 0.862, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.5004144, "label": "after F3 00 / F3 01", "dt": 0.876, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.5136156, "label": "after F3 00 / F3 01", "dt": 0.889, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.526617, "label": "after F3 00 / F3 01", "dt": 0.902, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.5396433, "label": "after F3 00 / F3 01", "dt": 0.915, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.5527043, "label": "after F3 00 / F3 01", "dt": 0.928, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.566169, "label": "after F3 00 / F3 01", "dt": 0.942, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.5790741, "label": "after F3 00 / F3 01", "dt": 0.954, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.5921485, "label": "after F3 00 / F3 01", "dt": 0.967, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.6061127, "label": "after F3 00 / F3 01", "dt": 0.981, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.6188622, "label": "after F3 00 / F3 01", "dt": 0.994, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.631637, "label": "after F3 00 / F3 01", "dt": 1.007, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.6441574, "label": "after F3 00 / F3 01", "dt": 1.019, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.657106, "label": "after F3 00 / F3 01", "dt": 1.032, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.6696188, "label": "after F3 00 / F3 01", "dt": 1.045, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.6823545, "label": "after F3 00 / F3 01", "dt": 1.058, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.694951, "label": "after F3 00 / F3 01", "dt": 1.07, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.7075603, "label": "after F3 00 / F3 01", "dt": 1.083, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.72054, "label": "after F3 00 / F3 01", "dt": 1.096, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.7353907, "label": "after F3 00 / F3 01", "dt": 1.111, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.749759, "label": "after F3 00 / F3 01", "dt": 1.125, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.7636847, "label": "after F3 00 / F3 01", "dt": 1.139, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.776713, "label": "after F3 00 / F3 01", "dt": 1.152, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.7895546, "label": "after F3 00 / F3 01", "dt": 1.165, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.8022206, "label": "after F3 00 / F3 01", "dt": 1.178, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.8154163, "label": "after F3 00 / F3 01", "dt": 1.191, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.8283088, "label": "after F3 00 / F3 01", "dt": 1.204, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.8412285, "label": "after F3 00 / F3 01", "dt": 1.217, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.854888, "label": "after F3 00 / F3 01", "dt": 1.23, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.8681488, "label": "after F3 00 / F3 01", "dt": 1.243, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.8807929, "label": "after F3 00 / F3 01", "dt": 1.256, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.8937893, "label": "after F3 00 / F3 01", "dt": 1.269, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.9064195, "label": "after F3 00 / F3 01", "dt": 1.282, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.9192626, "label": "after F3 00 / F3 01", "dt": 1.295, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.932332, "label": "after F3 00 / F3 01", "dt": 1.308, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.9453945, "label": "after F3 00 / F3 01", "dt": 1.321, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.9584985, "label": "after F3 00 / F3 01", "dt": 1.334, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.971095, "label": "after F3 00 / F3 01", "dt": 1.346, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.9839227, "label": "after F3 00 / F3 01", "dt": 1.359, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852147.9973345, "label": "after F3 00 / F3 01", "dt": 1.373, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.0100403, "label": "after F3 00 / F3 01", "dt": 1.385, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.0229995, "label": "after F3 00 / F3 01", "dt": 1.398, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.03573, "label": "after F3 00 / F3 01", "dt": 1.411, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.0484972, "label": "after F3 00 / F3 01", "dt": 1.424, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.0615218, "label": "after F3 00 / F3 01", "dt": 1.437, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.0742197, "label": "after F3 00 / F3 01", "dt": 1.45, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.0869164, "label": "after F3 00 / F3 01", "dt": 1.462, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.0997243, "label": "after F3 00 / F3 01", "dt": 1.475, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.1131616, "label": "after F3 00 / F3 01", "dt": 1.488, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.1271553, "label": "after F3 00 / F3 01", "dt": 1.502, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.1412733, "label": "after F3 00 / F3 01", "dt": 1.517, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.156214, "label": "after F3 00 / F3 01", "dt": 1.532, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.170648, "label": "after F3 00 / F3 01", "dt": 1.546, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.1846905, "label": "after F3 00 / F3 01", "dt": 1.56, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.1991236, "label": "after F3 00 / F3 01", "dt": 1.574, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.2131097, "label": "after F3 00 / F3 01", "dt": 1.588, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.2265403, "label": "after F3 00 / F3 01", "dt": 1.602, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.241016, "label": "after F3 00 / F3 01", "dt": 1.616, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.2544103, "label": "after F3 00 / F3 01", "dt": 1.63, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.2672515, "label": "after F3 00 / F3 01", "dt": 1.643, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.280107, "label": "after F3 00 / F3 01", "dt": 1.655, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.2930617, "label": "after F3 00 / F3 01", "dt": 1.668, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.305874, "label": "after F3 00 / F3 01", "dt": 1.681, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.318781, "label": "after F3 00 / F3 01", "dt": 1.694, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.331749, "label": "after F3 00 / F3 01", "dt": 1.707, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.34438, "label": "after F3 00 / F3 01", "dt": 1.72, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.3583405, "label": "after F3 00 / F3 01", "dt": 1.734, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.3710637, "label": "after F3 00 / F3 01", "dt": 1.746, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.3842134, "label": "after F3 00 / F3 01", "dt": 1.76, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.3970318, "label": "after F3 00 / F3 01", "dt": 1.772, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.409837, "label": "after F3 00 / F3 01", "dt": 1.785, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.4225492, "label": "after F3 00 / F3 01", "dt": 1.798, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.4356854, "label": "after F3 00 / F3 01", "dt": 1.811, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.4484875, "label": "after F3 00 / F3 01", "dt": 1.824, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.4612148, "label": "after F3 00 / F3 01", "dt": 1.837, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.4739082, "label": "after F3 00 / F3 01", "dt": 1.849, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.4896219, "label": "after F3 00 / F3 01", "dt": 1.865, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.5038214, "label": "after F3 00 / F3 01", "dt": 1.879, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.518085, "label": "after F3 00 / F3 01", "dt": 1.893, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.5316162, "label": "after F3 00 / F3 01", "dt": 1.907, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.5444844, "label": "after F3 00 / F3 01", "dt": 1.92, "enc": 27418, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.5574863, "label": "after F3 00 / F3 01", "dt": 1.933, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.5704095, "label": "after F3 00 / F3 01", "dt": 1.946, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.583353, "label": "after F3 00 / F3 01", "dt": 1.959, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.596267, "label": "after F3 00 / F3 01", "dt": 1.972, "enc": 27418, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.6091537, "label": "after F3 00 / F3 01", "dt": 1.984, "enc": 27418, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.6228402, "label": "after F3 00 / F3 01", "dt": 1.998, "enc": 27418, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.647019, "label": "after 94 (mode off?)", "dt": 0.008, "enc": 27423, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.6600008, "label": "after 94 (mode off?)", "dt": 0.021, "enc": 27423, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.6727426, "label": "after 94 (mode off?)", "dt": 0.033, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.6855419, "label": "after 94 (mode off?)", "dt": 0.046, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.6983926, "label": "after 94 (mode off?)", "dt": 0.059, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.711074, "label": "after 94 (mode off?)", "dt": 0.072, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.7238882, "label": "after 94 (mode off?)", "dt": 0.084, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.7368944, "label": "after 94 (mode off?)", "dt": 0.097, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.7527268, "label": "after 94 (mode off?)", "dt": 0.113, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.7670827, "label": "after 94 (mode off?)", "dt": 0.128, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.7827117, "label": "after 94 (mode off?)", "dt": 0.143, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.7957904, "label": "after 94 (mode off?)", "dt": 0.156, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.8088017, "label": "after 94 (mode off?)", "dt": 0.169, "enc": 27423, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.8218892, "label": "after 94 (mode off?)", "dt": 0.182, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.834857, "label": "after 94 (mode off?)", "dt": 0.195, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.8476489, "label": "after 94 (mode off?)", "dt": 0.208, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.8608656, "label": "after 94 (mode off?)", "dt": 0.221, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.874093, "label": "after 94 (mode off?)", "dt": 0.235, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.8879762, "label": "after 94 (mode off?)", "dt": 0.249, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.9038465, "label": "after 94 (mode off?)", "dt": 0.264, "enc": 27423, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.918098, "label": "after 94 (mode off?)", "dt": 0.279, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.9322653, "label": "after 94 (mode off?)", "dt": 0.293, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.9457738, "label": "after 94 (mode off?)", "dt": 0.306, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.9591837, "label": "after 94 (mode off?)", "dt": 0.32, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.9724119, "label": "after 94 (mode off?)", "dt": 0.333, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852148.9888985, "label": "after 94 (mode off?)", "dt": 0.349, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.003039, "label": "after 94 (mode off?)", "dt": 0.364, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.0167003, "label": "after 94 (mode off?)", "dt": 0.377, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.0313225, "label": "after 94 (mode off?)", "dt": 0.392, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.044723, "label": "after 94 (mode off?)", "dt": 0.405, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.058183, "label": "after 94 (mode off?)", "dt": 0.419, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.0737906, "label": "after 94 (mode off?)", "dt": 0.434, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.0871575, "label": "after 94 (mode off?)", "dt": 0.448, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.1006732, "label": "after 94 (mode off?)", "dt": 0.461, "enc": 27423, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.1139572, "label": "after 94 (mode off?)", "dt": 0.474, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.1283753, "label": "after 94 (mode off?)", "dt": 0.489, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.1422327, "label": "after 94 (mode off?)", "dt": 0.503, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.1572096, "label": "after 94 (mode off?)", "dt": 0.518, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.1722283, "label": "after 94 (mode off?)", "dt": 0.533, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.18641, "label": "after 94 (mode off?)", "dt": 0.547, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.2002416, "label": "after 94 (mode off?)", "dt": 0.561, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.2130759, "label": "after 94 (mode off?)", "dt": 0.574, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.2258682, "label": "after 94 (mode off?)", "dt": 0.586, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.2391055, "label": "after 94 (mode off?)", "dt": 0.6, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.2521055, "label": "after 94 (mode off?)", "dt": 0.613, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.2649665, "label": "after 94 (mode off?)", "dt": 0.626, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.2780068, "label": "after 94 (mode off?)", "dt": 0.639, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.2908819, "label": "after 94 (mode off?)", "dt": 0.651, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.304111, "label": "after 94 (mode off?)", "dt": 0.665, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.3186202, "label": "after 94 (mode off?)", "dt": 0.679, "enc": 27423, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.3314826, "label": "after 94 (mode off?)", "dt": 0.692, "enc": 27423, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.3444543, "label": "after 94 (mode off?)", "dt": 0.705, "enc": 27418, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.3592236, "label": "after 94 (mode off?)", "dt": 0.72, "enc": 27418, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.372725, "label": "after 94 (mode off?)", "dt": 0.733, "enc": 27418, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.3858895, "label": "after 94 (mode off?)", "dt": 0.746, "enc": 27418, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.3988407, "label": "after 94 (mode off?)", "dt": 0.759, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.4115906, "label": "after 94 (mode off?)", "dt": 0.772, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.4243202, "label": "after 94 (mode off?)", "dt": 0.785, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.4374812, "label": "after 94 (mode off?)", "dt": 0.798, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.45026, "label": "after 94 (mode off?)", "dt": 0.811, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.4630737, "label": "after 94 (mode off?)", "dt": 0.824, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.4757624, "label": "after 94 (mode off?)", "dt": 0.836, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.490303, "label": "after 94 (mode off?)", "dt": 0.851, "enc": 27423, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.5040023, "label": "after 94 (mode off?)", "dt": 0.865, "enc": 27423, "err": 5, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.517704, "label": "after 94 (mode off?)", "dt": 0.878, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.5306678, "label": "after 94 (mode off?)", "dt": 0.891, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.5434246, "label": "after 94 (mode off?)", "dt": 0.904, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.556329, "label": "after 94 (mode off?)", "dt": 0.917, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.5692334, "label": "after 94 (mode off?)", "dt": 0.93, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.5822597, "label": "after 94 (mode off?)", "dt": 0.943, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.595042, "label": "after 94 (mode off?)", "dt": 0.956, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.6089878, "label": "after 94 (mode off?)", "dt": 0.97, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.6221614, "label": "after 94 (mode off?)", "dt": 0.983, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.6352913, "label": "after 94 (mode off?)", "dt": 0.996, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.6492429, "label": "after 94 (mode off?)", "dt": 1.01, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.6622813, "label": "after 94 (mode off?)", "dt": 1.023, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.6752238, "label": "after 94 (mode off?)", "dt": 1.036, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.691094, "label": "after 94 (mode off?)", "dt": 1.052, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.7057943, "label": "after 94 (mode off?)", "dt": 1.066, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.7192118, "label": "after 94 (mode off?)", "dt": 1.08, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.7341042, "label": "after 94 (mode off?)", "dt": 1.095, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.7471337, "label": "after 94 (mode off?)", "dt": 1.108, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.761138, "label": "after 94 (mode off?)", "dt": 1.122, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.7756329, "label": "after 94 (mode off?)", "dt": 1.136, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.7885797, "label": "after 94 (mode off?)", "dt": 1.149, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.801575, "label": "after 94 (mode off?)", "dt": 1.162, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.8141868, "label": "after 94 (mode off?)", "dt": 1.175, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.8272479, "label": "after 94 (mode off?)", "dt": 1.188, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.8400614, "label": "after 94 (mode off?)", "dt": 1.201, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.8527741, "label": "after 94 (mode off?)", "dt": 1.213, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.8675983, "label": "after 94 (mode off?)", "dt": 1.228, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.8817384, "label": "after 94 (mode off?)", "dt": 1.242, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.895239, "label": "after 94 (mode off?)", "dt": 1.256, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.9084058, "label": "after 94 (mode off?)", "dt": 1.269, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.9214056, "label": "after 94 (mode off?)", "dt": 1.282, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.93427, "label": "after 94 (mode off?)", "dt": 1.295, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.9472625, "label": "after 94 (mode off?)", "dt": 1.308, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.9600081, "label": "after 94 (mode off?)", "dt": 1.321, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.9727027, "label": "after 94 (mode off?)", "dt": 1.333, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852149.9875453, "label": "after 94 (mode off?)", "dt": 1.348, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.00056, "label": "after 94 (mode off?)", "dt": 1.361, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.0133584, "label": "after 94 (mode off?)", "dt": 1.374, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.0261142, "label": "after 94 (mode off?)", "dt": 1.387, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.0388315, "label": "after 94 (mode off?)", "dt": 1.399, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.0516086, "label": "after 94 (mode off?)", "dt": 1.412, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.0645363, "label": "after 94 (mode off?)", "dt": 1.425, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.0773525, "label": "after 94 (mode off?)", "dt": 1.438, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.090534, "label": "after 94 (mode off?)", "dt": 1.451, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.1035972, "label": "after 94 (mode off?)", "dt": 1.464, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.1182847, "label": "after 94 (mode off?)", "dt": 1.479, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.1327584, "label": "after 94 (mode off?)", "dt": 1.493, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.1470807, "label": "after 94 (mode off?)", "dt": 1.508, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.1606836, "label": "after 94 (mode off?)", "dt": 1.521, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.1749423, "label": "after 94 (mode off?)", "dt": 1.535, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.1896052, "label": "after 94 (mode off?)", "dt": 1.55, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.2040596, "label": "after 94 (mode off?)", "dt": 1.565, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.2177944, "label": "after 94 (mode off?)", "dt": 1.578, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.2319555, "label": "after 94 (mode off?)", "dt": 1.592, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.246002, "label": "after 94 (mode off?)", "dt": 1.607, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.2591152, "label": "after 94 (mode off?)", "dt": 1.62, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.2722485, "label": "after 94 (mode off?)", "dt": 1.633, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.2855597, "label": "after 94 (mode off?)", "dt": 1.646, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.2983356, "label": "after 94 (mode off?)", "dt": 1.659, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.3114104, "label": "after 94 (mode off?)", "dt": 1.672, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.3244, "label": "after 94 (mode off?)", "dt": 1.685, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.337304, "label": "after 94 (mode off?)", "dt": 1.698, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.350579, "label": "after 94 (mode off?)", "dt": 1.711, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.3633418, "label": "after 94 (mode off?)", "dt": 1.724, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.3764915, "label": "after 94 (mode off?)", "dt": 1.737, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.3896716, "label": "after 94 (mode off?)", "dt": 1.75, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.402738, "label": "after 94 (mode off?)", "dt": 1.763, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.4156013, "label": "after 94 (mode off?)", "dt": 1.776, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.42848, "label": "after 94 (mode off?)", "dt": 1.789, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.4412398, "label": "after 94 (mode off?)", "dt": 1.802, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.4539719, "label": "after 94 (mode off?)", "dt": 1.815, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.466635, "label": "after 94 (mode off?)", "dt": 1.827, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.4798377, "label": "after 94 (mode off?)", "dt": 1.84, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.4947348, "label": "after 94 (mode off?)", "dt": 1.855, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.5086448, "label": "after 94 (mode off?)", "dt": 1.869, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.5226455, "label": "after 94 (mode off?)", "dt": 1.883, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.5357316, "label": "after 94 (mode off?)", "dt": 1.896, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.5485334, "label": "after 94 (mode off?)", "dt": 1.909, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.5614872, "label": "after 94 (mode off?)", "dt": 1.922, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.5744681, "label": "after 94 (mode off?)", "dt": 1.935, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.5872324, "label": "after 94 (mode off?)", "dt": 1.948, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.6005049, "label": "after 94 (mode off?)", "dt": 1.961, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.6143441, "label": "after 94 (mode off?)", "dt": 1.975, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.6274252, "label": "after 94 (mode off?)", "dt": 1.988, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.640246, "label": "after 94 (mode off?)", "dt": 2.001, "enc": 27423, "err": 0, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.6669838, "label": "after 94 (NearMode)", "dt": 0.007, "enc": 27423, "err": 3276, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.679608, "label": "after 94 (NearMode)", "dt": 0.02, "enc": 28719, "err": 414, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.6923091, "label": "after 94 (NearMode)", "dt": 0.033, "enc": 28719, "err": 84, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.7050676, "label": "after 94 (NearMode)", "dt": 0.045, "enc": 28719, "err": 52, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.7177517, "label": "after 94 (NearMode)", "dt": 0.058, "enc": 28719, "err": 48, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.7322996, "label": "after 94 (NearMode)", "dt": 0.073, "enc": 28719, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.7450423, "label": "after 94 (NearMode)", "dt": 0.085, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.7630742, "label": "after 94 (NearMode)", "dt": 0.103, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.7776523, "label": "after 94 (NearMode)", "dt": 0.118, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.792907, "label": "after 94 (NearMode)", "dt": 0.133, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.8062682, "label": "after 94 (NearMode)", "dt": 0.147, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.8197687, "label": "after 94 (NearMode)", "dt": 0.16, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.8324592, "label": "after 94 (NearMode)", "dt": 0.173, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.8450983, "label": "after 94 (NearMode)", "dt": 0.185, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.858884, "label": "after 94 (NearMode)", "dt": 0.199, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.8722198, "label": "after 94 (NearMode)", "dt": 0.213, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.8859084, "label": "after 94 (NearMode)", "dt": 0.226, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.8995886, "label": "after 94 (NearMode)", "dt": 0.24, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.9126217, "label": "after 94 (NearMode)", "dt": 0.253, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.925384, "label": "after 94 (NearMode)", "dt": 0.266, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.9383657, "label": "after 94 (NearMode)", "dt": 0.279, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.9513886, "label": "after 94 (NearMode)", "dt": 0.292, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.9640944, "label": "after 94 (NearMode)", "dt": 0.304, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.9769266, "label": "after 94 (NearMode)", "dt": 0.317, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852150.9898136, "label": "after 94 (NearMode)", "dt": 0.33, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.0033982, "label": "after 94 (NearMode)", "dt": 0.344, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.0161567, "label": "after 94 (NearMode)", "dt": 0.357, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.0290146, "label": "after 94 (NearMode)", "dt": 0.369, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.0418973, "label": "after 94 (NearMode)", "dt": 0.382, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.0545113, "label": "after 94 (NearMode)", "dt": 0.395, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.0676062, "label": "after 94 (NearMode)", "dt": 0.408, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.0807064, "label": "after 94 (NearMode)", "dt": 0.421, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.0935464, "label": "after 94 (NearMode)", "dt": 0.434, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.1076698, "label": "after 94 (NearMode)", "dt": 0.448, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.1217988, "label": "after 94 (NearMode)", "dt": 0.462, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.1353152, "label": "after 94 (NearMode)", "dt": 0.476, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.149022, "label": "after 94 (NearMode)", "dt": 0.489, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.161995, "label": "after 94 (NearMode)", "dt": 0.502, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.1747591, "label": "after 94 (NearMode)", "dt": 0.515, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.1880357, "label": "after 94 (NearMode)", "dt": 0.528, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.203627, "label": "after 94 (NearMode)", "dt": 0.544, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.2165854, "label": "after 94 (NearMode)", "dt": 0.557, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.2302601, "label": "after 94 (NearMode)", "dt": 0.571, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.2430427, "label": "after 94 (NearMode)", "dt": 0.583, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.2558596, "label": "after 94 (NearMode)", "dt": 0.596, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.2685804, "label": "after 94 (NearMode)", "dt": 0.609, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.28137, "label": "after 94 (NearMode)", "dt": 0.622, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.2941039, "label": "after 94 (NearMode)", "dt": 0.634, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.306925, "label": "after 94 (NearMode)", "dt": 0.647, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.320106, "label": "after 94 (NearMode)", "dt": 0.66, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.332959, "label": "after 94 (NearMode)", "dt": 0.673, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.345817, "label": "after 94 (NearMode)", "dt": 0.686, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.3602567, "label": "after 94 (NearMode)", "dt": 0.701, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.3747573, "label": "after 94 (NearMode)", "dt": 0.715, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.388733, "label": "after 94 (NearMode)", "dt": 0.729, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.4026673, "label": "after 94 (NearMode)", "dt": 0.743, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.4155538, "label": "after 94 (NearMode)", "dt": 0.756, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.428395, "label": "after 94 (NearMode)", "dt": 0.769, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.44126, "label": "after 94 (NearMode)", "dt": 0.782, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.4541738, "label": "after 94 (NearMode)", "dt": 0.795, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.466988, "label": "after 94 (NearMode)", "dt": 0.807, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.4815254, "label": "after 94 (NearMode)", "dt": 0.822, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.4945085, "label": "after 94 (NearMode)", "dt": 0.835, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.5073905, "label": "after 94 (NearMode)", "dt": 0.848, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.5203726, "label": "after 94 (NearMode)", "dt": 0.861, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.533411, "label": "after 94 (NearMode)", "dt": 0.874, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.5461307, "label": "after 94 (NearMode)", "dt": 0.886, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.5589354, "label": "after 94 (NearMode)", "dt": 0.899, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.5721161, "label": "after 94 (NearMode)", "dt": 0.912, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.5849566, "label": "after 94 (NearMode)", "dt": 0.925, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.597836, "label": "after 94 (NearMode)", "dt": 0.938, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.6120095, "label": "after 94 (NearMode)", "dt": 0.952, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.6254988, "label": "after 94 (NearMode)", "dt": 0.966, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.6383255, "label": "after 94 (NearMode)", "dt": 0.979, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.6512322, "label": "after 94 (NearMode)", "dt": 0.992, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.6641788, "label": "after 94 (NearMode)", "dt": 1.005, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.6769774, "label": "after 94 (NearMode)", "dt": 1.017, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.689977, "label": "after 94 (NearMode)", "dt": 1.03, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.702851, "label": "after 94 (NearMode)", "dt": 1.043, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.7158551, "label": "after 94 (NearMode)", "dt": 1.056, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.7305162, "label": "after 94 (NearMode)", "dt": 1.071, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.7456756, "label": "after 94 (NearMode)", "dt": 1.086, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.7592654, "label": "after 94 (NearMode)", "dt": 1.1, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.7728355, "label": "after 94 (NearMode)", "dt": 1.113, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.7858503, "label": "after 94 (NearMode)", "dt": 1.126, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.7999296, "label": "after 94 (NearMode)", "dt": 1.14, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.8137164, "label": "after 94 (NearMode)", "dt": 1.154, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.8268065, "label": "after 94 (NearMode)", "dt": 1.167, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.8395455, "label": "after 94 (NearMode)", "dt": 1.18, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.8542874, "label": "after 94 (NearMode)", "dt": 1.195, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.8677778, "label": "after 94 (NearMode)", "dt": 1.208, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.8808832, "label": "after 94 (NearMode)", "dt": 1.221, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.8939412, "label": "after 94 (NearMode)", "dt": 1.234, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.9069054, "label": "after 94 (NearMode)", "dt": 1.247, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.919994, "label": "after 94 (NearMode)", "dt": 1.26, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.9330997, "label": "after 94 (NearMode)", "dt": 1.273, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.9461036, "label": "after 94 (NearMode)", "dt": 1.286, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.9589188, "label": "after 94 (NearMode)", "dt": 1.299, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.971623, "label": "after 94 (NearMode)", "dt": 1.312, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.984553, "label": "after 94 (NearMode)", "dt": 1.325, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852151.9975579, "label": "after 94 (NearMode)", "dt": 1.338, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.0105603, "label": "after 94 (NearMode)", "dt": 1.351, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.0235357, "label": "after 94 (NearMode)", "dt": 1.364, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.036877, "label": "after 94 (NearMode)", "dt": 1.377, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.050404, "label": "after 94 (NearMode)", "dt": 1.391, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.0641124, "label": "after 94 (NearMode)", "dt": 1.404, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.0772057, "label": "after 94 (NearMode)", "dt": 1.418, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.0900242, "label": "after 94 (NearMode)", "dt": 1.43, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.1028376, "label": "after 94 (NearMode)", "dt": 1.443, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.1169057, "label": "after 94 (NearMode)", "dt": 1.457, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.1311867, "label": "after 94 (NearMode)", "dt": 1.472, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.145789, "label": "after 94 (NearMode)", "dt": 1.486, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.160195, "label": "after 94 (NearMode)", "dt": 1.501, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.1738918, "label": "after 94 (NearMode)", "dt": 1.514, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.1881497, "label": "after 94 (NearMode)", "dt": 1.528, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.2027383, "label": "after 94 (NearMode)", "dt": 1.543, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.2168436, "label": "after 94 (NearMode)", "dt": 1.557, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.2300186, "label": "after 94 (NearMode)", "dt": 1.57, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.2430532, "label": "after 94 (NearMode)", "dt": 1.583, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.2563722, "label": "after 94 (NearMode)", "dt": 1.597, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.2692237, "label": "after 94 (NearMode)", "dt": 1.61, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.2821414, "label": "after 94 (NearMode)", "dt": 1.622, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.2948396, "label": "after 94 (NearMode)", "dt": 1.635, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.3080473, "label": "after 94 (NearMode)", "dt": 1.648, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.3210907, "label": "after 94 (NearMode)", "dt": 1.661, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.3340642, "label": "after 94 (NearMode)", "dt": 1.674, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.346937, "label": "after 94 (NearMode)", "dt": 1.687, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.359636, "label": "after 94 (NearMode)", "dt": 1.7, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.372353, "label": "after 94 (NearMode)", "dt": 1.713, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.3852458, "label": "after 94 (NearMode)", "dt": 1.726, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.398317, "label": "after 94 (NearMode)", "dt": 1.739, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.411377, "label": "after 94 (NearMode)", "dt": 1.752, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.4275877, "label": "after 94 (NearMode)", "dt": 1.768, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.4437602, "label": "after 94 (NearMode)", "dt": 1.784, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.4576747, "label": "after 94 (NearMode)", "dt": 1.798, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.4717615, "label": "after 94 (NearMode)", "dt": 1.812, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.4848619, "label": "after 94 (NearMode)", "dt": 1.825, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.498244, "label": "after 94 (NearMode)", "dt": 1.839, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.5116408, "label": "after 94 (NearMode)", "dt": 1.852, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.5249424, "label": "after 94 (NearMode)", "dt": 1.865, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.539304, "label": "after 94 (NearMode)", "dt": 1.88, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.5530849, "label": "after 94 (NearMode)", "dt": 1.893, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.5661232, "label": "after 94 (NearMode)", "dt": 1.906, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.5790098, "label": "after 94 (NearMode)", "dt": 1.919, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.5922034, "label": "after 94 (NearMode)", "dt": 1.933, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.6050367, "label": "after 94 (NearMode)", "dt": 1.945, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.6181223, "label": "after 94 (NearMode)", "dt": 1.958, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.6308985, "label": "after 94 (NearMode)", "dt": 1.971, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.6439083, "label": "after 94 (NearMode)", "dt": 1.984, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.6575334, "label": "after 94 (NearMode)", "dt": 1.998, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.6703079, "label": "after 94 (NearMode)", "dt": 2.011, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.6833003, "label": "after 94 (NearMode)", "dt": 2.024, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.6963491, "label": "after 94 (NearMode)", "dt": 2.037, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.709592, "label": "after 94 (NearMode)", "dt": 2.05, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.7224128, "label": "after 94 (NearMode)", "dt": 2.063, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.7353032, "label": "after 94 (NearMode)", "dt": 2.076, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.7483785, "label": "after 94 (NearMode)", "dt": 2.089, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.7615194, "label": "after 94 (NearMode)", "dt": 2.102, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.7748713, "label": "after 94 (NearMode)", "dt": 2.115, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.7889183, "label": "after 94 (NearMode)", "dt": 2.129, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.803317, "label": "after 94 (NearMode)", "dt": 2.144, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.8185747, "label": "after 94 (NearMode)", "dt": 2.159, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.832361, "label": "after 94 (NearMode)", "dt": 2.173, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.845269, "label": "after 94 (NearMode)", "dt": 2.186, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.8583815, "label": "after 94 (NearMode)", "dt": 2.199, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.8713353, "label": "after 94 (NearMode)", "dt": 2.212, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.8841379, "label": "after 94 (NearMode)", "dt": 2.224, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.8988707, "label": "after 94 (NearMode)", "dt": 2.239, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.9116442, "label": "after 94 (NearMode)", "dt": 2.252, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.9246323, "label": "after 94 (NearMode)", "dt": 2.265, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.9380786, "label": "after 94 (NearMode)", "dt": 2.278, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.9510798, "label": "after 94 (NearMode)", "dt": 2.291, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.9639635, "label": "after 94 (NearMode)", "dt": 2.304, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.9768279, "label": "after 94 (NearMode)", "dt": 2.317, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852152.9895535, "label": "after 94 (NearMode)", "dt": 2.33, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.0028188, "label": "after 94 (NearMode)", "dt": 2.343, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.0157404, "label": "after 94 (NearMode)", "dt": 2.356, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.02872, "label": "after 94 (NearMode)", "dt": 2.369, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.0415833, "label": "after 94 (NearMode)", "dt": 2.382, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.054282, "label": "after 94 (NearMode)", "dt": 2.395, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.067029, "label": "after 94 (NearMode)", "dt": 2.407, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.0797799, "label": "after 94 (NearMode)", "dt": 2.42, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.092389, "label": "after 94 (NearMode)", "dt": 2.433, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.1051912, "label": "after 94 (NearMode)", "dt": 2.446, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.117957, "label": "after 94 (NearMode)", "dt": 2.458, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.1307223, "label": "after 94 (NearMode)", "dt": 2.471, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.1435807, "label": "after 94 (NearMode)", "dt": 2.484, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.1575904, "label": "after 94 (NearMode)", "dt": 2.498, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.1715813, "label": "after 94 (NearMode)", "dt": 2.512, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.1846955, "label": "after 94 (NearMode)", "dt": 2.525, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.197474, "label": "after 94 (NearMode)", "dt": 2.538, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.2109957, "label": "after 94 (NearMode)", "dt": 2.551, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.224362, "label": "after 94 (NearMode)", "dt": 2.565, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.2373922, "label": "after 94 (NearMode)", "dt": 2.578, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.250627, "label": "after 94 (NearMode)", "dt": 2.591, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.2632546, "label": "after 94 (NearMode)", "dt": 2.604, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.2760897, "label": "after 94 (NearMode)", "dt": 2.616, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.2890291, "label": "after 94 (NearMode)", "dt": 2.629, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.3017647, "label": "after 94 (NearMode)", "dt": 2.642, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.3147743, "label": "after 94 (NearMode)", "dt": 2.655, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.3277328, "label": "after 94 (NearMode)", "dt": 2.668, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.340579, "label": "after 94 (NearMode)", "dt": 2.681, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.3535879, "label": "after 94 (NearMode)", "dt": 2.694, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.3663332, "label": "after 94 (NearMode)", "dt": 2.707, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.378993, "label": "after 94 (NearMode)", "dt": 2.719, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.3917935, "label": "after 94 (NearMode)", "dt": 2.732, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.4047682, "label": "after 94 (NearMode)", "dt": 2.745, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.4173813, "label": "after 94 (NearMode)", "dt": 2.758, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.430574, "label": "after 94 (NearMode)", "dt": 2.771, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.443175, "label": "after 94 (NearMode)", "dt": 2.784, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.4560905, "label": "after 94 (NearMode)", "dt": 2.796, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.4689786, "label": "after 94 (NearMode)", "dt": 2.809, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.4815297, "label": "after 94 (NearMode)", "dt": 2.822, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.494525, "label": "after 94 (NearMode)", "dt": 2.835, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.5072715, "label": "after 94 (NearMode)", "dt": 2.848, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.5211735, "label": "after 94 (NearMode)", "dt": 2.862, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.5347984, "label": "after 94 (NearMode)", "dt": 2.875, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.5488632, "label": "after 94 (NearMode)", "dt": 2.889, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.5623217, "label": "after 94 (NearMode)", "dt": 2.903, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.5753055, "label": "after 94 (NearMode)", "dt": 2.916, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.588258, "label": "after 94 (NearMode)", "dt": 2.929, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.6013074, "label": "after 94 (NearMode)", "dt": 2.942, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.6141932, "label": "after 94 (NearMode)", "dt": 2.955, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.6271448, "label": "after 94 (NearMode)", "dt": 2.967, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.639981, "label": "after 94 (NearMode)", "dt": 2.98, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852153.6543567, "label": "after 94 (NearMode)", "dt": 2.995, "enc": 32940, "err": 44, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852155.0746565, "label": "after 94 (mode off)", "dt": 0.007, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.0871353, "label": "after 94 (mode off)", "dt": 0.02, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.1003706, "label": "after 94 (mode off)", "dt": 0.033, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.1136875, "label": "after 94 (mode off)", "dt": 0.046, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.1265504, "label": "after 94 (mode off)", "dt": 0.059, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.1393669, "label": "after 94 (mode off)", "dt": 0.072, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.152386, "label": "after 94 (mode off)", "dt": 0.085, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.1653001, "label": "after 94 (mode off)", "dt": 0.098, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.1781976, "label": "after 94 (mode off)", "dt": 0.111, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.1935809, "label": "after 94 (mode off)", "dt": 0.126, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.2077034, "label": "after 94 (mode off)", "dt": 0.14, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.2215722, "label": "after 94 (mode off)", "dt": 0.154, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.2352998, "label": "after 94 (mode off)", "dt": 0.168, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.2483206, "label": "after 94 (mode off)", "dt": 0.181, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.2614782, "label": "after 94 (mode off)", "dt": 0.194, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.2744694, "label": "after 94 (mode off)", "dt": 0.207, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.2877462, "label": "after 94 (mode off)", "dt": 0.22, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.3006368, "label": "after 94 (mode off)", "dt": 0.233, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.313266, "label": "after 94 (mode off)", "dt": 0.246, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.3261945, "label": "after 94 (mode off)", "dt": 0.259, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.3393095, "label": "after 94 (mode off)", "dt": 0.272, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.3526447, "label": "after 94 (mode off)", "dt": 0.285, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.3658657, "label": "after 94 (mode off)", "dt": 0.299, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.3786814, "label": "after 94 (mode off)", "dt": 0.311, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.3919163, "label": "after 94 (mode off)", "dt": 0.325, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.4052775, "label": "after 94 (mode off)", "dt": 0.338, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.4192822, "label": "after 94 (mode off)", "dt": 0.352, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.4322846, "label": "after 94 (mode off)", "dt": 0.365, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.4467282, "label": "after 94 (mode off)", "dt": 0.379, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.4608278, "label": "after 94 (mode off)", "dt": 0.394, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.4751053, "label": "after 94 (mode off)", "dt": 0.408, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.4886591, "label": "after 94 (mode off)", "dt": 0.421, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.501298, "label": "after 94 (mode off)", "dt": 0.434, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.514166, "label": "after 94 (mode off)", "dt": 0.447, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.5273001, "label": "after 94 (mode off)", "dt": 0.46, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.540283, "label": "after 94 (mode off)", "dt": 0.473, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.5531938, "label": "after 94 (mode off)", "dt": 0.486, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.5672007, "label": "after 94 (mode off)", "dt": 0.5, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.5799165, "label": "after 94 (mode off)", "dt": 0.513, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.593125, "label": "after 94 (mode off)", "dt": 0.526, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.606201, "label": "after 94 (mode off)", "dt": 0.539, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.61941, "label": "after 94 (mode off)", "dt": 0.552, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.6323006, "label": "after 94 (mode off)", "dt": 0.565, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.6451802, "label": "after 94 (mode off)", "dt": 0.578, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.6579807, "label": "after 94 (mode off)", "dt": 0.591, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.6709504, "label": "after 94 (mode off)", "dt": 0.604, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.683963, "label": "after 94 (mode off)", "dt": 0.617, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.6968234, "label": "after 94 (mode off)", "dt": 0.63, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.709738, "label": "after 94 (mode off)", "dt": 0.642, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.724325, "label": "after 94 (mode off)", "dt": 0.657, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.7391737, "label": "after 94 (mode off)", "dt": 0.672, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.753186, "label": "after 94 (mode off)", "dt": 0.686, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.7676342, "label": "after 94 (mode off)", "dt": 0.7, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.7823312, "label": "after 94 (mode off)", "dt": 0.715, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.796593, "label": "after 94 (mode off)", "dt": 0.729, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.8115942, "label": "after 94 (mode off)", "dt": 0.744, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.8288946, "label": "after 94 (mode off)", "dt": 0.762, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.842763, "label": "after 94 (mode off)", "dt": 0.775, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.85719, "label": "after 94 (mode off)", "dt": 0.79, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.8711586, "label": "after 94 (mode off)", "dt": 0.804, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.8841186, "label": "after 94 (mode off)", "dt": 0.817, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.8969138, "label": "after 94 (mode off)", "dt": 0.83, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.9103496, "label": "after 94 (mode off)", "dt": 0.843, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.9234018, "label": "after 94 (mode off)", "dt": 0.856, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.9368289, "label": "after 94 (mode off)", "dt": 0.87, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.949934, "label": "after 94 (mode off)", "dt": 0.883, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.9627366, "label": "after 94 (mode off)", "dt": 0.895, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.9757538, "label": "after 94 (mode off)", "dt": 0.908, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852155.9886181, "label": "after 94 (mode off)", "dt": 0.921, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.0014718, "label": "after 94 (mode off)", "dt": 0.934, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.0141938, "label": "after 94 (mode off)", "dt": 0.947, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.0268888, "label": "after 94 (mode off)", "dt": 0.96, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.0398302, "label": "after 94 (mode off)", "dt": 0.973, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.0527067, "label": "after 94 (mode off)", "dt": 0.985, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.0671136, "label": "after 94 (mode off)", "dt": 1.0, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.0798137, "label": "after 94 (mode off)", "dt": 1.013, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.0928721, "label": "after 94 (mode off)", "dt": 1.026, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.105642, "label": "after 94 (mode off)", "dt": 1.038, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.118461, "label": "after 94 (mode off)", "dt": 1.051, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.1318636, "label": "after 94 (mode off)", "dt": 1.065, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.1461635, "label": "after 94 (mode off)", "dt": 1.079, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.160036, "label": "after 94 (mode off)", "dt": 1.093, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.174415, "label": "after 94 (mode off)", "dt": 1.107, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.1899912, "label": "after 94 (mode off)", "dt": 1.123, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.2050276, "label": "after 94 (mode off)", "dt": 1.138, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.218949, "label": "after 94 (mode off)", "dt": 1.152, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.232875, "label": "after 94 (mode off)", "dt": 1.166, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.2466538, "label": "after 94 (mode off)", "dt": 1.179, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.2598271, "label": "after 94 (mode off)", "dt": 1.193, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.2726824, "label": "after 94 (mode off)", "dt": 1.205, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.2859862, "label": "after 94 (mode off)", "dt": 1.219, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.2987905, "label": "after 94 (mode off)", "dt": 1.231, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.312012, "label": "after 94 (mode off)", "dt": 1.245, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.3260229, "label": "after 94 (mode off)", "dt": 1.259, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.3389528, "label": "after 94 (mode off)", "dt": 1.272, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.3517554, "label": "after 94 (mode off)", "dt": 1.284, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.3648367, "label": "after 94 (mode off)", "dt": 1.298, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.377673, "label": "after 94 (mode off)", "dt": 1.31, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.3907597, "label": "after 94 (mode off)", "dt": 1.323, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.4046235, "label": "after 94 (mode off)", "dt": 1.337, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.4203403, "label": "after 94 (mode off)", "dt": 1.353, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.435862, "label": "after 94 (mode off)", "dt": 1.369, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.4500663, "label": "after 94 (mode off)", "dt": 1.383, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.4642274, "label": "after 94 (mode off)", "dt": 1.397, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.4788878, "label": "after 94 (mode off)", "dt": 1.412, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.4928439, "label": "after 94 (mode off)", "dt": 1.426, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.5065238, "label": "after 94 (mode off)", "dt": 1.439, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.5197854, "label": "after 94 (mode off)", "dt": 1.452, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.5330763, "label": "after 94 (mode off)", "dt": 1.466, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.5487275, "label": "after 94 (mode off)", "dt": 1.481, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.564662, "label": "after 94 (mode off)", "dt": 1.497, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.5786538, "label": "after 94 (mode off)", "dt": 1.511, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.5917335, "label": "after 94 (mode off)", "dt": 1.524, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.6050637, "label": "after 94 (mode off)", "dt": 1.538, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.618348, "label": "after 94 (mode off)", "dt": 1.551, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.6317413, "label": "after 94 (mode off)", "dt": 1.564, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.6454177, "label": "after 94 (mode off)", "dt": 1.578, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.6588016, "label": "after 94 (mode off)", "dt": 1.592, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.6722214, "label": "after 94 (mode off)", "dt": 1.605, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.686734, "label": "after 94 (mode off)", "dt": 1.619, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.7000284, "label": "after 94 (mode off)", "dt": 1.633, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.712968, "label": "after 94 (mode off)", "dt": 1.646, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.7258294, "label": "after 94 (mode off)", "dt": 1.659, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.7388103, "label": "after 94 (mode off)", "dt": 1.672, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.7521632, "label": "after 94 (mode off)", "dt": 1.685, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.764987, "label": "after 94 (mode off)", "dt": 1.698, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.7777672, "label": "after 94 (mode off)", "dt": 1.71, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.7911131, "label": "after 94 (mode off)", "dt": 1.724, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.804041, "label": "after 94 (mode off)", "dt": 1.737, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.8196442, "label": "after 94 (mode off)", "dt": 1.752, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.8357432, "label": "after 94 (mode off)", "dt": 1.768, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.8497167, "label": "after 94 (mode off)", "dt": 1.782, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.862933, "label": "after 94 (mode off)", "dt": 1.796, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.8767838, "label": "after 94 (mode off)", "dt": 1.809, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.889895, "label": "after 94 (mode off)", "dt": 1.823, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.9027333, "label": "after 94 (mode off)", "dt": 1.835, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.915707, "label": "after 94 (mode off)", "dt": 1.848, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.9284825, "label": "after 94 (mode off)", "dt": 1.861, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.942187, "label": "after 94 (mode off)", "dt": 1.875, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.9549766, "label": "after 94 (mode off)", "dt": 1.888, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.9678345, "label": "after 94 (mode off)", "dt": 1.901, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.9811068, "label": "after 94 (mode off)", "dt": 1.914, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852156.9942899, "label": "after 94 (mode off)", "dt": 1.927, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852157.0075054, "label": "after 94 (mode off)", "dt": 1.94, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852157.0205204, "label": "after 94 (mode off)", "dt": 1.953, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852157.0333686, "label": "after 94 (mode off)", "dt": 1.966, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852157.0464034, "label": "after 94 (mode off)", "dt": 1.979, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852157.0593169, "label": "after 94 (mode off)", "dt": 1.992, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852157.0720778, "label": "after 94 (mode off)", "dt": 2.005, "enc": 27447, "err": -3, "enabled": true, "pulses": -541}
+{"type": "zerodiag", "t": 1791852157.0991514, "label": "after 94 (DirMode)", "dt": 0.007, "enc": 27447, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.1121702, "label": "after 94 (DirMode)", "dt": 0.02, "enc": 27447, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.125099, "label": "after 94 (DirMode)", "dt": 0.033, "enc": 27447, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.1380408, "label": "after 94 (DirMode)", "dt": 0.046, "enc": 27447, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.1509125, "label": "after 94 (DirMode)", "dt": 0.059, "enc": 27447, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.1639097, "label": "after 94 (DirMode)", "dt": 0.072, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.1767771, "label": "after 94 (DirMode)", "dt": 0.085, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.189648, "label": "after 94 (DirMode)", "dt": 0.098, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.2026148, "label": "after 94 (DirMode)", "dt": 0.111, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.2158413, "label": "after 94 (DirMode)", "dt": 0.124, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.228778, "label": "after 94 (DirMode)", "dt": 0.137, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.2426903, "label": "after 94 (DirMode)", "dt": 0.151, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.2568905, "label": "after 94 (DirMode)", "dt": 0.165, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.270789, "label": "after 94 (DirMode)", "dt": 0.179, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.283941, "label": "after 94 (DirMode)", "dt": 0.192, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.296966, "label": "after 94 (DirMode)", "dt": 0.205, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.309806, "label": "after 94 (DirMode)", "dt": 0.218, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.3227327, "label": "after 94 (DirMode)", "dt": 0.231, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.3357666, "label": "after 94 (DirMode)", "dt": 0.244, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.3486392, "label": "after 94 (DirMode)", "dt": 0.257, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.361642, "label": "after 94 (DirMode)", "dt": 0.27, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.3747027, "label": "after 94 (DirMode)", "dt": 0.283, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.3914175, "label": "after 94 (DirMode)", "dt": 0.3, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.4042768, "label": "after 94 (DirMode)", "dt": 0.313, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.4177198, "label": "after 94 (DirMode)", "dt": 0.326, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.430853, "label": "after 94 (DirMode)", "dt": 0.339, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.443963, "label": "after 94 (DirMode)", "dt": 0.352, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.457594, "label": "after 94 (DirMode)", "dt": 0.366, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.4706137, "label": "after 94 (DirMode)", "dt": 0.379, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.4846978, "label": "after 94 (DirMode)", "dt": 0.393, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.4982433, "label": "after 94 (DirMode)", "dt": 0.407, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.511852, "label": "after 94 (DirMode)", "dt": 0.42, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.525859, "label": "after 94 (DirMode)", "dt": 0.434, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.5391319, "label": "after 94 (DirMode)", "dt": 0.447, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.5521388, "label": "after 94 (DirMode)", "dt": 0.46, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.5651672, "label": "after 94 (DirMode)", "dt": 0.473, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.5779574, "label": "after 94 (DirMode)", "dt": 0.486, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.591416, "label": "after 94 (DirMode)", "dt": 0.5, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.6047535, "label": "after 94 (DirMode)", "dt": 0.513, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.6177115, "label": "after 94 (DirMode)", "dt": 0.526, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.6305041, "label": "after 94 (DirMode)", "dt": 0.539, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.643508, "label": "after 94 (DirMode)", "dt": 0.552, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.6563606, "label": "after 94 (DirMode)", "dt": 0.565, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.669771, "label": "after 94 (DirMode)", "dt": 0.578, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.6827595, "label": "after 94 (DirMode)", "dt": 0.591, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.6953807, "label": "after 94 (DirMode)", "dt": 0.604, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.7080867, "label": "after 94 (DirMode)", "dt": 0.616, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.7208452, "label": "after 94 (DirMode)", "dt": 0.629, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.7339213, "label": "after 94 (DirMode)", "dt": 0.642, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.7468326, "label": "after 94 (DirMode)", "dt": 0.655, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.7598195, "label": "after 94 (DirMode)", "dt": 0.668, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.7725005, "label": "after 94 (DirMode)", "dt": 0.681, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.7854676, "label": "after 94 (DirMode)", "dt": 0.694, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.7983549, "label": "after 94 (DirMode)", "dt": 0.707, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.8110795, "label": "after 94 (DirMode)", "dt": 0.719, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.824576, "label": "after 94 (DirMode)", "dt": 0.733, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.8377452, "label": "after 94 (DirMode)", "dt": 0.746, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.8507643, "label": "after 94 (DirMode)", "dt": 0.759, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.8643644, "label": "after 94 (DirMode)", "dt": 0.773, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.8781173, "label": "after 94 (DirMode)", "dt": 0.786, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.892974, "label": "after 94 (DirMode)", "dt": 0.801, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.906336, "label": "after 94 (DirMode)", "dt": 0.815, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.9189603, "label": "after 94 (DirMode)", "dt": 0.827, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.9318774, "label": "after 94 (DirMode)", "dt": 0.84, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.944583, "label": "after 94 (DirMode)", "dt": 0.853, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.9573908, "label": "after 94 (DirMode)", "dt": 0.866, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.9699876, "label": "after 94 (DirMode)", "dt": 0.878, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.9847152, "label": "after 94 (DirMode)", "dt": 0.893, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852157.9977968, "label": "after 94 (DirMode)", "dt": 0.906, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.0107954, "label": "after 94 (DirMode)", "dt": 0.919, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.023643, "label": "after 94 (DirMode)", "dt": 0.932, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.0361497, "label": "after 94 (DirMode)", "dt": 0.944, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.049038, "label": "after 94 (DirMode)", "dt": 0.957, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.0625236, "label": "after 94 (DirMode)", "dt": 0.971, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.0755277, "label": "after 94 (DirMode)", "dt": 0.984, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.0887105, "label": "after 94 (DirMode)", "dt": 0.997, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.1015277, "label": "after 94 (DirMode)", "dt": 1.01, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.1153243, "label": "after 94 (DirMode)", "dt": 1.024, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.1290843, "label": "after 94 (DirMode)", "dt": 1.037, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.1438003, "label": "after 94 (DirMode)", "dt": 1.052, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.1582687, "label": "after 94 (DirMode)", "dt": 1.067, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.173367, "label": "after 94 (DirMode)", "dt": 1.082, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.1872215, "label": "after 94 (DirMode)", "dt": 1.095, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.2016933, "label": "after 94 (DirMode)", "dt": 1.11, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.2156608, "label": "after 94 (DirMode)", "dt": 1.124, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.2286544, "label": "after 94 (DirMode)", "dt": 1.137, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.2420497, "label": "after 94 (DirMode)", "dt": 1.15, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.2549286, "label": "after 94 (DirMode)", "dt": 1.163, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.2682114, "label": "after 94 (DirMode)", "dt": 1.176, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.2817075, "label": "after 94 (DirMode)", "dt": 1.19, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.2945573, "label": "after 94 (DirMode)", "dt": 1.203, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.3076441, "label": "after 94 (DirMode)", "dt": 1.216, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.3205137, "label": "after 94 (DirMode)", "dt": 1.229, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.33343, "label": "after 94 (DirMode)", "dt": 1.242, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.346292, "label": "after 94 (DirMode)", "dt": 1.255, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.3603895, "label": "after 94 (DirMode)", "dt": 1.269, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.3745666, "label": "after 94 (DirMode)", "dt": 1.283, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.3885875, "label": "after 94 (DirMode)", "dt": 1.297, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.402136, "label": "after 94 (DirMode)", "dt": 1.31, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.41539, "label": "after 94 (DirMode)", "dt": 1.324, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.4282527, "label": "after 94 (DirMode)", "dt": 1.337, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.4411001, "label": "after 94 (DirMode)", "dt": 1.349, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.4538238, "label": "after 94 (DirMode)", "dt": 1.362, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.4666493, "label": "after 94 (DirMode)", "dt": 1.375, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.4796913, "label": "after 94 (DirMode)", "dt": 1.388, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.492964, "label": "after 94 (DirMode)", "dt": 1.401, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.5056891, "label": "after 94 (DirMode)", "dt": 1.414, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.518743, "label": "after 94 (DirMode)", "dt": 1.427, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.531565, "label": "after 94 (DirMode)", "dt": 1.44, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.5443149, "label": "after 94 (DirMode)", "dt": 1.453, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.5572941, "label": "after 94 (DirMode)", "dt": 1.466, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.5700638, "label": "after 94 (DirMode)", "dt": 1.478, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.582743, "label": "after 94 (DirMode)", "dt": 1.491, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.5954766, "label": "after 94 (DirMode)", "dt": 1.504, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.609526, "label": "after 94 (DirMode)", "dt": 1.518, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.6227398, "label": "after 94 (DirMode)", "dt": 1.531, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.6355417, "label": "after 94 (DirMode)", "dt": 1.544, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.6483746, "label": "after 94 (DirMode)", "dt": 1.557, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.6612067, "label": "after 94 (DirMode)", "dt": 1.569, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.6743228, "label": "after 94 (DirMode)", "dt": 1.583, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.6871219, "label": "after 94 (DirMode)", "dt": 1.595, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.700263, "label": "after 94 (DirMode)", "dt": 1.609, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.7131422, "label": "after 94 (DirMode)", "dt": 1.621, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.7260122, "label": "after 94 (DirMode)", "dt": 1.634, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.742731, "label": "after 94 (DirMode)", "dt": 1.651, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.7566354, "label": "after 94 (DirMode)", "dt": 1.665, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.7702057, "label": "after 94 (DirMode)", "dt": 1.678, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.7834904, "label": "after 94 (DirMode)", "dt": 1.692, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.7962558, "label": "after 94 (DirMode)", "dt": 1.705, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.8093622, "label": "after 94 (DirMode)", "dt": 1.718, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.8226137, "label": "after 94 (DirMode)", "dt": 1.731, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.8354993, "label": "after 94 (DirMode)", "dt": 1.744, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.848527, "label": "after 94 (DirMode)", "dt": 1.757, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.8626018, "label": "after 94 (DirMode)", "dt": 1.771, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.8752825, "label": "after 94 (DirMode)", "dt": 1.784, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.8880937, "label": "after 94 (DirMode)", "dt": 1.796, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.901002, "label": "after 94 (DirMode)", "dt": 1.809, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.9148967, "label": "after 94 (DirMode)", "dt": 1.823, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.9276683, "label": "after 94 (DirMode)", "dt": 1.836, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.9403732, "label": "after 94 (DirMode)", "dt": 1.849, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.9534783, "label": "after 94 (DirMode)", "dt": 1.862, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.9662611, "label": "after 94 (DirMode)", "dt": 1.875, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.9792066, "label": "after 94 (DirMode)", "dt": 1.887, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852158.9937615, "label": "after 94 (DirMode)", "dt": 1.902, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.0077574, "label": "after 94 (DirMode)", "dt": 1.916, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.0217485, "label": "after 94 (DirMode)", "dt": 1.93, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.0347812, "label": "after 94 (DirMode)", "dt": 1.943, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.0481577, "label": "after 94 (DirMode)", "dt": 1.956, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.0612257, "label": "after 94 (DirMode)", "dt": 1.97, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.077644, "label": "after 94 (DirMode)", "dt": 1.986, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.0915554, "label": "after 94 (DirMode)", "dt": 2.0, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.1045535, "label": "after 94 (DirMode)", "dt": 2.013, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.1198456, "label": "after 94 (DirMode)", "dt": 2.028, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.1352699, "label": "after 94 (DirMode)", "dt": 2.044, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.1507876, "label": "after 94 (DirMode)", "dt": 2.059, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.1651857, "label": "after 94 (DirMode)", "dt": 2.073, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.1808977, "label": "after 94 (DirMode)", "dt": 2.089, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.1968322, "label": "after 94 (DirMode)", "dt": 2.105, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.2123742, "label": "after 94 (DirMode)", "dt": 2.121, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.2275724, "label": "after 94 (DirMode)", "dt": 2.136, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.2406526, "label": "after 94 (DirMode)", "dt": 2.149, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.2539904, "label": "after 94 (DirMode)", "dt": 2.162, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.2701037, "label": "after 94 (DirMode)", "dt": 2.178, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.2840831, "label": "after 94 (DirMode)", "dt": 2.192, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.3008926, "label": "after 94 (DirMode)", "dt": 2.209, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.3152375, "label": "after 94 (DirMode)", "dt": 2.224, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.3306212, "label": "after 94 (DirMode)", "dt": 2.239, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.3472133, "label": "after 94 (DirMode)", "dt": 2.255, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.3626273, "label": "after 94 (DirMode)", "dt": 2.271, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.37732, "label": "after 94 (DirMode)", "dt": 2.286, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.3918743, "label": "after 94 (DirMode)", "dt": 2.3, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.4057426, "label": "after 94 (DirMode)", "dt": 2.314, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.4197602, "label": "after 94 (DirMode)", "dt": 2.328, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.4329178, "label": "after 94 (DirMode)", "dt": 2.341, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.4463322, "label": "after 94 (DirMode)", "dt": 2.355, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.4596415, "label": "after 94 (DirMode)", "dt": 2.368, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.4729602, "label": "after 94 (DirMode)", "dt": 2.381, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.486228, "label": "after 94 (DirMode)", "dt": 2.395, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.4998968, "label": "after 94 (DirMode)", "dt": 2.408, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.5137348, "label": "after 94 (DirMode)", "dt": 2.422, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.5280254, "label": "after 94 (DirMode)", "dt": 2.436, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.5413437, "label": "after 94 (DirMode)", "dt": 2.45, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.5548682, "label": "after 94 (DirMode)", "dt": 2.463, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.569202, "label": "after 94 (DirMode)", "dt": 2.477, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.584986, "label": "after 94 (DirMode)", "dt": 2.493, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.598756, "label": "after 94 (DirMode)", "dt": 2.507, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.6123197, "label": "after 94 (DirMode)", "dt": 2.521, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.625846, "label": "after 94 (DirMode)", "dt": 2.534, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.6399162, "label": "after 94 (DirMode)", "dt": 2.548, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.6569817, "label": "after 94 (DirMode)", "dt": 2.565, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.6708214, "label": "after 94 (DirMode)", "dt": 2.579, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.6848466, "label": "after 94 (DirMode)", "dt": 2.593, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.6989698, "label": "after 94 (DirMode)", "dt": 2.607, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.7132378, "label": "after 94 (DirMode)", "dt": 2.622, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.7289963, "label": "after 94 (DirMode)", "dt": 2.637, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.7425435, "label": "after 94 (DirMode)", "dt": 2.651, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.7558856, "label": "after 94 (DirMode)", "dt": 2.664, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.7697809, "label": "after 94 (DirMode)", "dt": 2.678, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.7836173, "label": "after 94 (DirMode)", "dt": 2.692, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.79692, "label": "after 94 (DirMode)", "dt": 2.705, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.8126476, "label": "after 94 (DirMode)", "dt": 2.721, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.8270335, "label": "after 94 (DirMode)", "dt": 2.735, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.8408837, "label": "after 94 (DirMode)", "dt": 2.749, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.854851, "label": "after 94 (DirMode)", "dt": 2.763, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.8683102, "label": "after 94 (DirMode)", "dt": 2.777, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.8838136, "label": "after 94 (DirMode)", "dt": 2.792, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.8980818, "label": "after 94 (DirMode)", "dt": 2.806, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.9117312, "label": "after 94 (DirMode)", "dt": 2.82, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.9272385, "label": "after 94 (DirMode)", "dt": 2.836, "enc": 27451, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.9408405, "label": "after 94 (DirMode)", "dt": 2.849, "enc": 27451, "err": -3, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.9542632, "label": "after 94 (DirMode)", "dt": 2.863, "enc": 27451, "err": -3, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.9679737, "label": "after 94 (DirMode)", "dt": 2.876, "enc": 27447, "err": -3, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.9829435, "label": "after 94 (DirMode)", "dt": 2.891, "enc": 27447, "err": -3, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852159.9962726, "label": "after 94 (DirMode)", "dt": 2.905, "enc": 27447, "err": -3, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852160.009978, "label": "after 94 (DirMode)", "dt": 2.918, "enc": 27447, "err": -3, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852160.024342, "label": "after 94 (DirMode)", "dt": 2.933, "enc": 27447, "err": -3, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852160.0388246, "label": "after 94 (DirMode)", "dt": 2.947, "enc": 27447, "err": -3, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852160.0527458, "label": "after 94 (DirMode)", "dt": 2.961, "enc": 27447, "err": -3, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852160.0672688, "label": "after 94 (DirMode)", "dt": 2.976, "enc": 27447, "err": -3, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852160.0807374, "label": "after 94 (DirMode)", "dt": 2.989, "enc": 27447, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852160.093805, "label": "after 94 (DirMode)", "dt": 3.002, "enc": 27447, "err": -7, "enabled": true, "pulses": 0}
+{"type": "zerodiag", "t": 1791852160.3510845, "label": "after 94 (mode off #2)", "dt": 0.01, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.365309, "label": "after 94 (mode off #2)", "dt": 0.024, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.3789234, "label": "after 94 (mode off #2)", "dt": 0.038, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.3966527, "label": "after 94 (mode off #2)", "dt": 0.055, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.4104269, "label": "after 94 (mode off #2)", "dt": 0.069, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.424713, "label": "after 94 (mode off #2)", "dt": 0.083, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.4392245, "label": "after 94 (mode off #2)", "dt": 0.098, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.4531677, "label": "after 94 (mode off #2)", "dt": 0.112, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.4689183, "label": "after 94 (mode off #2)", "dt": 0.128, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.4849792, "label": "after 94 (mode off #2)", "dt": 0.144, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.5007195, "label": "after 94 (mode off #2)", "dt": 0.159, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.516149, "label": "after 94 (mode off #2)", "dt": 0.175, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.5311298, "label": "after 94 (mode off #2)", "dt": 0.19, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.546835, "label": "after 94 (mode off #2)", "dt": 0.206, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.5602353, "label": "after 94 (mode off #2)", "dt": 0.219, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.5742338, "label": "after 94 (mode off #2)", "dt": 0.233, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.5899582, "label": "after 94 (mode off #2)", "dt": 0.249, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.6032035, "label": "after 94 (mode off #2)", "dt": 0.262, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.6181846, "label": "after 94 (mode off #2)", "dt": 0.277, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.632349, "label": "after 94 (mode off #2)", "dt": 0.291, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.6476471, "label": "after 94 (mode off #2)", "dt": 0.306, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.66377, "label": "after 94 (mode off #2)", "dt": 0.322, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.6781466, "label": "after 94 (mode off #2)", "dt": 0.337, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.6918848, "label": "after 94 (mode off #2)", "dt": 0.351, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.7058384, "label": "after 94 (mode off #2)", "dt": 0.365, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.7196538, "label": "after 94 (mode off #2)", "dt": 0.378, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.73348, "label": "after 94 (mode off #2)", "dt": 0.392, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.748896, "label": "after 94 (mode off #2)", "dt": 0.408, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.762339, "label": "after 94 (mode off #2)", "dt": 0.421, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.7787726, "label": "after 94 (mode off #2)", "dt": 0.437, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.7946212, "label": "after 94 (mode off #2)", "dt": 0.453, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.8090882, "label": "after 94 (mode off #2)", "dt": 0.468, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.8256755, "label": "after 94 (mode off #2)", "dt": 0.484, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.8394985, "label": "after 94 (mode off #2)", "dt": 0.498, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.8546128, "label": "after 94 (mode off #2)", "dt": 0.513, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.868084, "label": "after 94 (mode off #2)", "dt": 0.527, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.8815308, "label": "after 94 (mode off #2)", "dt": 0.54, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.8948786, "label": "after 94 (mode off #2)", "dt": 0.554, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.9083676, "label": "after 94 (mode off #2)", "dt": 0.567, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.92222, "label": "after 94 (mode off #2)", "dt": 0.581, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.9373162, "label": "after 94 (mode off #2)", "dt": 0.596, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.951176, "label": "after 94 (mode off #2)", "dt": 0.61, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.9643712, "label": "after 94 (mode off #2)", "dt": 0.623, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.9783924, "label": "after 94 (mode off #2)", "dt": 0.637, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852160.992662, "label": "after 94 (mode off #2)", "dt": 0.651, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.006183, "label": "after 94 (mode off #2)", "dt": 0.665, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.0207555, "label": "after 94 (mode off #2)", "dt": 0.679, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.0369723, "label": "after 94 (mode off #2)", "dt": 0.696, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.0518556, "label": "after 94 (mode off #2)", "dt": 0.711, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.0678902, "label": "after 94 (mode off #2)", "dt": 0.727, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.082108, "label": "after 94 (mode off #2)", "dt": 0.741, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.0968404, "label": "after 94 (mode off #2)", "dt": 0.756, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.111779, "label": "after 94 (mode off #2)", "dt": 0.77, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.1261547, "label": "after 94 (mode off #2)", "dt": 0.785, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.1399708, "label": "after 94 (mode off #2)", "dt": 0.799, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.1539948, "label": "after 94 (mode off #2)", "dt": 0.813, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.1681812, "label": "after 94 (mode off #2)", "dt": 0.827, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.1817863, "label": "after 94 (mode off #2)", "dt": 0.84, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.1951394, "label": "after 94 (mode off #2)", "dt": 0.854, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.2088184, "label": "after 94 (mode off #2)", "dt": 0.868, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.222507, "label": "after 94 (mode off #2)", "dt": 0.881, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.2369738, "label": "after 94 (mode off #2)", "dt": 0.896, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.2508898, "label": "after 94 (mode off #2)", "dt": 0.91, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.264758, "label": "after 94 (mode off #2)", "dt": 0.923, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.2791321, "label": "after 94 (mode off #2)", "dt": 0.938, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.2927923, "label": "after 94 (mode off #2)", "dt": 0.951, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.306858, "label": "after 94 (mode off #2)", "dt": 0.966, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.3206105, "label": "after 94 (mode off #2)", "dt": 0.979, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.3338604, "label": "after 94 (mode off #2)", "dt": 0.993, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.3468914, "label": "after 94 (mode off #2)", "dt": 1.006, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.3601992, "label": "after 94 (mode off #2)", "dt": 1.019, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.3748438, "label": "after 94 (mode off #2)", "dt": 1.034, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.388325, "label": "after 94 (mode off #2)", "dt": 1.047, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.4036222, "label": "after 94 (mode off #2)", "dt": 1.062, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.417061, "label": "after 94 (mode off #2)", "dt": 1.076, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.4307425, "label": "after 94 (mode off #2)", "dt": 1.089, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.4444652, "label": "after 94 (mode off #2)", "dt": 1.103, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.457603, "label": "after 94 (mode off #2)", "dt": 1.116, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.4705648, "label": "after 94 (mode off #2)", "dt": 1.129, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.4834788, "label": "after 94 (mode off #2)", "dt": 1.142, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.496314, "label": "after 94 (mode off #2)", "dt": 1.155, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.5090911, "label": "after 94 (mode off #2)", "dt": 1.168, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.5239615, "label": "after 94 (mode off #2)", "dt": 1.183, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.5374377, "label": "after 94 (mode off #2)", "dt": 1.196, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.5503728, "label": "after 94 (mode off #2)", "dt": 1.209, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.563871, "label": "after 94 (mode off #2)", "dt": 1.223, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.5773635, "label": "after 94 (mode off #2)", "dt": 1.236, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.5905387, "label": "after 94 (mode off #2)", "dt": 1.249, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.6040485, "label": "after 94 (mode off #2)", "dt": 1.263, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.6180704, "label": "after 94 (mode off #2)", "dt": 1.277, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.6317945, "label": "after 94 (mode off #2)", "dt": 1.29, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.6451583, "label": "after 94 (mode off #2)", "dt": 1.304, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.659054, "label": "after 94 (mode off #2)", "dt": 1.318, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.672942, "label": "after 94 (mode off #2)", "dt": 1.332, "enc": 27455, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.686344, "label": "after 94 (mode off #2)", "dt": 1.345, "enc": 27455, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.6992433, "label": "after 94 (mode off #2)", "dt": 1.358, "enc": 27455, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.7122996, "label": "after 94 (mode off #2)", "dt": 1.371, "enc": 27455, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.7256024, "label": "after 94 (mode off #2)", "dt": 1.384, "enc": 27459, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.7387214, "label": "after 94 (mode off #2)", "dt": 1.397, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.7515144, "label": "after 94 (mode off #2)", "dt": 1.41, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.7645268, "label": "after 94 (mode off #2)", "dt": 1.423, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.7782803, "label": "after 94 (mode off #2)", "dt": 1.437, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.7912366, "label": "after 94 (mode off #2)", "dt": 1.45, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.8041975, "label": "after 94 (mode off #2)", "dt": 1.463, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.8172178, "label": "after 94 (mode off #2)", "dt": 1.476, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.830201, "label": "after 94 (mode off #2)", "dt": 1.489, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.8432348, "label": "after 94 (mode off #2)", "dt": 1.502, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.8562338, "label": "after 94 (mode off #2)", "dt": 1.515, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.869164, "label": "after 94 (mode off #2)", "dt": 1.528, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.882488, "label": "after 94 (mode off #2)", "dt": 1.541, "enc": 27459, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.8957224, "label": "after 94 (mode off #2)", "dt": 1.554, "enc": 27459, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.9100907, "label": "after 94 (mode off #2)", "dt": 1.569, "enc": 27459, "err": 9, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.924169, "label": "after 94 (mode off #2)", "dt": 1.583, "enc": 27455, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.938097, "label": "after 94 (mode off #2)", "dt": 1.597, "enc": 27455, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.9529552, "label": "after 94 (mode off #2)", "dt": 1.612, "enc": 27455, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.9663558, "label": "after 94 (mode off #2)", "dt": 1.625, "enc": 27455, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.979627, "label": "after 94 (mode off #2)", "dt": 1.638, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852161.9926262, "label": "after 94 (mode off #2)", "dt": 1.651, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.005996, "label": "after 94 (mode off #2)", "dt": 1.665, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.0189767, "label": "after 94 (mode off #2)", "dt": 1.678, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.0320241, "label": "after 94 (mode off #2)", "dt": 1.691, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.0471063, "label": "after 94 (mode off #2)", "dt": 1.706, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.0602107, "label": "after 94 (mode off #2)", "dt": 1.719, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.073326, "label": "after 94 (mode off #2)", "dt": 1.732, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.0862706, "label": "after 94 (mode off #2)", "dt": 1.745, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.0992632, "label": "after 94 (mode off #2)", "dt": 1.758, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.112197, "label": "after 94 (mode off #2)", "dt": 1.771, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.125285, "label": "after 94 (mode off #2)", "dt": 1.784, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.1395102, "label": "after 94 (mode off #2)", "dt": 1.798, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.1559312, "label": "after 94 (mode off #2)", "dt": 1.815, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.1698995, "label": "after 94 (mode off #2)", "dt": 1.829, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.1844323, "label": "after 94 (mode off #2)", "dt": 1.843, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.198849, "label": "after 94 (mode off #2)", "dt": 1.858, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.2133954, "label": "after 94 (mode off #2)", "dt": 1.872, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.2273207, "label": "after 94 (mode off #2)", "dt": 1.886, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.2403293, "label": "after 94 (mode off #2)", "dt": 1.899, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.2535517, "label": "after 94 (mode off #2)", "dt": 1.912, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.2664025, "label": "after 94 (mode off #2)", "dt": 1.925, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.279237, "label": "after 94 (mode off #2)", "dt": 1.938, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.2922986, "label": "after 94 (mode off #2)", "dt": 1.951, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.304867, "label": "after 94 (mode off #2)", "dt": 1.964, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.3188505, "label": "after 94 (mode off #2)", "dt": 1.978, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.3321898, "label": "after 94 (mode off #2)", "dt": 1.991, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}
+{"type": "zerodiag", "t": 1791852162.345174, "label": "after 94 (mode off #2)", "dt": 2.004, "enc": 27459, "err": 5, "enabled": true, "pulses": 1}

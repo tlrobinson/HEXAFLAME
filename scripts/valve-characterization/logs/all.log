@@ -1,0 +1,65 @@
+logging to /mnt/share/ubuntu/worktrees/3d3af2d4-fffa-4b68-964b-b54dba068e53/calm-wanderer/scripts/valve-characterization/data/20261013-002046_all.jsonl
+  [00:20:46] psu Siglent Technologies,SPD3303X-E,SPD3XJGQ904563,1.01.01.03.11R1,V6.2
+  [00:20:47] setup: enc 25151, 548.690185546875 deg open, err -0.0054931640625, blocked False
+  [00:20:47] home: find the seat at low torque
+  move   1 home pre-open                open     4.7 rpm MaxT  500: target       19.6 deg in  0.96 s, peak err  1.01 deg, I 0.03 A
+  move   2 home approach                close    4.7 rpm MaxT  500: stall       206.9 deg in  8.23 s, peak err  8.14 deg, I 0.03 A
+  [00:20:56] seat at enc -8951
+  move   3 home back-off                open     4.7 rpm MaxT  500: target       14.9 deg in  0.79 s, peak err  5.93 deg, I 0.2 A
+  [00:20:57] travel: open at low torque until the open end (max 720.0 deg)
+  move   4 travel probe                 open     4.7 rpm MaxT  500: blocked     420.7 deg in 15.79 s, peak err  7.66 deg, I 0.03 A
+  [00:21:13] open end at 435.6 deg open
+  move   5 travel back-off              close    4.7 rpm MaxT  500: target       15.4 deg in  0.85 s, peak err  3.95 deg, I 0.12 A
+  [00:21:14] survey: window 30..406 deg open, torques [300, 400, 500, 700, 900, 1200], rpms [5.0, 10.0, 20.0, 40.0, 60.0, 90.0, 120.0]
+  move   6 survey start                 close   18.8 rpm MaxT  500: target      385.4 deg in  3.75 s, peak err  2.16 deg, I 0.03 A
+  move   7 survey T300 R5.0             open     4.7 rpm MaxT  300: target      370.0 deg in 13.46 s, peak err  2.59 deg, I 0.09 A
+  move   8 survey T300 R5.0             close    4.7 rpm MaxT  300: target      374.8 deg in 13.64 s, peak err  2.77 deg, I 0.04 A
+  move   9 survey T300 R10.0            open     9.4 rpm MaxT  300: target      373.8 deg in  6.93 s, peak err  2.90 deg, I 0.09 A
+  move  10 survey T300 R10.0            close    9.4 rpm MaxT  300: target      372.5 deg in  6.91 s, peak err  3.15 deg, I 0.04 A
+  move  11 survey T300 R20.0            open    18.8 rpm MaxT  300: target      374.9 deg in  3.61 s, peak err  3.54 deg, I 0.13 A
+  move  12 survey T300 R20.0            close   18.8 rpm MaxT  300: target      374.0 deg in  3.60 s, peak err  3.85 deg, I 0.04 A
+  move  13 survey T300 R40.0            open    42.2 rpm MaxT  300: target      368.8 deg in  1.72 s, peak err  3.72 deg, I 0.1 A
+  move  14 survey T300 R40.0            close   42.2 rpm MaxT  300: target      369.8 deg in  1.72 s, peak err  3.93 deg, I 0.04 A
+  move  15 survey T300 R60.0            open    60.9 rpm MaxT  300: target      366.6 deg in  1.26 s, peak err  3.96 deg, I 0.09 A
+  move  16 survey T300 R60.0            close   60.9 rpm MaxT  300: target      370.9 deg in  1.27 s, peak err  4.10 deg, I 0.06 A
+  move  17 survey T300 R90.0            open    89.1 rpm MaxT  300: target      368.0 deg in  0.95 s, peak err  5.12 deg, I 0.07 A
+  move  18 survey T300 R90.0            close   89.1 rpm MaxT  300: target      367.1 deg in  0.95 s, peak err  5.06 deg, I 0.05 A
+  [00:22:14] error +2.6 deg after rearm; disabling
+  move  19 survey T300 R120.0           open   121.9 rpm MaxT  300: stall       376.0 deg in  1.34 s, peak err  8.34 deg, I 0.03 A
+  move  20 survey reposition            close   18.8 rpm MaxT  500: stall       173.9 deg in  0.42 s, peak err 18.00 deg, I 0.09 A
+  move  21 survey T400 R5.0             open     4.7 rpm MaxT  400: target      176.0 deg in  6.60 s, peak err  3.05 deg, I 0.13 A
+  move  22 survey T400 R5.0             close    4.7 rpm MaxT  400: target      375.6 deg in 13.68 s, peak err  3.07 deg, I 0.04 A
+  move  23 survey T400 R10.0            open     9.4 rpm MaxT  400: target      374.6 deg in  6.95 s, peak err  3.17 deg, I 0.12 A
+  move  24 survey T400 R10.0            close    9.4 rpm MaxT  400: target      374.5 deg in  6.95 s, peak err  3.24 deg, I 0.04 A
+  move  25 survey T400 R20.0            open    18.8 rpm MaxT  400: target      375.6 deg in  3.62 s, peak err  3.87 deg, I 0.05 A
+  move  26 survey T400 R20.0            close   18.8 rpm MaxT  400: target      375.0 deg in  3.61 s, peak err  3.82 deg, I 0.04 A
+  move  27 survey T400 R40.0            open    42.2 rpm MaxT  400: target      369.6 deg in  1.73 s, peak err  3.89 deg, I 0.07 A
+  move  28 survey T400 R40.0            close   42.2 rpm MaxT  400: target      368.6 deg in  1.72 s, peak err  4.13 deg, I 0.05 A
+  move  29 survey T400 R60.0            open    60.9 rpm MaxT  400: target      359.2 deg in  1.24 s, peak err  3.59 deg, I 0.06 A
+  move  30 survey T400 R60.0            close   60.9 rpm MaxT  400: target      360.6 deg in  1.25 s, peak err  4.03 deg, I 0.06 A
+  move  31 survey T400 R90.0            open    89.1 rpm MaxT  400: target      377.8 deg in  0.97 s, peak err  7.38 deg, I 0.16 A
+  move  32 survey T400 R90.0            close   89.1 rpm MaxT  400: target      374.6 deg in  0.97 s, peak err  6.70 deg, I 0.04 A
+  [00:23:05] error +2.6 deg after rearm; disabling
+  move  33 survey T400 R120.0           open   121.9 rpm MaxT  400: stall       370.0 deg in  1.33 s, peak err  8.05 deg, I 0.03 A
+  move  34 survey reposition            close   18.8 rpm MaxT  500: target      373.3 deg in  3.62 s, peak err  2.95 deg, I 0.04 A
+  move  35 survey T500 R5.0             open     4.7 rpm MaxT  500: target      375.3 deg in 13.69 s, peak err  3.30 deg, I 0.15 A
+  move  36 survey T500 R5.0             close    4.7 rpm MaxT  500: target      374.9 deg in 13.67 s, peak err  3.14 deg, I 0.04 A
+  move  37 survey T500 R10.0            open     9.4 rpm MaxT  500: target      374.7 deg in  6.96 s, peak err  3.50 deg, I 0.13 A
+  move  38 survey T500 R10.0            close    9.4 rpm MaxT  500: target      375.6 deg in  6.98 s, peak err  3.43 deg, I 0.04 A
+  move  39 survey T500 R20.0            open    18.8 rpm MaxT  500: target      377.6 deg in  3.64 s, peak err  4.18 deg, I 0.17 A
+  move  40 survey T500 R20.0            close   18.8 rpm MaxT  500: target      379.0 deg in  3.65 s, peak err  4.08 deg, I 0.04 A
+  move  41 survey T500 R40.0            open    42.2 rpm MaxT  500: target      368.7 deg in  1.72 s, peak err  3.25 deg, I 0.08 A
+  move  42 survey T500 R40.0            close   42.2 rpm MaxT  500: target      358.1 deg in  1.68 s, peak err  3.57 deg, I 0.04 A
+  move  43 survey T500 R60.0            open    60.9 rpm MaxT  500: target      353.3 deg in  1.23 s, peak err  3.38 deg, I 0.07 A
+  move  44 survey T500 R60.0            close   60.9 rpm MaxT  500: target      347.4 deg in  1.21 s, peak err  3.89 deg, I 0.06 A
+  move  45 survey reposition            close   18.8 rpm MaxT  500: target       14.2 deg in  0.46 s, peak err  1.01 deg, I 0.04 A
+  move  46 survey T500 R90.0            open    89.1 rpm MaxT  500: target      373.1 deg in  0.96 s, peak err  6.26 deg, I 0.07 A
+  move  47 survey T500 R90.0            close   89.1 rpm MaxT  500: target      366.8 deg in  0.95 s, peak err  5.64 deg, I 0.04 A
+  move  48 survey T500 R120.0           open   121.9 rpm MaxT  500: target      348.8 deg in  0.74 s, peak err  6.16 deg, I 0.07 A
+  move  49 survey T500 R120.0           close  121.9 rpm MaxT  500: target      337.1 deg in  0.72 s, peak err  6.46 deg, I 0.04 A
+  move  50 survey reposition            close   18.8 rpm MaxT  500: target       18.2 deg in  0.50 s, peak err  1.01 deg, I 0.04 A
+  move  51 survey T700 R5.0             open     4.7 rpm MaxT  700: target      374.6 deg in 13.65 s, peak err  3.30 deg, I 0.15 A
+  move  52 survey T700 R5.0             close    4.7 rpm MaxT  700: target      374.6 deg in 13.66 s, peak err  3.07 deg, I 0.04 A
+  move  53 survey T700 R10.0            open     9.4 rpm MaxT  700: target      374.3 deg in  6.96 s, peak err  3.44 deg, I 0.14 A
+  [00:24:44] interrupted
+  [00:24:44] shutdown: motor disabled, MaxT 500, enc 55296, enabled True

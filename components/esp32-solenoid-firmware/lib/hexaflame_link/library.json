@@ -1,0 +1,11 @@
+{
+  "name": "hexaflame_link",
+  "version": "0.1.0",
+  "description": "Device-agnostic host link for HEXAFLAME output devices: an OutputBank/OutputController abstraction plus a Modbus RTU slave compatible with the WaveShare Modbus RTU Relay 32CH register map.",
+  "keywords": "modbus, rtu, relay, solenoid, hexaflame",
+  "frameworks": "*",
+  "platforms": "*",
+  "build": {
+    "srcDir": "src"
+  }
+}

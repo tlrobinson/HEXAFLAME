@@ -1,0 +1,316 @@
+<title>Needle Valve Torque Map</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one column of bench-notebook sections, filters in one row above the charts, every chart with a table twin. */
+:root {
+  --bg: #f9f9f7; --surface: #fcfcfb; --fg: #0b0b0b; --fg2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10); --accent: #2a78d6;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4; --s6: #008300; --s7: #6250d6; --s8: #e34948;
+  --good: #0ca30c; --warn: #fab219; --serious: #ec835a; --critical: #d03b3b;
+  --seq1: #cde2fb; --seq3: #9ec5f4; --seq5: #6da7ec; --seq7: #3987e5; --seq9: #1c5cab;
+  --font: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0d0d0d; --surface: #1a1a19; --fg: #f0efec; --fg2: #c3c2b7; --muted: #898781;
+  --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10); --accent: #3987e5;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
+  --seq1: #184f95; --seq3: #256abf; --seq5: #3987e5; --seq7: #6da7ec; --seq9: #b7d3f6;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0d0d0d; --surface: #1a1a19; --fg: #f0efec; --fg2: #c3c2b7; --muted: #898781;
+  --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10); --accent: #3987e5;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
+  --seq1: #184f95; --seq3: #256abf; --seq5: #3987e5; --seq7: #6da7ec; --seq9: #b7d3f6;
+  color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; line-height: 1.5; margin: 0; }
+main { max-width: 1100px; margin: 0 auto; padding-block: 28px 64px; padding-inline: 20px; display: grid; gap: 36px; }
+header h1 { font-size: 28px; font-weight: 600; margin: 0 0 4px; letter-spacing: -0.01em; text-wrap: balance; }
+header p { margin: 0; color: var(--fg2); max-width: 70ch; }
+.meta { font-family: var(--mono); font-size: 12.5px; color: var(--muted); margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+section > h2 { font-size: 17px; font-weight: 600; margin: 0 0 4px; }
+section > p.lead { margin: 0 0 14px; color: var(--fg2); max-width: 75ch; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.tile { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; min-width: 0; }
+.tile .label { font-size: 12.5px; color: var(--fg2); letter-spacing: 0.02em; }
+.tile .value { font-size: 30px; font-weight: 600; line-height: 1.15; margin-top: 4px; }
+.tile .unit { font-size: 13px; color: var(--muted); margin-left: 4px; font-weight: 400; }
+.tile .note { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+.note { background: var(--surface); border-left: 3px solid var(--s4); padding: 10px 14px; color: var(--fg2); font-size: 14px; border-radius: 0 6px 6px 0; }
+.filters { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin-bottom: 14px; font-size: 14px; }
+.filters label { display: inline-flex; align-items: center; gap: 8px; }
+select, button { font: inherit; font-size: 14px; color: var(--fg); background: var(--surface); border: 1px solid var(--axis); border-radius: 4px; padding: 5px 8px; }
+button { cursor: pointer; } button:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px 10px; min-width: 0; }
+.chart-card h3 { font-size: 14px; font-weight: 600; margin: 0 0 2px; }
+.chart-card .sub { font-size: 12.5px; color: var(--muted); margin: 0 0 8px; }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+svg.chart { width: 100%; height: auto; display: block; font-family: var(--font); }
+svg.chart text { fill: var(--fg2); font-size: 11.5px; } svg.chart .tick { fill: var(--muted); font-variant-numeric: tabular-nums; }
+svg.chart .grid { stroke: var(--grid); stroke-width: 1; } svg.chart .axis { stroke: var(--axis); stroke-width: 1; }
+svg.chart .line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+svg.chart .dot { stroke: var(--surface); stroke-width: 2; }
+svg.chart .crosshair { stroke: var(--muted); stroke-width: 1; pointer-events: none; }
+svg.chart .cell { stroke: var(--surface); stroke-width: 2; cursor: default; } svg.chart .cell:hover { opacity: 0.85; }
+svg.chart .cell-label { font-family: var(--mono); font-size: 11px; font-variant-numeric: tabular-nums; pointer-events: none; }
+svg.chart .bar { rx: 0; } svg.chart .axis-label { fill: var(--muted); font-size: 11px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--fg2); margin: 6px 0 2px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; } .legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; }
+.legend i.swatch { width: 12px; height: 12px; border-radius: 2px; }
+.tooltip { position: fixed; pointer-events: none; background: var(--surface); color: var(--fg); border: 1px solid var(--border); border-radius: 5px; padding: 8px 10px; font-size: 12.5px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); z-index: 10; min-width: 150px; }
+.tooltip .t { color: var(--muted); font-family: var(--mono); font-size: 11.5px; margin-bottom: 3px; }
+.tooltip .row { display: flex; justify-content: space-between; gap: 14px; } .tooltip .row b { font-variant-numeric: tabular-nums; }
+.tooltip .row span { display: inline-flex; align-items: center; gap: 6px; color: var(--fg2); } .tooltip .row i { width: 10px; height: 2px; display: inline-block; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--grid); white-space: nowrap; } th { color: var(--fg2); font-weight: 500; }
+td.num, th.num { text-align: right; } .table-wrap { overflow-x: auto; }
+.toggle { margin-top: 8px; display: flex; gap: 8px; align-items: center; }
+.pill { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 11.5px; font-weight: 500; color: #fff; }
+.pill.ok { background: var(--good); } .pill.marginal { background: var(--warn); color: #1a1a19; } .pill.stall { background: var(--critical); }
+.mono { font-family: var(--mono); font-size: 12.5px; }
+.log { font-family: var(--mono); font-size: 12px; color: var(--fg2); max-height: 320px; overflow: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; }
+.log div { display: grid; grid-template-columns: 70px 1fr; gap: 10px; padding: 1px 0; } .log .run { color: var(--muted); grid-column: 1 / -1; margin-top: 6px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+@media (max-width: 560px) { header h1 { font-size: 23px; } .tile .value { font-size: 24px; } }
+</style>
+
+<main>
+<header>
+  <h1>Needle Valve Torque Map</h1>
+  <p>How much torque the valve needs at each speed, how hard it can be closed and still opened again, and what the motor's supply draws while doing it. Measured with an MKS SERVO42C closed-loop driver used as the instrument: its torque limit (MaxT, 0–1200) is the current knob and its position error is the skip signal.</p>
+  <div class="meta" id="meta"></div>
+</header>
+
+<section>
+  <h2>Headline</h2>
+  <div class="tiles" id="tiles"></div>
+</section>
+
+<section>
+  <div class="note" id="caveat">The driver runs closed-loop, so a "stall" here means the load exceeded the torque limit and the shaft fell more than 8° behind, at which point the test stopped it. An open-loop TMC2209 at the same torque would have skipped steps instead. The valve's load torque and its sticking behaviour are properties of the valve and carry over; the exact current needed on another driver does not.</div>
+</section>
+
+<section id="survey-section">
+  <h2>Torque × speed survey</h2>
+  <p class="lead">Each cell is one run across the free travel window at a fixed torque limit and speed. Green: shaft tracked within 3°. Amber: lagged 3–8°. Red: fell 8° behind or the driver flagged a stall. The number is the peak lag in degrees.</p>
+  <div class="pair" id="heatmaps"></div>
+  <div class="toggle"><button id="survey-table-btn" type="button">Show table</button></div>
+  <div class="table-wrap" id="survey-table" hidden></div>
+</section>
+
+<section id="lines-section">
+  <h2>Lag and supply current by speed</h2>
+  <div class="filters"><label for="dir-select">Direction <select id="dir-select"><option value="open">Opening</option><option value="close">Closing</option></select></label></div>
+  <div class="pair">
+    <div class="chart-card"><h3>Peak position lag</h3><p class="sub">degrees behind the commanded position, one line per torque limit</p><div id="lag-chart"></div><div class="legend" id="lag-legend"></div></div>
+    <div class="chart-card"><h3>Mean supply current while moving</h3><p class="sub">amps at the motor supply, one line per torque limit</p><div id="cur-chart"></div><div class="legend" id="cur-legend"></div></div>
+  </div>
+</section>
+
+<section id="incidents-section">
+  <h2>Safety incidents</h2>
+  <div class="note">The driver (MKS SERVO42C) has a "return to zero" feature with a zero angle stored in its menu (229.9° open on this valve). Two separate faults were found and measured. First, the serial command that sets the torque limit (MaxT, 0xA5) makes the shaft lunge to that zero angle about once in 27 sends (11 of 300, at roughly 100 rpm), while 480 sends of enable, run, stop and status reads never did. The lunge usually takes the short way, but once ran the long way into the open end, so it could reach the seat from the wrong starting angle. Second, whenever the driver logic restarts (a power cycle on 12 Oct, a set-zero flash write on 13 Oct) it runs its menu-configured return-to-zero at default torque in the closing direction, which is what drove the valve into the seat both times. The test harness now changes the torque limit only while parked at the zero angle (a zero-length lunge) or while stuck at the seat (a lunge can only open the valve), never re-sends an unchanged limit, keeps the survey between 60° and 330° open, and stops and disables the motor on any overspeed, silent driver or lost stop. The permanent fix for the restart case is 0_Mode = Disable in the driver's OLED menu.</div>
+  <div class="log" id="incidents"></div>
+</section>
+
+<section id="stick-section">
+  <h2>Closing into the seat</h2>
+  <p class="lead">Each bar is one closing into the seat at the stated torque limit and approach speed, followed by opening attempts at rising torque. The bar length is the first opening torque that moved the valve; the tick is the torque it was closed with. A bar past its tick means the valve needed more to open than to close.</p>
+  <div class="chart-card"><div id="stick-chart"></div><div class="legend" id="stick-legend"></div></div>
+  <div class="toggle"><button id="stick-table-btn" type="button">Show table</button></div>
+  <div class="table-wrap" id="stick-table" hidden></div>
+</section>
+
+<section id="trace-section">
+  <h2>Raw traces</h2>
+  <div class="filters"><label for="move-select">Move <select id="move-select"></select></label><span id="move-summary" class="mono"></span></div>
+  <div class="chart-card">
+    <h3>Position, lag and supply current</h3><p class="sub">one move, sampled from the driver at ~30 Hz and from the supply at ~2–4 Hz</p>
+    <div id="trace-pos"></div><div id="trace-err"></div><div id="trace-cur"></div>
+  </div>
+</section>
+
+<section>
+  <h2>Run log</h2>
+  <div class="log" id="log"></div>
+</section>
+</main>
+
+<script>
+/*__REPORT_DATA__*/
+(function () {
+  const R = window.REPORT || { runs: [], moves: [], survey: [], stick: [], headline: {}, state: {} };
+  const SERIES = ['--s1','--s2','--s3','--s4','--s5','--s6','--s7','--s8'];
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const fmt = (v, d = 1) => (v === null || v === undefined || Number.isNaN(v)) ? '–' : Number(v).toFixed(d);
+  const el = (tag, attrs = {}, text) => { const e = document.createElement(tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text !== undefined) e.textContent = text; return e; };
+  const svgEl = (tag, attrs = {}) => { const e = document.createElementNS('http://www.w3.org/2000/svg', tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
+  const tip = el('div', { class: 'tooltip' }); tip.hidden = true; document.body.appendChild(tip);
+  function showTip(x, y, title, rows) {
+    tip.replaceChildren(); const t = el('div', { class: 't' }, title); tip.appendChild(t);
+    for (const r of rows) { const row = el('div', { class: 'row' }); const s = el('span'); if (r.color) { const i = el('i'); i.style.background = r.color; s.appendChild(i); } s.appendChild(document.createTextNode(r.label)); row.appendChild(s); row.appendChild(el('b', {}, r.value)); tip.appendChild(row); }
+    tip.hidden = false; const w = tip.offsetWidth, h = tip.offsetHeight; tip.style.left = Math.min(x + 14, window.innerWidth - w - 8) + 'px'; tip.style.top = Math.max(8, Math.min(y - h - 10, window.innerHeight - h - 8)) + 'px';
+  }
+  const hideTip = () => { tip.hidden = true; };
+  const niceTicks = (lo, hi, n = 5) => { if (hi <= lo) hi = lo + 1; const span = hi - lo, step0 = span / n, p = Math.pow(10, Math.floor(Math.log10(step0))), m = step0 / p, step = (m >= 5 ? 5 : m >= 2 ? 2 : 1) * p; const t = []; for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) t.push(+v.toFixed(6)); return t; };
+
+  // ---- line chart with crosshair tooltip: series = [{name, color, points:[[x,y]]}] ----
+  function lineChart(container, { series, xLabel, yLabel, height = 230, xTicksIsRpm = false, legendEl, yMin }) {
+    container.replaceChildren(); if (legendEl) legendEl.replaceChildren();
+    const W = 560, H = height, m = { l: 46, r: 16, t: 10, b: 34 };
+    const pts = series.flatMap(s => s.points).filter(p => p[1] !== null && p[1] !== undefined);
+    if (!pts.length) { container.appendChild(el('p', { class: 'sub' }, 'No data yet.')); return; }
+    const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+    const x0 = Math.min(...xs), x1 = Math.max(...xs) || 1, ylo = yMin !== undefined ? yMin : Math.min(0, ...ys), yhi0 = Math.max(...ys);
+    const yt = niceTicks(ylo, yhi0 === ylo ? ylo + 1 : yhi0), y0 = yt[0], y1 = yt[yt.length - 1];
+    const sx = x => m.l + (x - x0) / ((x1 - x0) || 1) * (W - m.l - m.r), sy = y => m.t + (1 - (y - y0) / ((y1 - y0) || 1)) * (H - m.t - m.b);
+    const svg = svgEl('svg', { class: 'chart', viewBox: `0 0 ${W} ${H}`, role: 'img' });
+    for (const t of yt) { svg.appendChild(svgEl('line', { class: 'grid', x1: m.l, x2: W - m.r, y1: sy(t), y2: sy(t) })); const tx = svgEl('text', { class: 'tick', x: m.l - 6, y: sy(t) + 4, 'text-anchor': 'end' }); tx.textContent = String(t); svg.appendChild(tx); }
+    const xt = niceTicks(x0, x1, 6); for (const t of xt) { const tx = svgEl('text', { class: 'tick', x: sx(t), y: H - m.b + 16, 'text-anchor': 'middle' }); tx.textContent = String(t); svg.appendChild(tx); }
+    svg.appendChild(svgEl('line', { class: 'axis', x1: m.l, x2: W - m.r, y1: sy(y0), y2: sy(y0) }));
+    const xl = svgEl('text', { class: 'axis-label', x: W - m.r, y: H - 4, 'text-anchor': 'end' }); xl.textContent = xLabel; svg.appendChild(xl);
+    const yl = svgEl('text', { class: 'axis-label', x: m.l, y: m.t + 2, 'text-anchor': 'start' }); yl.textContent = yLabel; svg.appendChild(yl);
+    series.forEach((s, i) => {
+      const p = s.points.filter(q => q[1] !== null && q[1] !== undefined).sort((a, b) => a[0] - b[0]);
+      if (!p.length) return; const color = s.color || `var(${SERIES[i % 8]})`;
+      svg.appendChild(svgEl('path', { class: 'line', d: p.map((q, j) => (j ? 'L' : 'M') + sx(q[0]).toFixed(1) + ' ' + sy(q[1]).toFixed(1)).join(' '), stroke: color }));
+      if (p.length <= 40) for (const q of p) svg.appendChild(svgEl('circle', { class: 'dot', cx: sx(q[0]), cy: sy(q[1]), r: 4, fill: color }));
+      if (legendEl) { const span = el('span'); const i2 = el('i'); i2.style.background = color; span.appendChild(i2); span.appendChild(document.createTextNode(s.name)); legendEl.appendChild(span); }
+    });
+    const cross = svgEl('line', { class: 'crosshair', y1: m.t, y2: H - m.b, x1: -10, x2: -10 }); svg.appendChild(cross);
+    const hit = svgEl('rect', { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b, fill: 'transparent' }); svg.appendChild(hit);
+    const allX = [...new Set(xs)].sort((a, b) => a - b);
+    hit.addEventListener('pointermove', ev => {
+      const rect = svg.getBoundingClientRect(); const px = (ev.clientX - rect.left) / rect.width * W; const xv = x0 + (px - m.l) / (W - m.l - m.r) * (x1 - x0);
+      let best = allX[0]; for (const v of allX) if (Math.abs(v - xv) < Math.abs(best - xv)) best = v;
+      cross.setAttribute('x1', sx(best)); cross.setAttribute('x2', sx(best));
+      const rows = series.map((s, i) => { const q = s.points.find(p => p[0] === best); return q && q[1] !== null ? { label: s.name, value: fmt(q[1], 2), color: s.color || css(SERIES[i % 8]) } : null; }).filter(Boolean);
+      showTip(ev.clientX, ev.clientY, `${xLabel} ${fmt(best, xTicksIsRpm ? 1 : 2)}`, rows);
+    });
+    hit.addEventListener('pointerleave', () => { hideTip(); cross.setAttribute('x1', -10); cross.setAttribute('x2', -10); });
+    container.appendChild(svg);
+  }
+
+  // ---- heatmap: rows (torque) x cols (rpm) ----
+  function heatmap(container, { title, cells, rows, cols }) {
+    const card = el('div', { class: 'chart-card' }); card.appendChild(el('h3', {}, title)); card.appendChild(el('p', { class: 'sub' }, 'rows: torque limit MaxT · columns: RPM · number: peak lag, degrees'));
+    const cw = 58, ch = 34, ml = 50, mt = 22; const W = ml + cols.length * cw + 8, H = mt + rows.length * ch + 8;
+    const svg = svgEl('svg', { class: 'chart', viewBox: `0 0 ${W} ${H}`, role: 'img' });
+    cols.forEach((c, j) => { const t = svgEl('text', { class: 'tick', x: ml + j * cw + cw / 2, y: mt - 7, 'text-anchor': 'middle' }); t.textContent = c; svg.appendChild(t); });
+    rows.forEach((r, i) => { const t = svgEl('text', { class: 'tick', x: ml - 8, y: mt + i * ch + ch / 2 + 4, 'text-anchor': 'end' }); t.textContent = r; svg.appendChild(t); });
+    const colorFor = o => o === 'ok' ? 'var(--good)' : o === 'marginal' ? 'var(--warn)' : o === 'stall' ? 'var(--critical)' : 'var(--grid)';
+    rows.forEach((r, i) => cols.forEach((c, j) => {
+      const cell = cells.find(k => k.maxt === r && k.rpm === c); const x = ml + j * cw, y = mt + i * ch;
+      const rect = svgEl('rect', { class: 'cell', x, y, width: cw, height: ch, fill: cell ? colorFor(cell.outcome) : 'var(--grid)', opacity: cell ? 1 : 0.5, tabindex: 0 });
+      svg.appendChild(rect);
+      if (cell) {
+        const lbl = svgEl('text', { class: 'cell-label', x: x + cw / 2, y: y + ch / 2 + 4, 'text-anchor': 'middle', fill: cell.outcome === 'marginal' ? '#1a1a19' : '#ffffff' }); lbl.textContent = fmt(cell.peak_err_deg, 1); svg.appendChild(lbl);
+        const show = ev => showTip(ev.clientX, ev.clientY, `MaxT ${r} · ${c} rpm · ${cell.closing ? 'closing' : 'opening'}`, [
+          { label: 'outcome', value: cell.outcome }, { label: 'peak lag', value: fmt(cell.peak_err_deg, 2) + '°' }, { label: 'mean current', value: fmt(cell.avg_i, 2) + ' A' }, { label: 'peak current', value: fmt(cell.peak_i, 2) + ' A' }, { label: 'travel', value: fmt(cell.travel_deg, 0) + '°' }]);
+        rect.addEventListener('pointermove', show); rect.addEventListener('focus', ev => { const b = rect.getBoundingClientRect(); showTip(b.left + b.width / 2, b.top, `MaxT ${r} · ${c} rpm`, [{ label: 'outcome', value: cell.outcome }, { label: 'peak lag', value: fmt(cell.peak_err_deg, 2) + '°' }]); });
+        rect.addEventListener('pointerleave', hideTip); rect.addEventListener('blur', hideTip);
+      }
+    }));
+    card.appendChild(svg);
+    const lg = el('div', { class: 'legend' }); for (const [k, n] of [['good', 'tracked (<5°)'], ['warn', 'lagged (5–8°)'], ['critical', 'stalled (>8° or blocked)']]) { const s = el('span'); const i = el('i', { class: 'swatch' }); i.style.background = `var(--${k})`; s.appendChild(i); s.appendChild(document.createTextNode(n)); lg.appendChild(s); }
+    card.appendChild(lg); container.appendChild(card);
+  }
+
+  // ---- horizontal bars for the stick sweep ----
+  function stickChart(container, legendEl, results) {
+    container.replaceChildren(); legendEl.replaceChildren();
+    const rows = results.filter(r => r.closing_maxt);
+    if (!rows.length) { container.appendChild(el('p', { class: 'sub' }, 'No seat tests yet.')); return; }
+    const W = 640, bh = 22, gap = 10, ml = 190, mr = 50, mt = 24, H = mt + rows.length * (bh + gap) + 24, maxv = 1200;
+    const sx = v => ml + v / maxv * (W - ml - mr);
+    const svg = svgEl('svg', { class: 'chart', viewBox: `0 0 ${W} ${H}`, role: 'img' });
+    for (const t of [0, 300, 600, 900, 1200]) { svg.appendChild(svgEl('line', { class: 'grid', x1: sx(t), x2: sx(t), y1: mt - 4, y2: H - 20 })); const tx = svgEl('text', { class: 'tick', x: sx(t), y: H - 6, 'text-anchor': 'middle' }); tx.textContent = String(t); svg.appendChild(tx); }
+    const xl = svgEl('text', { class: 'axis-label', x: ml, y: mt - 10 }); xl.textContent = 'opening torque limit (MaxT) that moved the valve'; svg.appendChild(xl);
+    rows.forEach((r, i) => {
+      const y = mt + i * (bh + gap); const name = `MaxT ${r.closing_maxt} @ ${fmt(r.approach_rpm, 1)} rpm${r.ramp ? ', ramped' : ''}`;
+      const lbl = svgEl('text', { x: ml - 10, y: y + bh / 2 + 4, 'text-anchor': 'end' }); lbl.textContent = name; svg.appendChild(lbl);
+      const stuck = r.unstick_maxt === null || r.unstick_maxt === undefined; const v = stuck ? maxv : r.unstick_maxt;
+      const bar = svgEl('rect', { x: sx(0), y, width: Math.max(2, sx(v) - sx(0)), height: bh, fill: stuck ? 'var(--critical)' : (r.unstick_maxt > r.closing_maxt ? 'var(--serious)' : 'var(--s1)'), rx: 4 });
+      svg.appendChild(bar);
+      svg.appendChild(svgEl('rect', { x: sx(r.closing_maxt) - 1.5, y: y - 3, width: 3, height: bh + 6, fill: 'var(--fg)' }));
+      const vt = svgEl('text', { class: 'tick', x: sx(v) + 6, y: y + bh / 2 + 4 }); vt.textContent = stuck ? 'stuck' : String(r.unstick_maxt); svg.appendChild(vt);
+      const show = ev => showTip(ev.clientX, ev.clientY, name, [{ label: 'closed with', value: `MaxT ${r.closing_maxt}` }, { label: 'opened with', value: stuck ? 'not even 1200' : `MaxT ${r.unstick_maxt}` }, { label: 'seat offset', value: fmt(r.seat_offset_deg, 2) + '°' }]);
+      bar.addEventListener('pointermove', show); bar.addEventListener('pointerleave', hideTip);
+    });
+    container.appendChild(svg);
+    for (const [c, n] of [['--s1', 'opened at or below closing torque'], ['--serious', 'needed more torque to open than to close'], ['--critical', 'could not be opened by the motor']]) { const s = el('span'); const i = el('i', { class: 'swatch' }); i.style.background = `var(${c})`; s.appendChild(i); s.appendChild(document.createTextNode(n)); legendEl.appendChild(s); }
+    const s = el('span'); const i = el('i', { class: 'swatch' }); i.style.background = 'var(--fg)'; i.style.width = '3px'; s.appendChild(i); s.appendChild(document.createTextNode('closing torque')); legendEl.appendChild(s);
+  }
+
+  function table(container, headers, rows) {
+    container.replaceChildren(); const t = el('table'); const thead = el('thead'); const tr = el('tr'); headers.forEach(h => tr.appendChild(el('th', { class: h.num ? 'num' : '' }, h.label))); thead.appendChild(tr); t.appendChild(thead);
+    const tb = el('tbody'); for (const r of rows) { const tr2 = el('tr'); r.forEach((v, i) => { const td = el('td', { class: headers[i].num ? 'num' : '' }); if (v && v.pill) { const p = el('span', { class: 'pill ' + v.pill }, v.pill); td.appendChild(p); } else td.textContent = v === null || v === undefined ? '–' : String(v); tr2.appendChild(td); }); tb.appendChild(tr2); }
+    t.appendChild(tb); container.appendChild(t);
+  }
+
+  // ---- header & tiles ----
+  const meta = document.getElementById('meta');
+  const st = R.state || {};
+  [`generated ${new Date((R.generated || 0) * 1000).toLocaleString()}`, `${R.runs.length} runs · ${R.moves.length} moves`,
+   st.seat_enc !== undefined ? `seat at encoder ${st.seat_enc}` : '', st.open_end_deg ? `open end at ${fmt(st.open_end_deg, 0)}° open` : (st.probed_open_deg ? `no open end within ${fmt(st.probed_open_deg, 0)}°` : '')]
+    .filter(Boolean).forEach(s => meta.appendChild(el('span', {}, s)));
+  const H = R.headline || {}; const tiles = document.getElementById('tiles');
+  const tile = (label, value, unit, note) => { const t = el('div', { class: 'tile' }); t.appendChild(el('div', { class: 'label' }, label)); const v = el('div', { class: 'value' }); v.textContent = value; if (unit) v.appendChild(el('span', { class: 'unit' }, unit)); t.appendChild(v); if (note) t.appendChild(el('div', { class: 'note' }, note)); tiles.appendChild(t); };
+  tile('Closing torque the valve recovers from', H.max_self_recovering_closing_maxt ?? '–', 'MaxT', 'highest closing limit that could be reopened at the same or lower torque');
+  const fullT = (H.torques || []).length ? Math.max(...H.torques) : null; const mo = H.max_ok_rpm_by_torque || {};
+  tile('Fastest clean run at full torque', fullT ? (mo[String(fullT)] ?? '–') : '–', 'rpm', fullT ? `at MaxT ${fullT}, tracked within 5°` : 'survey not run yet');
+  tile('Least torque that moves it at 5 rpm', H.min_torque_ok_at_5rpm ?? '–', 'MaxT', 'lowest limit that tracked within 5° across the window');
+  tile('Times the motor could not reopen it', H.stuck_events ?? 0, '', 'each needed a hand on the knob');
+
+  // ---- survey ----
+  const hm = document.getElementById('heatmaps'); hm.replaceChildren();
+  const torques = H.torques || [], rpms = H.rpms || [];
+  if (R.survey.length) { heatmap(hm, { title: 'Opening', cells: R.survey.filter(c => !c.closing), rows: torques, cols: rpms }); heatmap(hm, { title: 'Closing', cells: R.survey.filter(c => c.closing), rows: torques, cols: rpms }); }
+  else hm.appendChild(el('p', { class: 'sub' }, 'Survey not run yet.'));
+  const surveyTable = document.getElementById('survey-table');
+  table(surveyTable, [{ label: 'MaxT', num: true }, { label: 'rpm', num: true }, { label: 'direction' }, { label: 'outcome' }, { label: 'peak lag °', num: true }, { label: 'mean A', num: true }, { label: 'peak A', num: true }, { label: 'travel °', num: true }],
+    R.survey.map(c => [c.maxt, c.rpm, c.closing ? 'closing' : 'opening', { pill: c.outcome }, fmt(c.peak_err_deg, 2), fmt(c.avg_i, 2), fmt(c.peak_i, 2), fmt(c.travel_deg, 0)]));
+  document.getElementById('survey-table-btn').addEventListener('click', ev => { surveyTable.hidden = !surveyTable.hidden; ev.target.textContent = surveyTable.hidden ? 'Show table' : 'Hide table'; });
+
+  // ---- lag / current lines ----
+  function drawLines() {
+    const closing = document.getElementById('dir-select').value === 'close';
+    const cells = R.survey.filter(c => c.closing === closing);
+    const mk = key => torques.map((t, i) => ({ name: `MaxT ${t}`, color: `var(${SERIES[i % 8]})`, points: rpms.map(r => { const c = cells.find(k => k.maxt === t && k.rpm === r); return [r, c ? c[key] : null]; }) }));
+    lineChart(document.getElementById('lag-chart'), { series: mk('peak_err_deg'), xLabel: 'rpm', yLabel: 'peak lag, °', xTicksIsRpm: true, legendEl: document.getElementById('lag-legend'), yMin: 0 });
+    lineChart(document.getElementById('cur-chart'), { series: mk('avg_i'), xLabel: 'rpm', yLabel: 'A', xTicksIsRpm: true, legendEl: document.getElementById('cur-legend'), yMin: 0 });
+  }
+  document.getElementById('dir-select').addEventListener('change', drawLines); drawLines();
+
+  // ---- stick ----
+  stickChart(document.getElementById('stick-chart'), document.getElementById('stick-legend'), R.stick);
+  const stickTable = document.getElementById('stick-table');
+  table(stickTable, [{ label: 'closed with MaxT', num: true }, { label: 'approach rpm', num: true }, { label: 'ramped' }, { label: 'opened with MaxT', num: true }, { label: 'seat offset °', num: true }, { label: 'note' }],
+    R.stick.map(s => [s.closing_maxt, fmt(s.approach_rpm, 1), s.ramp === null || s.ramp === undefined ? '–' : (s.ramp ? 'yes' : 'no'), s.unstick_maxt ?? 'stuck', fmt(s.seat_offset_deg, 2), s.note || '']));
+  document.getElementById('stick-table-btn').addEventListener('click', ev => { stickTable.hidden = !stickTable.hidden; ev.target.textContent = stickTable.hidden ? 'Show table' : 'Hide table'; });
+
+  // ---- traces ----
+  const sel = document.getElementById('move-select');
+  R.moves.forEach((m, i) => { const o = el('option', { value: String(i) }, `${m.run} #${m.move_id} ${m.label} · ${m.closing ? 'close' : 'open'} ${fmt(m.rpm, 1)} rpm MaxT ${m.maxt} · ${m.outcome}`); sel.appendChild(o); });
+  function drawTrace() {
+    const m = R.moves[Number(sel.value)]; if (!m) return;
+    document.getElementById('move-summary').textContent = `${m.reason} · ${fmt(m.travel_deg, 1)}° in ${fmt(m.elapsed, 2)} s · peak lag ${fmt(m.peak_err_deg, 2)}° · mean ${fmt(m.avg_i, 2)} A`;
+    const pos = m.samples.map(s => [s[0], s[1]]), err = m.samples.map(s => [s[0], s[2]]), cur = m.psu.map(p => [p[0], p[1]]);
+    lineChart(document.getElementById('trace-pos'), { series: [{ name: 'position, ° open', points: pos, color: 'var(--s1)' }], xLabel: 's', yLabel: '° open', height: 170 });
+    lineChart(document.getElementById('trace-err'), { series: [{ name: 'lag, °', points: err, color: 'var(--s2)' }], xLabel: 's', yLabel: 'lag °', height: 150 });
+    lineChart(document.getElementById('trace-cur'), { series: [{ name: 'supply current, A', points: cur, color: 'var(--s3)' }], xLabel: 's', yLabel: 'A', height: 150, yMin: 0 });
+  }
+  sel.addEventListener('change', drawTrace);
+  if (R.moves.length) { const idx = R.moves.findIndex(m => m.outcome === 'stall'); sel.value = String(idx >= 0 ? idx : 0); drawTrace(); }
+
+  // ---- incidents ----
+  const inc = document.getElementById('incidents');
+  if (!(R.incidents || []).length) inc.appendChild(el('div', {}, 'None recorded.'));
+  for (const e of (R.incidents || [])) { const d = el('div'); d.appendChild(el('span', {}, new Date(e.t * 1000).toLocaleString())); d.appendChild(el('span', {}, `${e.run}: ${e.msg}`)); inc.appendChild(d); }
+
+  // ---- log ----
+  const log = document.getElementById('log');
+  for (const run of R.runs) { log.appendChild(el('div', { class: 'run' }, run.name)); for (const e of run.events) { const d = el('div'); d.appendChild(el('span', {}, new Date(e.t * 1000).toLocaleTimeString())); d.appendChild(el('span', {}, e.msg)); log.appendChild(d); } }
+})();
+</script>

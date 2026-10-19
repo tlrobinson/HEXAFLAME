@@ -1,0 +1,5 @@
+{"type": "event", "t": 1791852402.0817378, "msg": "parked at seat after zero-return", "enc": -8947, "deg_open": 0.02197265625}
+{"type": "event", "t": 1791852404.1247382, "msg": "unstick attempt", "maxt": 300, "moved_deg": 0.0, "blocked": false, "deg_open": 0.02197265625, "psu_i": 0.03}
+{"type": "event", "t": 1791852405.5855763, "msg": "unstick attempt", "maxt": 400, "moved_deg": 12.5189208984375, "blocked": false, "deg_open": 13.1451416015625, "psu_i": 0.03}
+{"type": "event", "t": 1791852405.5858293, "msg": "freed", "maxt": 400}
+{"type": "event", "t": 1791852408.2059865, "msg": "parked", "enc": 11267, "deg_open": 111.060791015625, "disabled": true}

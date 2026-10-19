@@ -1,0 +1,44 @@
+{
+  "name": "esp32-solenoid-firmware",
+  "root": "esp32-solenoid-firmware",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": [
+        "{projectRoot}/.pio/build"
+      ],
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pio run -e feather_esp32s3"
+      }
+    },
+    "clean": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pio run -e feather_esp32s3 -t clean"
+      }
+    },
+    "upload": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pio run -e feather_esp32s3 -t upload"
+      }
+    },
+    "monitor": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pio device monitor -b 115200"
+      }
+    },
+    "test-host": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "./test/host/run.sh"
+      }
+    }
+  }
+}

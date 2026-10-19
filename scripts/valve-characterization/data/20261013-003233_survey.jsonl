@@ -1,0 +1,13 @@
+{"type": "event", "t": 1791851553.7488353, "msg": "psu Siglent Technologies,SPD3303X-E,SPD3XJGQ904563,1.01.01.03.11R1,V6.2"}
+{"type": "maxt", "t": 1791851553.963334, "maxt": 500}
+{"type": "sample", "t": 1791851554.124135, "enc": 29827, "deg_open": 213.013916015625, "err_deg": 0.3076171875, "blocked": false, "move_id": 0, "psu_v": null, "psu_i": null}
+{"type": "event", "t": 1791851554.1249511, "msg": "setup: enc 29827, 213.013916015625 deg open, err 0.3076171875, blocked False"}
+{"type": "event", "t": 1791851554.1258457, "msg": "survey: window 60..406 deg open, torques [300, 400, 500, 700, 900, 1200], rpms [5.0, 10.0, 20.0, 40.0, 60.0, 90.0, 120.0, 180.0]"}
+{"type": "event", "t": 1791851554.1364126, "msg": "shaft moved -207.1 deg between moves (uncommanded)", "uncommanded_deg": -207.1307373046875}
+{"type": "move_start", "t": 1791851554.136812, "move_id": 1, "start_enc": 29827, "start_deg_open": 213.013916015625, "target_enc": 2881, "max_travel_deg": 148.018798828125, "ramp_deg": 15.0, "label": "survey start", "closing": true, "gear": 4, "rpm": 18.75, "maxt": 500}
+{"type": "sample", "t": 1791851554.1445951, "enc": 32928, "deg_open": 230.0482177734375, "err_deg": 0.1318359375, "blocked": false, "move_id": 1, "psu_v": null, "psu_i": null, "label": "survey start", "closing": true, "gear": 4, "rpm": 18.75, "maxt": 500}
+{"type": "overspeed", "t": 1791851554.149401, "move_id": 1, "obs_rpm": 94.635009765625, "rpm_limit": 41.25, "enc": 32928, "label": "survey start", "closing": true, "gear": 4, "rpm": 18.75, "maxt": 500}
+{"type": "event", "t": 1791851554.1502323, "msg": "OVERSPEED: 95 rpm observed on a 18.8 rpm command (survey start); stopped and disabled", "obs_rpm": 94.635009765625}
+{"type": "event", "t": 1791851554.150982, "msg": "ABORT: overspeed on survey start: 95 rpm vs 18.8 commanded"}
+{"type": "psu", "t": 1791851554.3248446, "v": 16.0, "i": 0.09, "move_id": 1, "label": "survey start", "closing": true, "gear": 4, "rpm": 18.75, "maxt": 500}
+{"type": "event", "t": 1791851554.3671956, "msg": "shutdown: motor disabled, shaft still, MaxT 500, enc 32916, enabled False, link: 0 bad replies, 0 retried, 0 failed cmds"}

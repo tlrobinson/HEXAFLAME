@@ -1,0 +1,781 @@
+{"type": "trigger", "t": 1791853105.8408663, "cmd": "reads only", "i": 0, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853106.1012282, "cmd": "reads only", "i": 1, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853106.3600693, "cmd": "reads only", "i": 2, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853106.6224713, "cmd": "reads only", "i": 3, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853106.8786027, "cmd": "reads only", "i": 4, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853107.1381364, "cmd": "reads only", "i": 5, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853107.3947413, "cmd": "reads only", "i": 6, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853107.6592076, "cmd": "reads only", "i": 7, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853107.918553, "cmd": "reads only", "i": 8, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853108.1750653, "cmd": "reads only", "i": 9, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853108.4369495, "cmd": "reads only", "i": 10, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853108.6920176, "cmd": "reads only", "i": 11, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853108.953199, "cmd": "reads only", "i": 12, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853109.2156653, "cmd": "reads only", "i": 13, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853109.4797356, "cmd": "reads only", "i": 14, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853109.7397254, "cmd": "reads only", "i": 15, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853110.000619, "cmd": "reads only", "i": 16, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853110.2600791, "cmd": "reads only", "i": 17, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853110.5133982, "cmd": "reads only", "i": 18, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853110.769755, "cmd": "reads only", "i": 19, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853111.0302022, "cmd": "reads only", "i": 20, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853111.2891638, "cmd": "reads only", "i": 21, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853111.5479264, "cmd": "reads only", "i": 22, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853111.801327, "cmd": "reads only", "i": 23, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853112.054569, "cmd": "reads only", "i": 24, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853112.3144016, "cmd": "reads only", "i": 25, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853112.5691853, "cmd": "reads only", "i": 26, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853112.8298466, "cmd": "reads only", "i": 27, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853113.0897682, "cmd": "reads only", "i": 28, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853113.3519728, "cmd": "reads only", "i": 29, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853113.6110368, "cmd": "reads only", "i": 30, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853113.8743336, "cmd": "reads only", "i": 31, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853114.1301653, "cmd": "reads only", "i": 32, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853114.3971856, "cmd": "reads only", "i": 33, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853114.6522028, "cmd": "reads only", "i": 34, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853114.9091027, "cmd": "reads only", "i": 35, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853115.1648214, "cmd": "reads only", "i": 36, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853115.4243336, "cmd": "reads only", "i": 37, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853115.683717, "cmd": "reads only", "i": 38, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853115.9377503, "cmd": "reads only", "i": 39, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853116.2033992, "cmd": "reads only", "i": 40, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853116.4632154, "cmd": "reads only", "i": 41, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853116.7223098, "cmd": "reads only", "i": 42, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853116.9750047, "cmd": "reads only", "i": 43, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853117.2283306, "cmd": "reads only", "i": 44, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853117.4863503, "cmd": "reads only", "i": 45, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853117.7451563, "cmd": "reads only", "i": 46, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853118.0067093, "cmd": "reads only", "i": 47, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853118.273085, "cmd": "reads only", "i": 48, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853118.5332105, "cmd": "reads only", "i": 49, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853118.789405, "cmd": "reads only", "i": 50, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853119.0522542, "cmd": "reads only", "i": 51, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853119.3086913, "cmd": "reads only", "i": 52, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853119.5689023, "cmd": "reads only", "i": 53, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853119.8257105, "cmd": "reads only", "i": 54, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853120.0810418, "cmd": "reads only", "i": 55, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853120.3345077, "cmd": "reads only", "i": 56, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853120.5896838, "cmd": "reads only", "i": 57, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853120.8450575, "cmd": "reads only", "i": 58, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853121.1044014, "cmd": "reads only", "i": 59, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853121.3589082, "cmd": "reads only", "i": 60, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853121.6140866, "cmd": "reads only", "i": 61, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853121.8690996, "cmd": "reads only", "i": 62, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853122.1308208, "cmd": "reads only", "i": 63, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853122.3924356, "cmd": "reads only", "i": 64, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853122.6496344, "cmd": "reads only", "i": 65, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853122.9052818, "cmd": "reads only", "i": 66, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853123.1611702, "cmd": "reads only", "i": 67, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853123.420596, "cmd": "reads only", "i": 68, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853123.6818466, "cmd": "reads only", "i": 69, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853123.9366555, "cmd": "reads only", "i": 70, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853124.195059, "cmd": "reads only", "i": 71, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853124.450543, "cmd": "reads only", "i": 72, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853124.7114775, "cmd": "reads only", "i": 73, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853124.9708776, "cmd": "reads only", "i": 74, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853125.22679, "cmd": "reads only", "i": 75, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853125.4830697, "cmd": "reads only", "i": 76, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853125.7439024, "cmd": "reads only", "i": 77, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853125.9998636, "cmd": "reads only", "i": 78, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853126.2546859, "cmd": "reads only", "i": 79, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853126.5145938, "cmd": "reads only", "i": 80, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853126.7716794, "cmd": "reads only", "i": 81, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853127.0390697, "cmd": "reads only", "i": 82, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853127.3000467, "cmd": "reads only", "i": 83, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853127.5629508, "cmd": "reads only", "i": 84, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853127.8181388, "cmd": "reads only", "i": 85, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853128.0748131, "cmd": "reads only", "i": 86, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853128.3312535, "cmd": "reads only", "i": 87, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853128.591114, "cmd": "reads only", "i": 88, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853128.8588398, "cmd": "reads only", "i": 89, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853129.1217842, "cmd": "reads only", "i": 90, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853129.3849716, "cmd": "reads only", "i": 91, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853129.6434271, "cmd": "reads only", "i": 92, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853129.9053452, "cmd": "reads only", "i": 93, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853130.1613262, "cmd": "reads only", "i": 94, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853130.4217052, "cmd": "reads only", "i": 95, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853130.6793683, "cmd": "reads only", "i": 96, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853130.9364018, "cmd": "reads only", "i": 97, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853131.1899354, "cmd": "reads only", "i": 98, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853131.4761095, "cmd": "reads only", "i": 99, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853131.7382996, "cmd": "reads only", "i": 100, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853132.0014846, "cmd": "reads only", "i": 101, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853132.260072, "cmd": "reads only", "i": 102, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853132.5226035, "cmd": "reads only", "i": 103, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853132.778002, "cmd": "reads only", "i": 104, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853133.0433319, "cmd": "reads only", "i": 105, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853133.3025126, "cmd": "reads only", "i": 106, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853133.5610316, "cmd": "reads only", "i": 107, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853133.81539, "cmd": "reads only", "i": 108, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853134.068669, "cmd": "reads only", "i": 109, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853134.3297458, "cmd": "reads only", "i": 110, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853134.5867164, "cmd": "reads only", "i": 111, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853134.840776, "cmd": "reads only", "i": 112, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853135.1049638, "cmd": "reads only", "i": 113, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853135.3631842, "cmd": "reads only", "i": 114, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853135.6201046, "cmd": "reads only", "i": 115, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853135.884099, "cmd": "reads only", "i": 116, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853136.137262, "cmd": "reads only", "i": 117, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853136.395996, "cmd": "reads only", "i": 118, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853136.660717, "cmd": "reads only", "i": 119, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853136.9186027, "cmd": "A5 MaxT 500", "i": 0, "lunge": false, "peak": -0.0384521484375}
+{"type": "trigger", "t": 1791853137.1803863, "cmd": "A5 MaxT 500", "i": 1, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853137.4395833, "cmd": "A5 MaxT 500", "i": 2, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853138.4320095, "cmd": "A5 MaxT 500", "i": 3, "lunge": true, "from_deg": 197.314453125, "to_deg": 229.9603271484375, "moved": 32.6458740234375}
+{"type": "trigger", "t": 1791853139.6749318, "cmd": "A5 MaxT 500", "i": 4, "lunge": false, "peak": 0.0439453125}
+{"type": "trigger", "t": 1791853139.9380155, "cmd": "A5 MaxT 500", "i": 5, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853140.2037356, "cmd": "A5 MaxT 500", "i": 6, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853140.4604735, "cmd": "A5 MaxT 500", "i": 7, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853140.7274354, "cmd": "A5 MaxT 500", "i": 8, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853140.9970436, "cmd": "A5 MaxT 500", "i": 9, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853141.256243, "cmd": "A5 MaxT 500", "i": 10, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853142.2140672, "cmd": "A5 MaxT 500", "i": 11, "lunge": true, "from_deg": 202.8900146484375, "to_deg": 229.9383544921875, "moved": 27.04833984375}
+{"type": "trigger", "t": 1791853143.5433288, "cmd": "A5 MaxT 500", "i": 12, "lunge": false, "peak": 0.0439453125}
+{"type": "trigger", "t": 1791853143.8071694, "cmd": "A5 MaxT 500", "i": 13, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853144.0733707, "cmd": "A5 MaxT 500", "i": 14, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853144.3305964, "cmd": "A5 MaxT 500", "i": 15, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853144.590992, "cmd": "A5 MaxT 500", "i": 16, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853144.8520927, "cmd": "A5 MaxT 500", "i": 17, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853145.1116939, "cmd": "A5 MaxT 500", "i": 18, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853145.3701215, "cmd": "A5 MaxT 500", "i": 19, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853145.6319947, "cmd": "A5 MaxT 500", "i": 20, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853145.8915486, "cmd": "A5 MaxT 500", "i": 21, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853146.155928, "cmd": "A5 MaxT 500", "i": 22, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853146.4224563, "cmd": "A5 MaxT 500", "i": 23, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853146.6811848, "cmd": "A5 MaxT 500", "i": 24, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853146.9468317, "cmd": "A5 MaxT 500", "i": 25, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853147.2062871, "cmd": "A5 MaxT 500", "i": 26, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853147.465869, "cmd": "A5 MaxT 500", "i": 27, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853147.7333763, "cmd": "A5 MaxT 500", "i": 28, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853148.000929, "cmd": "A5 MaxT 500", "i": 29, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853148.2669225, "cmd": "A5 MaxT 500", "i": 30, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853148.5242758, "cmd": "A5 MaxT 500", "i": 31, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853148.7827952, "cmd": "A5 MaxT 500", "i": 32, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853149.0414872, "cmd": "A5 MaxT 500", "i": 33, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853149.3069558, "cmd": "A5 MaxT 500", "i": 34, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853149.5702264, "cmd": "A5 MaxT 500", "i": 35, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853149.8424819, "cmd": "A5 MaxT 500", "i": 36, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853150.0982757, "cmd": "A5 MaxT 500", "i": 37, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853150.3608599, "cmd": "A5 MaxT 500", "i": 38, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853150.6215885, "cmd": "A5 MaxT 500", "i": 39, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853150.8835127, "cmd": "A5 MaxT 500", "i": 40, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853151.1395674, "cmd": "A5 MaxT 500", "i": 41, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853151.3962412, "cmd": "A5 MaxT 500", "i": 42, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853151.6544685, "cmd": "A5 MaxT 500", "i": 43, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853151.9166152, "cmd": "A5 MaxT 500", "i": 44, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853152.1802332, "cmd": "A5 MaxT 500", "i": 45, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853152.4373376, "cmd": "A5 MaxT 500", "i": 46, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853152.694865, "cmd": "A5 MaxT 500", "i": 47, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853152.9603648, "cmd": "A5 MaxT 500", "i": 48, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853153.2255416, "cmd": "A5 MaxT 500", "i": 49, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853153.4844341, "cmd": "A5 MaxT 500", "i": 50, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853153.7493026, "cmd": "A5 MaxT 500", "i": 51, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853154.011018, "cmd": "A5 MaxT 500", "i": 52, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853154.2739182, "cmd": "A5 MaxT 500", "i": 53, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853154.5332355, "cmd": "A5 MaxT 500", "i": 54, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853154.8029685, "cmd": "A5 MaxT 500", "i": 55, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853155.067338, "cmd": "A5 MaxT 500", "i": 56, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853155.3301716, "cmd": "A5 MaxT 500", "i": 57, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853155.5903354, "cmd": "A5 MaxT 500", "i": 58, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853155.8473167, "cmd": "A5 MaxT 500", "i": 59, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853156.1197762, "cmd": "A5 MaxT 500", "i": 60, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853156.3773522, "cmd": "A5 MaxT 500", "i": 61, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853156.640301, "cmd": "A5 MaxT 500", "i": 62, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853156.9056242, "cmd": "A5 MaxT 500", "i": 63, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853157.1629727, "cmd": "A5 MaxT 500", "i": 64, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853157.4255648, "cmd": "A5 MaxT 500", "i": 65, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853157.6901276, "cmd": "A5 MaxT 500", "i": 66, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853157.9555852, "cmd": "A5 MaxT 500", "i": 67, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853158.2253218, "cmd": "A5 MaxT 500", "i": 68, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853158.4898658, "cmd": "A5 MaxT 500", "i": 69, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853158.754213, "cmd": "A5 MaxT 500", "i": 70, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853159.0145097, "cmd": "A5 MaxT 500", "i": 71, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853159.2718904, "cmd": "A5 MaxT 500", "i": 72, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853159.5301516, "cmd": "A5 MaxT 500", "i": 73, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853159.7921903, "cmd": "A5 MaxT 500", "i": 74, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853160.0544875, "cmd": "A5 MaxT 500", "i": 75, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853160.3237145, "cmd": "A5 MaxT 500", "i": 76, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853160.5841997, "cmd": "A5 MaxT 500", "i": 77, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853160.8489017, "cmd": "A5 MaxT 500", "i": 78, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853161.1121602, "cmd": "A5 MaxT 500", "i": 79, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853161.3696537, "cmd": "A5 MaxT 500", "i": 80, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853161.632107, "cmd": "A5 MaxT 500", "i": 81, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853161.8949854, "cmd": "A5 MaxT 500", "i": 82, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853162.8793952, "cmd": "A5 MaxT 500", "i": 83, "lunge": true, "from_deg": 200.0775146484375, "to_deg": 229.9383544921875, "moved": 29.86083984375}
+{"type": "trigger", "t": 1791853164.200109, "cmd": "A5 MaxT 500", "i": 84, "lunge": false, "peak": 0.0439453125}
+{"type": "trigger", "t": 1791853164.4690428, "cmd": "A5 MaxT 500", "i": 85, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853164.7265546, "cmd": "A5 MaxT 500", "i": 86, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853164.9854248, "cmd": "A5 MaxT 500", "i": 87, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853165.2502067, "cmd": "A5 MaxT 500", "i": 88, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853165.5096722, "cmd": "A5 MaxT 500", "i": 89, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853165.7721877, "cmd": "A5 MaxT 500", "i": 90, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853166.0396361, "cmd": "A5 MaxT 500", "i": 91, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853166.303066, "cmd": "A5 MaxT 500", "i": 92, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853166.568472, "cmd": "A5 MaxT 500", "i": 93, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853166.838839, "cmd": "A5 MaxT 500", "i": 94, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853167.1020722, "cmd": "A5 MaxT 500", "i": 95, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853167.3687372, "cmd": "A5 MaxT 500", "i": 96, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853167.634833, "cmd": "A5 MaxT 500", "i": 97, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853167.8935928, "cmd": "A5 MaxT 500", "i": 98, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853168.1622694, "cmd": "A5 MaxT 500", "i": 99, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853168.4256282, "cmd": "A5 MaxT 500", "i": 100, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853168.6828794, "cmd": "A5 MaxT 500", "i": 101, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853168.9503274, "cmd": "A5 MaxT 500", "i": 102, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853169.2157333, "cmd": "A5 MaxT 500", "i": 103, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853169.4737735, "cmd": "A5 MaxT 500", "i": 104, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853169.739577, "cmd": "A5 MaxT 500", "i": 105, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853170.6900148, "cmd": "A5 MaxT 500", "i": 106, "lunge": true, "from_deg": 200.006103515625, "to_deg": 229.9383544921875, "moved": 29.9322509765625}
+{"type": "trigger", "t": 1791853171.9850647, "cmd": "A5 MaxT 500", "i": 107, "lunge": false, "peak": 0.0439453125}
+{"type": "trigger", "t": 1791853172.2502224, "cmd": "A5 MaxT 500", "i": 108, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853172.507306, "cmd": "A5 MaxT 500", "i": 109, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853172.7721715, "cmd": "A5 MaxT 500", "i": 110, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853173.0415804, "cmd": "A5 MaxT 500", "i": 111, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853173.3065083, "cmd": "A5 MaxT 500", "i": 112, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853173.5631216, "cmd": "A5 MaxT 500", "i": 113, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853173.830264, "cmd": "A5 MaxT 500", "i": 114, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853174.0971403, "cmd": "A5 MaxT 500", "i": 115, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853174.3555691, "cmd": "A5 MaxT 500", "i": 116, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853174.6145585, "cmd": "A5 MaxT 500", "i": 117, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853174.8748775, "cmd": "A5 MaxT 500", "i": 118, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853175.1375566, "cmd": "A5 MaxT 500", "i": 119, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853175.3993247, "cmd": "A5 MaxT 400", "i": 0, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853175.656511, "cmd": "A5 MaxT 400", "i": 1, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853175.918876, "cmd": "A5 MaxT 400", "i": 2, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853176.1783223, "cmd": "A5 MaxT 400", "i": 3, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853176.4427938, "cmd": "A5 MaxT 400", "i": 4, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853177.417369, "cmd": "A5 MaxT 400", "i": 5, "lunge": true, "from_deg": 203.060302734375, "to_deg": 229.9383544921875, "moved": 26.8780517578125}
+{"type": "trigger", "t": 1791853178.6988046, "cmd": "A5 MaxT 400", "i": 6, "lunge": false, "peak": 0.0384521484375}
+{"type": "trigger", "t": 1791853178.9621637, "cmd": "A5 MaxT 400", "i": 7, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853179.22181, "cmd": "A5 MaxT 400", "i": 8, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853179.4904635, "cmd": "A5 MaxT 400", "i": 9, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853179.7480595, "cmd": "A5 MaxT 400", "i": 10, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853180.0121238, "cmd": "A5 MaxT 400", "i": 11, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853180.9982033, "cmd": "A5 MaxT 400", "i": 12, "lunge": true, "from_deg": 202.8021240234375, "to_deg": 229.9383544921875, "moved": 27.13623046875}
+{"type": "trigger", "t": 1791853182.2487683, "cmd": "A5 MaxT 400", "i": 13, "lunge": false, "peak": 0.0439453125}
+{"type": "trigger", "t": 1791853182.5131047, "cmd": "A5 MaxT 400", "i": 14, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853182.7783585, "cmd": "A5 MaxT 400", "i": 15, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853183.0447233, "cmd": "A5 MaxT 400", "i": 16, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853183.306527, "cmd": "A5 MaxT 400", "i": 17, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853183.5625806, "cmd": "A5 MaxT 400", "i": 18, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853183.8255792, "cmd": "A5 MaxT 400", "i": 19, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853184.094477, "cmd": "A5 MaxT 400", "i": 20, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853184.3515506, "cmd": "A5 MaxT 400", "i": 21, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853184.6082542, "cmd": "A5 MaxT 400", "i": 22, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853184.8723683, "cmd": "A5 MaxT 400", "i": 23, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853185.137906, "cmd": "A5 MaxT 400", "i": 24, "lunge": false, "peak": 0.0164794921875}
+{"type": "trigger", "t": 1791853185.4003272, "cmd": "A5 MaxT 400", "i": 25, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853185.6598005, "cmd": "A5 MaxT 400", "i": 26, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853185.9214978, "cmd": "A5 MaxT 400", "i": 27, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853186.1855648, "cmd": "A5 MaxT 400", "i": 28, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853186.4420762, "cmd": "A5 MaxT 400", "i": 29, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853186.7072687, "cmd": "A5 MaxT 400", "i": 30, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853186.965715, "cmd": "A5 MaxT 400", "i": 31, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853187.2276785, "cmd": "A5 MaxT 400", "i": 32, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853187.485453, "cmd": "A5 MaxT 400", "i": 33, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853187.7514265, "cmd": "A5 MaxT 400", "i": 34, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853188.0180984, "cmd": "A5 MaxT 400", "i": 35, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853188.2750368, "cmd": "A5 MaxT 400", "i": 36, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853188.5432484, "cmd": "A5 MaxT 400", "i": 37, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853188.8009675, "cmd": "A5 MaxT 400", "i": 38, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853189.062414, "cmd": "A5 MaxT 400", "i": 39, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853189.334902, "cmd": "A5 MaxT 400", "i": 40, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853189.5939577, "cmd": "A5 MaxT 400", "i": 41, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853189.85487, "cmd": "A5 MaxT 400", "i": 42, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853190.123835, "cmd": "A5 MaxT 400", "i": 43, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853190.382256, "cmd": "A5 MaxT 400", "i": 44, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853190.6475391, "cmd": "A5 MaxT 400", "i": 45, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853190.9073644, "cmd": "A5 MaxT 400", "i": 46, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853191.1719463, "cmd": "A5 MaxT 400", "i": 47, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853191.4377954, "cmd": "A5 MaxT 400", "i": 48, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853191.6974993, "cmd": "A5 MaxT 400", "i": 49, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853191.9550416, "cmd": "A5 MaxT 400", "i": 50, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853192.2221565, "cmd": "A5 MaxT 400", "i": 51, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853192.4785826, "cmd": "A5 MaxT 400", "i": 52, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853192.7454987, "cmd": "A5 MaxT 400", "i": 53, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853193.00815, "cmd": "A5 MaxT 400", "i": 54, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853193.9728768, "cmd": "A5 MaxT 400", "i": 55, "lunge": true, "from_deg": 203.0767822265625, "to_deg": 229.9163818359375, "moved": 26.839599609375}
+{"type": "trigger", "t": 1791853195.2434072, "cmd": "A5 MaxT 400", "i": 56, "lunge": false, "peak": 0.0439453125}
+{"type": "trigger", "t": 1791853195.5047061, "cmd": "A5 MaxT 400", "i": 57, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853195.7675447, "cmd": "A5 MaxT 400", "i": 58, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853196.0240283, "cmd": "A5 MaxT 400", "i": 59, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853196.2909443, "cmd": "F3 01 enable", "i": 0, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853196.5516064, "cmd": "F3 01 enable", "i": 1, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853196.8059902, "cmd": "F3 01 enable", "i": 2, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853197.0677335, "cmd": "F3 01 enable", "i": 3, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853197.3292568, "cmd": "F3 01 enable", "i": 4, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853197.5863664, "cmd": "F3 01 enable", "i": 5, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853197.8426566, "cmd": "F3 01 enable", "i": 6, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853198.1062226, "cmd": "F3 01 enable", "i": 7, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853198.3736546, "cmd": "F3 01 enable", "i": 8, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853198.6299057, "cmd": "F3 01 enable", "i": 9, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853198.887589, "cmd": "F3 01 enable", "i": 10, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853199.14868, "cmd": "F3 01 enable", "i": 11, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853199.403944, "cmd": "F3 01 enable", "i": 12, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853199.6728084, "cmd": "F3 01 enable", "i": 13, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853199.9356568, "cmd": "F3 01 enable", "i": 14, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853200.1918702, "cmd": "F3 01 enable", "i": 15, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853200.4499002, "cmd": "F3 01 enable", "i": 16, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853200.7173176, "cmd": "F3 01 enable", "i": 17, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853200.979811, "cmd": "F3 01 enable", "i": 18, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853201.2367024, "cmd": "F3 01 enable", "i": 19, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853201.4949226, "cmd": "F3 01 enable", "i": 20, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853201.7572596, "cmd": "F3 01 enable", "i": 21, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853202.0199003, "cmd": "F3 01 enable", "i": 22, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853202.2751405, "cmd": "F3 01 enable", "i": 23, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853202.543483, "cmd": "F3 01 enable", "i": 24, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853202.8067634, "cmd": "F3 01 enable", "i": 25, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853203.0647697, "cmd": "F3 01 enable", "i": 26, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853203.3276649, "cmd": "F3 01 enable", "i": 27, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853203.5951083, "cmd": "F3 01 enable", "i": 28, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853203.857385, "cmd": "F3 01 enable", "i": 29, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853204.112362, "cmd": "F3 01 enable", "i": 30, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853204.3668423, "cmd": "F3 01 enable", "i": 31, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853204.6291263, "cmd": "F3 01 enable", "i": 32, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853204.8880963, "cmd": "F3 01 enable", "i": 33, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853205.1430297, "cmd": "F3 01 enable", "i": 34, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853205.399351, "cmd": "F3 01 enable", "i": 35, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853205.660849, "cmd": "F3 01 enable", "i": 36, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853205.9248343, "cmd": "F3 01 enable", "i": 37, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853206.1903305, "cmd": "F3 01 enable", "i": 38, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853206.4499366, "cmd": "F3 01 enable", "i": 39, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853206.7062669, "cmd": "F3 01 enable", "i": 40, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853206.9645934, "cmd": "F3 01 enable", "i": 41, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853207.2221143, "cmd": "F3 01 enable", "i": 42, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853207.485824, "cmd": "F3 01 enable", "i": 43, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853207.7411418, "cmd": "F3 01 enable", "i": 44, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853207.9965565, "cmd": "F3 01 enable", "i": 45, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853208.2552502, "cmd": "F3 01 enable", "i": 46, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853208.5189214, "cmd": "F3 01 enable", "i": 47, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853208.7773833, "cmd": "F3 01 enable", "i": 48, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853209.0410988, "cmd": "F3 01 enable", "i": 49, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853209.304048, "cmd": "F3 01 enable", "i": 50, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853209.564068, "cmd": "F3 01 enable", "i": 51, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853209.8267293, "cmd": "F3 01 enable", "i": 52, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853210.0836644, "cmd": "F3 01 enable", "i": 53, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853210.3391657, "cmd": "F3 01 enable", "i": 54, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853210.600077, "cmd": "F3 01 enable", "i": 55, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853210.8615882, "cmd": "F3 01 enable", "i": 56, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853211.1176884, "cmd": "F3 01 enable", "i": 57, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853211.3823895, "cmd": "F3 01 enable", "i": 58, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853211.6494155, "cmd": "F3 01 enable", "i": 59, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853211.9089308, "cmd": "F3 01 enable", "i": 60, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853212.174024, "cmd": "F3 01 enable", "i": 61, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853212.4298658, "cmd": "F3 01 enable", "i": 62, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853212.694029, "cmd": "F3 01 enable", "i": 63, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853212.95892, "cmd": "F3 01 enable", "i": 64, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853213.217049, "cmd": "F3 01 enable", "i": 65, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853213.4773068, "cmd": "F3 01 enable", "i": 66, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853213.733321, "cmd": "F3 01 enable", "i": 67, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853213.994037, "cmd": "F3 01 enable", "i": 68, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853214.2510674, "cmd": "F3 01 enable", "i": 69, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853214.514986, "cmd": "F3 01 enable", "i": 70, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853214.771538, "cmd": "F3 01 enable", "i": 71, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853215.0390108, "cmd": "F3 01 enable", "i": 72, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853215.2980747, "cmd": "F3 01 enable", "i": 73, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853215.5552878, "cmd": "F3 01 enable", "i": 74, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853215.8174825, "cmd": "F3 01 enable", "i": 75, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853216.0851367, "cmd": "F3 01 enable", "i": 76, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853216.3398468, "cmd": "F3 01 enable", "i": 77, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853216.6011527, "cmd": "F3 01 enable", "i": 78, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853216.865521, "cmd": "F3 01 enable", "i": 79, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853217.1221755, "cmd": "F3 01 enable", "i": 80, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853217.3843493, "cmd": "F3 01 enable", "i": 81, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853217.6428509, "cmd": "F3 01 enable", "i": 82, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853217.90181, "cmd": "F3 01 enable", "i": 83, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853218.1656594, "cmd": "F3 01 enable", "i": 84, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853218.4314737, "cmd": "F3 01 enable", "i": 85, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853218.6932337, "cmd": "F3 01 enable", "i": 86, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853218.9509642, "cmd": "F3 01 enable", "i": 87, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853219.2063682, "cmd": "F3 01 enable", "i": 88, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853219.4616709, "cmd": "F3 01 enable", "i": 89, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853219.7223644, "cmd": "F3 01 enable", "i": 90, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853219.985551, "cmd": "F3 01 enable", "i": 91, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853220.253379, "cmd": "F3 01 enable", "i": 92, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853220.5199704, "cmd": "F3 01 enable", "i": 93, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853220.7774978, "cmd": "F3 01 enable", "i": 94, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853221.0416555, "cmd": "F3 01 enable", "i": 95, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853221.3064551, "cmd": "F3 01 enable", "i": 96, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853221.570143, "cmd": "F3 01 enable", "i": 97, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853221.8270907, "cmd": "F3 01 enable", "i": 98, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853222.0892992, "cmd": "F3 01 enable", "i": 99, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853222.345358, "cmd": "F3 01 enable", "i": 100, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853222.606563, "cmd": "F3 01 enable", "i": 101, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853222.8662117, "cmd": "F3 01 enable", "i": 102, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853223.130008, "cmd": "F3 01 enable", "i": 103, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853223.3894722, "cmd": "F3 01 enable", "i": 104, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853223.6484158, "cmd": "F3 01 enable", "i": 105, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853223.9069824, "cmd": "F3 01 enable", "i": 106, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853224.169424, "cmd": "F3 01 enable", "i": 107, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853224.435955, "cmd": "F3 01 enable", "i": 108, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853224.69489, "cmd": "F3 01 enable", "i": 109, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853224.9518611, "cmd": "F3 01 enable", "i": 110, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853225.2126813, "cmd": "F3 01 enable", "i": 111, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853225.4684339, "cmd": "F3 01 enable", "i": 112, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853225.7330177, "cmd": "F3 01 enable", "i": 113, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853225.9935741, "cmd": "F3 01 enable", "i": 114, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853226.2576172, "cmd": "F3 01 enable", "i": 115, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853226.5185888, "cmd": "F3 01 enable", "i": 116, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853226.7838624, "cmd": "F3 01 enable", "i": 117, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853227.0431654, "cmd": "F3 01 enable", "i": 118, "lunge": false, "peak": -0.02197265625}
+{"type": "trigger", "t": 1791853227.304641, "cmd": "F3 01 enable", "i": 119, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853227.7231572, "cmd": "F6 g1 / F7", "i": 0, "lunge": false, "peak": -1.219482421875}
+{"type": "trigger", "t": 1791853228.1382267, "cmd": "F6 g1 / F7", "i": 1, "lunge": false, "peak": 0.7745361328125}
+{"type": "trigger", "t": 1791853228.5548997, "cmd": "F6 g1 / F7", "i": 2, "lunge": false, "peak": -0.6866455078125}
+{"type": "trigger", "t": 1791853228.965807, "cmd": "F6 g1 / F7", "i": 3, "lunge": false, "peak": 0.7086181640625}
+{"type": "trigger", "t": 1791853229.377142, "cmd": "F6 g1 / F7", "i": 4, "lunge": false, "peak": -0.6866455078125}
+{"type": "trigger", "t": 1791853229.7888644, "cmd": "F6 g1 / F7", "i": 5, "lunge": false, "peak": 0.7305908203125}
+{"type": "trigger", "t": 1791853230.2051733, "cmd": "F6 g1 / F7", "i": 6, "lunge": false, "peak": -0.7305908203125}
+{"type": "trigger", "t": 1791853230.6242273, "cmd": "F6 g1 / F7", "i": 7, "lunge": false, "peak": 0.76904296875}
+{"type": "trigger", "t": 1791853231.0424788, "cmd": "F6 g1 / F7", "i": 8, "lunge": false, "peak": -0.6646728515625}
+{"type": "trigger", "t": 1791853231.4535496, "cmd": "F6 g1 / F7", "i": 9, "lunge": false, "peak": 0.626220703125}
+{"type": "trigger", "t": 1791853231.8685946, "cmd": "F6 g1 / F7", "i": 10, "lunge": false, "peak": -0.6866455078125}
+{"type": "trigger", "t": 1791853232.2874975, "cmd": "F6 g1 / F7", "i": 11, "lunge": false, "peak": 0.8294677734375}
+{"type": "trigger", "t": 1791853232.703388, "cmd": "F6 g1 / F7", "i": 12, "lunge": false, "peak": -0.63720703125}
+{"type": "trigger", "t": 1791853233.111121, "cmd": "F6 g1 / F7", "i": 13, "lunge": false, "peak": 0.6207275390625}
+{"type": "trigger", "t": 1791853233.5310106, "cmd": "F6 g1 / F7", "i": 14, "lunge": false, "peak": -0.6866455078125}
+{"type": "trigger", "t": 1791853233.953457, "cmd": "F6 g1 / F7", "i": 15, "lunge": false, "peak": 0.7855224609375}
+{"type": "trigger", "t": 1791853234.374127, "cmd": "F6 g1 / F7", "i": 16, "lunge": false, "peak": -0.9393310546875}
+{"type": "trigger", "t": 1791853234.7903402, "cmd": "F6 g1 / F7", "i": 17, "lunge": false, "peak": 0.7745361328125}
+{"type": "trigger", "t": 1791853235.2082984, "cmd": "F6 g1 / F7", "i": 18, "lunge": false, "peak": -0.6866455078125}
+{"type": "trigger", "t": 1791853235.6197038, "cmd": "F6 g1 / F7", "i": 19, "lunge": false, "peak": 0.6646728515625}
+{"type": "trigger", "t": 1791853236.0289943, "cmd": "F6 g1 / F7", "i": 20, "lunge": false, "peak": -0.6646728515625}
+{"type": "trigger", "t": 1791853236.4394667, "cmd": "F6 g1 / F7", "i": 21, "lunge": false, "peak": 0.7745361328125}
+{"type": "trigger", "t": 1791853236.8489587, "cmd": "F6 g1 / F7", "i": 22, "lunge": false, "peak": -0.7086181640625}
+{"type": "trigger", "t": 1791853237.266643, "cmd": "F6 g1 / F7", "i": 23, "lunge": false, "peak": 0.7086181640625}
+{"type": "trigger", "t": 1791853237.6827068, "cmd": "F6 g1 / F7", "i": 24, "lunge": false, "peak": -0.7745361328125}
+{"type": "trigger", "t": 1791853238.0983424, "cmd": "F6 g1 / F7", "i": 25, "lunge": false, "peak": 0.7965087890625}
+{"type": "trigger", "t": 1791853238.5139627, "cmd": "F6 g1 / F7", "i": 26, "lunge": false, "peak": -0.6427001953125}
+{"type": "trigger", "t": 1791853238.9262211, "cmd": "F6 g1 / F7", "i": 27, "lunge": false, "peak": 0.6427001953125}
+{"type": "trigger", "t": 1791853239.33954, "cmd": "F6 g1 / F7", "i": 28, "lunge": false, "peak": -0.7086181640625}
+{"type": "trigger", "t": 1791853239.7544346, "cmd": "F6 g1 / F7", "i": 29, "lunge": false, "peak": 0.6646728515625}
+{"type": "trigger", "t": 1791853240.1706605, "cmd": "F6 g1 / F7", "i": 30, "lunge": false, "peak": -0.6646728515625}
+{"type": "trigger", "t": 1791853240.5833364, "cmd": "F6 g1 / F7", "i": 31, "lunge": false, "peak": 0.6427001953125}
+{"type": "trigger", "t": 1791853240.9950948, "cmd": "F6 g1 / F7", "i": 32, "lunge": false, "peak": -0.6207275390625}
+{"type": "trigger", "t": 1791853241.4111207, "cmd": "F6 g1 / F7", "i": 33, "lunge": false, "peak": 0.8734130859375}
+{"type": "trigger", "t": 1791853241.8301823, "cmd": "F6 g1 / F7", "i": 34, "lunge": false, "peak": -0.68115234375}
+{"type": "trigger", "t": 1791853242.2458382, "cmd": "F6 g1 / F7", "i": 35, "lunge": false, "peak": 0.615234375}
+{"type": "trigger", "t": 1791853242.6581786, "cmd": "F6 g1 / F7", "i": 36, "lunge": false, "peak": -0.72509765625}
+{"type": "trigger", "t": 1791853243.0670352, "cmd": "F6 g1 / F7", "i": 37, "lunge": false, "peak": 0.63720703125}
+{"type": "trigger", "t": 1791853243.486883, "cmd": "F6 g1 / F7", "i": 38, "lunge": false, "peak": -0.87890625}
+{"type": "trigger", "t": 1791853243.9019258, "cmd": "F6 g1 / F7", "i": 39, "lunge": false, "peak": 0.76904296875}
+{"type": "trigger", "t": 1791853244.3167157, "cmd": "F6 g1 / F7", "i": 40, "lunge": false, "peak": -0.68115234375}
+{"type": "trigger", "t": 1791853244.7309604, "cmd": "F6 g1 / F7", "i": 41, "lunge": false, "peak": 0.7470703125}
+{"type": "trigger", "t": 1791853245.1403258, "cmd": "F6 g1 / F7", "i": 42, "lunge": false, "peak": -0.5987548828125}
+{"type": "trigger", "t": 1791853245.5562892, "cmd": "F6 g1 / F7", "i": 43, "lunge": false, "peak": 0.6591796875}
+{"type": "trigger", "t": 1791853245.9649003, "cmd": "F6 g1 / F7", "i": 44, "lunge": false, "peak": -0.703125}
+{"type": "trigger", "t": 1791853246.3739774, "cmd": "F6 g1 / F7", "i": 45, "lunge": false, "peak": 0.68115234375}
+{"type": "trigger", "t": 1791853246.798409, "cmd": "F6 g1 / F7", "i": 46, "lunge": false, "peak": -0.9173583984375}
+{"type": "trigger", "t": 1791853247.2148263, "cmd": "F6 g1 / F7", "i": 47, "lunge": false, "peak": 0.7305908203125}
+{"type": "trigger", "t": 1791853247.6323845, "cmd": "F6 g1 / F7", "i": 48, "lunge": false, "peak": -0.7305908203125}
+{"type": "trigger", "t": 1791853248.0509295, "cmd": "F6 g1 / F7", "i": 49, "lunge": false, "peak": 0.7086181640625}
+{"type": "trigger", "t": 1791853248.464171, "cmd": "F6 g1 / F7", "i": 50, "lunge": false, "peak": -0.7745361328125}
+{"type": "trigger", "t": 1791853248.872157, "cmd": "F6 g1 / F7", "i": 51, "lunge": false, "peak": 0.7305908203125}
+{"type": "trigger", "t": 1791853249.287358, "cmd": "F6 g1 / F7", "i": 52, "lunge": false, "peak": -0.7745361328125}
+{"type": "trigger", "t": 1791853249.7048335, "cmd": "F6 g1 / F7", "i": 53, "lunge": false, "peak": 0.7086181640625}
+{"type": "trigger", "t": 1791853250.1218839, "cmd": "F6 g1 / F7", "i": 54, "lunge": false, "peak": -0.7525634765625}
+{"type": "trigger", "t": 1791853250.5349, "cmd": "F6 g1 / F7", "i": 55, "lunge": false, "peak": 0.7086181640625}
+{"type": "trigger", "t": 1791853250.9488533, "cmd": "F6 g1 / F7", "i": 56, "lunge": false, "peak": -0.6646728515625}
+{"type": "trigger", "t": 1791853251.3575573, "cmd": "F6 g1 / F7", "i": 57, "lunge": false, "peak": 0.6646728515625}
+{"type": "trigger", "t": 1791853251.7710438, "cmd": "F6 g1 / F7", "i": 58, "lunge": false, "peak": -0.7470703125}
+{"type": "trigger", "t": 1791853252.1855183, "cmd": "F6 g1 / F7", "i": 59, "lunge": false, "peak": 0.68115234375}
+{"type": "trigger", "t": 1791853252.6022143, "cmd": "F6 g1 / F7", "i": 60, "lunge": false, "peak": -0.7086181640625}
+{"type": "trigger", "t": 1791853253.02182, "cmd": "F6 g1 / F7", "i": 61, "lunge": false, "peak": 0.6427001953125}
+{"type": "trigger", "t": 1791853253.4351065, "cmd": "F6 g1 / F7", "i": 62, "lunge": false, "peak": -0.81298828125}
+{"type": "trigger", "t": 1791853253.8531098, "cmd": "F6 g1 / F7", "i": 63, "lunge": false, "peak": 0.7305908203125}
+{"type": "trigger", "t": 1791853254.2717113, "cmd": "F6 g1 / F7", "i": 64, "lunge": false, "peak": -0.966796875}
+{"type": "trigger", "t": 1791853254.6878204, "cmd": "F6 g1 / F7", "i": 65, "lunge": false, "peak": 0.7745361328125}
+{"type": "trigger", "t": 1791853255.0993161, "cmd": "F6 g1 / F7", "i": 66, "lunge": false, "peak": -0.7086181640625}
+{"type": "trigger", "t": 1791853255.5159621, "cmd": "F6 g1 / F7", "i": 67, "lunge": false, "peak": 0.7305908203125}
+{"type": "trigger", "t": 1791853255.9278595, "cmd": "F6 g1 / F7", "i": 68, "lunge": false, "peak": -0.7086181640625}
+{"type": "trigger", "t": 1791853256.3361514, "cmd": "F6 g1 / F7", "i": 69, "lunge": false, "peak": 0.6427001953125}
+{"type": "trigger", "t": 1791853256.7561536, "cmd": "F6 g1 / F7", "i": 70, "lunge": false, "peak": -0.7470703125}
+{"type": "trigger", "t": 1791853257.1731877, "cmd": "F6 g1 / F7", "i": 71, "lunge": false, "peak": 0.7470703125}
+{"type": "trigger", "t": 1791853257.5880105, "cmd": "F6 g1 / F7", "i": 72, "lunge": false, "peak": -0.7470703125}
+{"type": "trigger", "t": 1791853257.9991248, "cmd": "F6 g1 / F7", "i": 73, "lunge": false, "peak": 0.6646728515625}
+{"type": "trigger", "t": 1791853258.4116488, "cmd": "F6 g1 / F7", "i": 74, "lunge": false, "peak": -0.7745361328125}
+{"type": "trigger", "t": 1791853258.825593, "cmd": "F6 g1 / F7", "i": 75, "lunge": false, "peak": 0.90087890625}
+{"type": "trigger", "t": 1791853259.2325397, "cmd": "F6 g1 / F7", "i": 76, "lunge": false, "peak": -0.7470703125}
+{"type": "trigger", "t": 1791853259.6476262, "cmd": "F6 g1 / F7", "i": 77, "lunge": false, "peak": 0.81298828125}
+{"type": "trigger", "t": 1791853260.0842009, "cmd": "F6 g1 / F7", "i": 78, "lunge": false, "peak": -0.7086181640625}
+{"type": "trigger", "t": 1791853260.4990394, "cmd": "F6 g1 / F7", "i": 79, "lunge": false, "peak": 0.6866455078125}
+{"type": "trigger", "t": 1791853260.9162762, "cmd": "F6 g1 / F7", "i": 80, "lunge": false, "peak": -0.8404541015625}
+{"type": "trigger", "t": 1791853261.3389678, "cmd": "F6 g1 / F7", "i": 81, "lunge": false, "peak": 0.7086181640625}
+{"type": "trigger", "t": 1791853261.7491603, "cmd": "F6 g1 / F7", "i": 82, "lunge": false, "peak": -0.7305908203125}
+{"type": "trigger", "t": 1791853262.1593206, "cmd": "F6 g1 / F7", "i": 83, "lunge": false, "peak": 0.7086181640625}
+{"type": "trigger", "t": 1791853262.5751789, "cmd": "F6 g1 / F7", "i": 84, "lunge": false, "peak": -0.7745361328125}
+{"type": "trigger", "t": 1791853262.9948843, "cmd": "F6 g1 / F7", "i": 85, "lunge": false, "peak": 0.6646728515625}
+{"type": "trigger", "t": 1791853263.4192233, "cmd": "F6 g1 / F7", "i": 86, "lunge": false, "peak": -0.94482421875}
+{"type": "trigger", "t": 1791853263.840069, "cmd": "F6 g1 / F7", "i": 87, "lunge": false, "peak": 0.87890625}
+{"type": "trigger", "t": 1791853264.2505682, "cmd": "F6 g1 / F7", "i": 88, "lunge": false, "peak": -0.7525634765625}
+{"type": "trigger", "t": 1791853264.66557, "cmd": "F6 g1 / F7", "i": 89, "lunge": false, "peak": 0.87890625}
+{"type": "trigger", "t": 1791853265.0776486, "cmd": "F6 g1 / F7", "i": 90, "lunge": false, "peak": -0.81298828125}
+{"type": "trigger", "t": 1791853265.4927688, "cmd": "F6 g1 / F7", "i": 91, "lunge": false, "peak": 0.87890625}
+{"type": "trigger", "t": 1791853265.9099607, "cmd": "F6 g1 / F7", "i": 92, "lunge": false, "peak": -0.81298828125}
+{"type": "trigger", "t": 1791853266.3287094, "cmd": "F6 g1 / F7", "i": 93, "lunge": false, "peak": 0.791015625}
+{"type": "trigger", "t": 1791853266.7480917, "cmd": "F6 g1 / F7", "i": 94, "lunge": false, "peak": -0.7305908203125}
+{"type": "trigger", "t": 1791853267.1619177, "cmd": "F6 g1 / F7", "i": 95, "lunge": false, "peak": 0.7305908203125}
+{"type": "trigger", "t": 1791853267.5736132, "cmd": "F6 g1 / F7", "i": 96, "lunge": false, "peak": -0.7305908203125}
+{"type": "trigger", "t": 1791853267.989249, "cmd": "F6 g1 / F7", "i": 97, "lunge": false, "peak": 0.7086181640625}
+{"type": "trigger", "t": 1791853268.4060793, "cmd": "F6 g1 / F7", "i": 98, "lunge": false, "peak": -0.72509765625}
+{"type": "trigger", "t": 1791853268.8236485, "cmd": "F6 g1 / F7", "i": 99, "lunge": false, "peak": 0.8349609375}
+{"type": "trigger", "t": 1791853269.2379794, "cmd": "F6 g1 / F7", "i": 100, "lunge": false, "peak": -0.7470703125}
+{"type": "trigger", "t": 1791853269.6545384, "cmd": "F6 g1 / F7", "i": 101, "lunge": false, "peak": 0.7470703125}
+{"type": "trigger", "t": 1791853270.0710132, "cmd": "F6 g1 / F7", "i": 102, "lunge": false, "peak": -0.791015625}
+{"type": "trigger", "t": 1791853270.491419, "cmd": "F6 g1 / F7", "i": 103, "lunge": false, "peak": 0.81298828125}
+{"type": "trigger", "t": 1791853270.9047198, "cmd": "F6 g1 / F7", "i": 104, "lunge": false, "peak": -0.6866455078125}
+{"type": "trigger", "t": 1791853271.318268, "cmd": "F6 g1 / F7", "i": 105, "lunge": false, "peak": 0.7525634765625}
+{"type": "trigger", "t": 1791853271.7274723, "cmd": "F6 g1 / F7", "i": 106, "lunge": false, "peak": -0.7525634765625}
+{"type": "trigger", "t": 1791853272.1338897, "cmd": "F6 g1 / F7", "i": 107, "lunge": false, "peak": 0.6866455078125}
+{"type": "trigger", "t": 1791853272.5485456, "cmd": "F6 g1 / F7", "i": 108, "lunge": false, "peak": -0.791015625}
+{"type": "trigger", "t": 1791853272.9584062, "cmd": "F6 g1 / F7", "i": 109, "lunge": false, "peak": 0.7086181640625}
+{"type": "trigger", "t": 1791853273.3777864, "cmd": "F6 g1 / F7", "i": 110, "lunge": false, "peak": -0.7525634765625}
+{"type": "trigger", "t": 1791853273.7903936, "cmd": "F6 g1 / F7", "i": 111, "lunge": false, "peak": 0.7965087890625}
+{"type": "trigger", "t": 1791853274.1968112, "cmd": "F6 g1 / F7", "i": 112, "lunge": false, "peak": -0.7305908203125}
+{"type": "trigger", "t": 1791853274.6156306, "cmd": "F6 g1 / F7", "i": 113, "lunge": false, "peak": 0.81298828125}
+{"type": "trigger", "t": 1791853275.0281835, "cmd": "F6 g1 / F7", "i": 114, "lunge": false, "peak": -0.6646728515625}
+{"type": "trigger", "t": 1791853275.4443274, "cmd": "F6 g1 / F7", "i": 115, "lunge": false, "peak": 0.7305908203125}
+{"type": "trigger", "t": 1791853275.8579812, "cmd": "F6 g1 / F7", "i": 116, "lunge": false, "peak": -0.7086181640625}
+{"type": "trigger", "t": 1791853276.274069, "cmd": "F6 g1 / F7", "i": 117, "lunge": false, "peak": 0.6646728515625}
+{"type": "trigger", "t": 1791853276.6876013, "cmd": "F6 g1 / F7", "i": 118, "lunge": false, "peak": -0.7305908203125}
+{"type": "trigger", "t": 1791853277.1049764, "cmd": "F6 g1 / F7", "i": 119, "lunge": false, "peak": 0.8349609375}
+{"type": "trigger", "t": 1791853277.3642347, "cmd": "39/3E/3A reads", "i": 0, "lunge": false, "peak": 0.1483154296875}
+{"type": "trigger", "t": 1791853277.6294973, "cmd": "39/3E/3A reads", "i": 1, "lunge": false, "peak": 0.06591796875}
+{"type": "trigger", "t": 1791853277.8994036, "cmd": "39/3E/3A reads", "i": 2, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853278.1682227, "cmd": "39/3E/3A reads", "i": 3, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853278.429106, "cmd": "39/3E/3A reads", "i": 4, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853278.6880586, "cmd": "39/3E/3A reads", "i": 5, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853278.953537, "cmd": "39/3E/3A reads", "i": 6, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853279.2152762, "cmd": "39/3E/3A reads", "i": 7, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853279.480319, "cmd": "39/3E/3A reads", "i": 8, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853279.7439196, "cmd": "39/3E/3A reads", "i": 9, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853280.0063186, "cmd": "39/3E/3A reads", "i": 10, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853280.2679343, "cmd": "39/3E/3A reads", "i": 11, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853280.5360217, "cmd": "39/3E/3A reads", "i": 12, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853280.8002353, "cmd": "39/3E/3A reads", "i": 13, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853281.0605493, "cmd": "39/3E/3A reads", "i": 14, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853281.322971, "cmd": "39/3E/3A reads", "i": 15, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853281.5912633, "cmd": "39/3E/3A reads", "i": 16, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853281.8587358, "cmd": "39/3E/3A reads", "i": 17, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853282.1274822, "cmd": "39/3E/3A reads", "i": 18, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853282.3856223, "cmd": "39/3E/3A reads", "i": 19, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853282.6486745, "cmd": "39/3E/3A reads", "i": 20, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853282.9104779, "cmd": "39/3E/3A reads", "i": 21, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853283.17712, "cmd": "39/3E/3A reads", "i": 22, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853283.4389586, "cmd": "39/3E/3A reads", "i": 23, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853283.703748, "cmd": "39/3E/3A reads", "i": 24, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853283.9742572, "cmd": "39/3E/3A reads", "i": 25, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853284.233108, "cmd": "39/3E/3A reads", "i": 26, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853284.4933534, "cmd": "39/3E/3A reads", "i": 27, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853284.7524617, "cmd": "39/3E/3A reads", "i": 28, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853285.0108147, "cmd": "39/3E/3A reads", "i": 29, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853285.2755783, "cmd": "39/3E/3A reads", "i": 30, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853285.5411546, "cmd": "39/3E/3A reads", "i": 31, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853285.811126, "cmd": "39/3E/3A reads", "i": 32, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853286.0755718, "cmd": "39/3E/3A reads", "i": 33, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853286.3358915, "cmd": "39/3E/3A reads", "i": 34, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853286.5958724, "cmd": "39/3E/3A reads", "i": 35, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853286.858731, "cmd": "39/3E/3A reads", "i": 36, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853287.1180928, "cmd": "39/3E/3A reads", "i": 37, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853287.3816931, "cmd": "39/3E/3A reads", "i": 38, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853287.6428547, "cmd": "39/3E/3A reads", "i": 39, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853287.9044845, "cmd": "39/3E/3A reads", "i": 40, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853288.168066, "cmd": "39/3E/3A reads", "i": 41, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853288.4392557, "cmd": "39/3E/3A reads", "i": 42, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853288.706064, "cmd": "39/3E/3A reads", "i": 43, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853288.974748, "cmd": "39/3E/3A reads", "i": 44, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853289.2409034, "cmd": "39/3E/3A reads", "i": 45, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853289.5072742, "cmd": "39/3E/3A reads", "i": 46, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853289.7715988, "cmd": "39/3E/3A reads", "i": 47, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853290.0342016, "cmd": "39/3E/3A reads", "i": 48, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853290.30164, "cmd": "39/3E/3A reads", "i": 49, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853290.56414, "cmd": "39/3E/3A reads", "i": 50, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853290.8343596, "cmd": "39/3E/3A reads", "i": 51, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853291.0982842, "cmd": "39/3E/3A reads", "i": 52, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853291.365974, "cmd": "39/3E/3A reads", "i": 53, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853291.6254117, "cmd": "39/3E/3A reads", "i": 54, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853291.8851562, "cmd": "39/3E/3A reads", "i": 55, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853292.1482975, "cmd": "39/3E/3A reads", "i": 56, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853292.40684, "cmd": "39/3E/3A reads", "i": 57, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853292.6719117, "cmd": "39/3E/3A reads", "i": 58, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853292.9336295, "cmd": "39/3E/3A reads", "i": 59, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853293.196426, "cmd": "39/3E/3A reads", "i": 60, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853293.458207, "cmd": "39/3E/3A reads", "i": 61, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853293.7252984, "cmd": "39/3E/3A reads", "i": 62, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853293.9865317, "cmd": "39/3E/3A reads", "i": 63, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853294.2505844, "cmd": "39/3E/3A reads", "i": 64, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853294.5096774, "cmd": "39/3E/3A reads", "i": 65, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853294.775229, "cmd": "39/3E/3A reads", "i": 66, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853295.0333874, "cmd": "39/3E/3A reads", "i": 67, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853295.2913854, "cmd": "39/3E/3A reads", "i": 68, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853295.5570343, "cmd": "39/3E/3A reads", "i": 69, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853295.8285587, "cmd": "39/3E/3A reads", "i": 70, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853296.0981271, "cmd": "39/3E/3A reads", "i": 71, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853296.368107, "cmd": "39/3E/3A reads", "i": 72, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853296.6280835, "cmd": "39/3E/3A reads", "i": 73, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853296.890094, "cmd": "39/3E/3A reads", "i": 74, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853297.1590984, "cmd": "39/3E/3A reads", "i": 75, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853297.4191837, "cmd": "39/3E/3A reads", "i": 76, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853297.6878128, "cmd": "39/3E/3A reads", "i": 77, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853297.9496663, "cmd": "39/3E/3A reads", "i": 78, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853298.215906, "cmd": "39/3E/3A reads", "i": 79, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853298.4856448, "cmd": "39/3E/3A reads", "i": 80, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853298.7515333, "cmd": "39/3E/3A reads", "i": 81, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853299.010567, "cmd": "39/3E/3A reads", "i": 82, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853299.272108, "cmd": "39/3E/3A reads", "i": 83, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853299.532018, "cmd": "39/3E/3A reads", "i": 84, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853299.796558, "cmd": "39/3E/3A reads", "i": 85, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853300.0581944, "cmd": "39/3E/3A reads", "i": 86, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853300.3238382, "cmd": "39/3E/3A reads", "i": 87, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853300.587851, "cmd": "39/3E/3A reads", "i": 88, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853300.852321, "cmd": "39/3E/3A reads", "i": 89, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853301.119133, "cmd": "39/3E/3A reads", "i": 90, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853301.3862612, "cmd": "39/3E/3A reads", "i": 91, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853301.6542203, "cmd": "39/3E/3A reads", "i": 92, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853301.9146123, "cmd": "39/3E/3A reads", "i": 93, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853302.1845014, "cmd": "39/3E/3A reads", "i": 94, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853302.4441772, "cmd": "39/3E/3A reads", "i": 95, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853302.711675, "cmd": "39/3E/3A reads", "i": 96, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853302.9705129, "cmd": "39/3E/3A reads", "i": 97, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853303.233667, "cmd": "39/3E/3A reads", "i": 98, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853303.5051308, "cmd": "39/3E/3A reads", "i": 99, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853303.7690408, "cmd": "39/3E/3A reads", "i": 100, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853304.0362053, "cmd": "39/3E/3A reads", "i": 101, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853304.301352, "cmd": "39/3E/3A reads", "i": 102, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853304.5598605, "cmd": "39/3E/3A reads", "i": 103, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853304.8251784, "cmd": "39/3E/3A reads", "i": 104, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853305.092865, "cmd": "39/3E/3A reads", "i": 105, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853305.3518717, "cmd": "39/3E/3A reads", "i": 106, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853305.6124887, "cmd": "39/3E/3A reads", "i": 107, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853305.8770504, "cmd": "39/3E/3A reads", "i": 108, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853306.1403878, "cmd": "39/3E/3A reads", "i": 109, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853306.4065409, "cmd": "39/3E/3A reads", "i": 110, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853306.674619, "cmd": "39/3E/3A reads", "i": 111, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853306.942639, "cmd": "39/3E/3A reads", "i": 112, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853307.205899, "cmd": "39/3E/3A reads", "i": 113, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853307.4688501, "cmd": "39/3E/3A reads", "i": 114, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853307.7371, "cmd": "39/3E/3A reads", "i": 115, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853307.9997022, "cmd": "39/3E/3A reads", "i": 116, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853308.2699318, "cmd": "39/3E/3A reads", "i": 117, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853308.5410893, "cmd": "39/3E/3A reads", "i": 118, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853308.8043847, "cmd": "39/3E/3A reads", "i": 119, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853309.0639174, "cmd": "A5 MaxT 500 #2", "i": 0, "lunge": false, "peak": -0.0439453125}
+{"type": "trigger", "t": 1791853309.3300433, "cmd": "A5 MaxT 500 #2", "i": 1, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853309.5912526, "cmd": "A5 MaxT 500 #2", "i": 2, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853309.8568451, "cmd": "A5 MaxT 500 #2", "i": 3, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853310.8155046, "cmd": "A5 MaxT 500 #2", "i": 4, "lunge": true, "from_deg": 202.1484375, "to_deg": 229.9163818359375, "moved": 27.7679443359375}
+{"type": "trigger", "t": 1791853312.09359, "cmd": "A5 MaxT 500 #2", "i": 5, "lunge": false, "peak": 0.0439453125}
+{"type": "trigger", "t": 1791853312.3527074, "cmd": "A5 MaxT 500 #2", "i": 6, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853312.6168206, "cmd": "A5 MaxT 500 #2", "i": 7, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853312.879213, "cmd": "A5 MaxT 500 #2", "i": 8, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853313.1415925, "cmd": "A5 MaxT 500 #2", "i": 9, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853314.1475031, "cmd": "A5 MaxT 500 #2", "i": 10, "lunge": true, "from_deg": 202.6153564453125, "to_deg": 229.9163818359375, "moved": 27.301025390625}
+{"type": "trigger", "t": 1791853315.4668112, "cmd": "A5 MaxT 500 #2", "i": 11, "lunge": false, "peak": 0.0439453125}
+{"type": "trigger", "t": 1791853315.7297535, "cmd": "A5 MaxT 500 #2", "i": 12, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853315.9896853, "cmd": "A5 MaxT 500 #2", "i": 13, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853316.2544322, "cmd": "A5 MaxT 500 #2", "i": 14, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853316.5163398, "cmd": "A5 MaxT 500 #2", "i": 15, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853316.776165, "cmd": "A5 MaxT 500 #2", "i": 16, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853317.037673, "cmd": "A5 MaxT 500 #2", "i": 17, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853317.3038526, "cmd": "A5 MaxT 500 #2", "i": 18, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853317.5726032, "cmd": "A5 MaxT 500 #2", "i": 19, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853317.835303, "cmd": "A5 MaxT 500 #2", "i": 20, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853318.1048517, "cmd": "A5 MaxT 500 #2", "i": 21, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853318.3659377, "cmd": "A5 MaxT 500 #2", "i": 22, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853319.3583562, "cmd": "A5 MaxT 500 #2", "i": 23, "lunge": true, "from_deg": 201.37939453125, "to_deg": 229.9163818359375, "moved": 28.5369873046875}
+{"type": "trigger", "t": 1791853320.7378285, "cmd": "A5 MaxT 500 #2", "i": 24, "lunge": false, "peak": 0.0439453125}
+{"type": "trigger", "t": 1791853320.9986572, "cmd": "A5 MaxT 500 #2", "i": 25, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853321.261017, "cmd": "A5 MaxT 500 #2", "i": 26, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853321.5271711, "cmd": "A5 MaxT 500 #2", "i": 27, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853321.7865477, "cmd": "A5 MaxT 500 #2", "i": 28, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853322.046307, "cmd": "A5 MaxT 500 #2", "i": 29, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853322.3077087, "cmd": "A5 MaxT 500 #2", "i": 30, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853322.568819, "cmd": "A5 MaxT 500 #2", "i": 31, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853322.834051, "cmd": "A5 MaxT 500 #2", "i": 32, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853323.7738154, "cmd": "A5 MaxT 500 #2", "i": 33, "lunge": true, "from_deg": 201.0113525390625, "to_deg": 229.8944091796875, "moved": 28.883056640625}
+{"type": "trigger", "t": 1791853325.0478826, "cmd": "A5 MaxT 500 #2", "i": 34, "lunge": false, "peak": 0.0439453125}
+{"type": "trigger", "t": 1791853325.3158715, "cmd": "A5 MaxT 500 #2", "i": 35, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853325.5810466, "cmd": "A5 MaxT 500 #2", "i": 36, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853325.8390439, "cmd": "A5 MaxT 500 #2", "i": 37, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853326.1002722, "cmd": "A5 MaxT 500 #2", "i": 38, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853326.3694565, "cmd": "A5 MaxT 500 #2", "i": 39, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853326.6298363, "cmd": "A5 MaxT 500 #2", "i": 40, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853326.890152, "cmd": "A5 MaxT 500 #2", "i": 41, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853327.1514904, "cmd": "A5 MaxT 500 #2", "i": 42, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853327.4156642, "cmd": "A5 MaxT 500 #2", "i": 43, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853327.674228, "cmd": "A5 MaxT 500 #2", "i": 44, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853327.9432788, "cmd": "A5 MaxT 500 #2", "i": 45, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853328.2043993, "cmd": "A5 MaxT 500 #2", "i": 46, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853328.4723024, "cmd": "A5 MaxT 500 #2", "i": 47, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853328.7287014, "cmd": "A5 MaxT 500 #2", "i": 48, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853328.9883175, "cmd": "A5 MaxT 500 #2", "i": 49, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853329.2571006, "cmd": "A5 MaxT 500 #2", "i": 50, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853329.5212593, "cmd": "A5 MaxT 500 #2", "i": 51, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853329.7816389, "cmd": "A5 MaxT 500 #2", "i": 52, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853330.0445235, "cmd": "A5 MaxT 500 #2", "i": 53, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853330.3112063, "cmd": "A5 MaxT 500 #2", "i": 54, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853330.5832498, "cmd": "A5 MaxT 500 #2", "i": 55, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853330.8442614, "cmd": "A5 MaxT 500 #2", "i": 56, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853331.1078303, "cmd": "A5 MaxT 500 #2", "i": 57, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853331.3695948, "cmd": "A5 MaxT 500 #2", "i": 58, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853331.6298058, "cmd": "A5 MaxT 500 #2", "i": 59, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853331.8930924, "cmd": "A5 MaxT 500 #2", "i": 60, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853332.1554804, "cmd": "A5 MaxT 500 #2", "i": 61, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853332.4151406, "cmd": "A5 MaxT 500 #2", "i": 62, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853332.6803458, "cmd": "A5 MaxT 500 #2", "i": 63, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853332.9391165, "cmd": "A5 MaxT 500 #2", "i": 64, "lunge": false, "peak": 0.02197265625}
+{"type": "trigger", "t": 1791853333.1965778, "cmd": "A5 MaxT 500 #2", "i": 65, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853333.4603503, "cmd": "A5 MaxT 500 #2", "i": 66, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853333.7166302, "cmd": "A5 MaxT 500 #2", "i": 67, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853333.9776943, "cmd": "A5 MaxT 500 #2", "i": 68, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853334.2432241, "cmd": "A5 MaxT 500 #2", "i": 69, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853334.5079944, "cmd": "A5 MaxT 500 #2", "i": 70, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853334.7785316, "cmd": "A5 MaxT 500 #2", "i": 71, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853335.044723, "cmd": "A5 MaxT 500 #2", "i": 72, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853335.3020673, "cmd": "A5 MaxT 500 #2", "i": 73, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853335.566, "cmd": "A5 MaxT 500 #2", "i": 74, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853335.8266747, "cmd": "A5 MaxT 500 #2", "i": 75, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853336.0963295, "cmd": "A5 MaxT 500 #2", "i": 76, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853336.354537, "cmd": "A5 MaxT 500 #2", "i": 77, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853336.6191523, "cmd": "A5 MaxT 500 #2", "i": 78, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853336.8904822, "cmd": "A5 MaxT 500 #2", "i": 79, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853337.1496944, "cmd": "A5 MaxT 500 #2", "i": 80, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853337.4070451, "cmd": "A5 MaxT 500 #2", "i": 81, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853337.6681502, "cmd": "A5 MaxT 500 #2", "i": 82, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853337.933246, "cmd": "A5 MaxT 500 #2", "i": 83, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853338.1971548, "cmd": "A5 MaxT 500 #2", "i": 84, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853338.460042, "cmd": "A5 MaxT 500 #2", "i": 85, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853338.7220767, "cmd": "A5 MaxT 500 #2", "i": 86, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853338.991096, "cmd": "A5 MaxT 500 #2", "i": 87, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853339.2486694, "cmd": "A5 MaxT 500 #2", "i": 88, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853339.5142033, "cmd": "A5 MaxT 500 #2", "i": 89, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853339.7755518, "cmd": "A5 MaxT 500 #2", "i": 90, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853340.0321722, "cmd": "A5 MaxT 500 #2", "i": 91, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853340.2913358, "cmd": "A5 MaxT 500 #2", "i": 92, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853340.55558, "cmd": "A5 MaxT 500 #2", "i": 93, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853340.8138876, "cmd": "A5 MaxT 500 #2", "i": 94, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853341.0823894, "cmd": "A5 MaxT 500 #2", "i": 95, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853341.3481872, "cmd": "A5 MaxT 500 #2", "i": 96, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853341.609798, "cmd": "A5 MaxT 500 #2", "i": 97, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853341.8726244, "cmd": "A5 MaxT 500 #2", "i": 98, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853342.1293044, "cmd": "A5 MaxT 500 #2", "i": 99, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853342.393626, "cmd": "A5 MaxT 500 #2", "i": 100, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853342.658842, "cmd": "A5 MaxT 500 #2", "i": 101, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853342.915377, "cmd": "A5 MaxT 500 #2", "i": 102, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853343.179589, "cmd": "A5 MaxT 500 #2", "i": 103, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853343.4420476, "cmd": "A5 MaxT 500 #2", "i": 104, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853343.698734, "cmd": "A5 MaxT 500 #2", "i": 105, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853343.9552584, "cmd": "A5 MaxT 500 #2", "i": 106, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853344.2116826, "cmd": "A5 MaxT 500 #2", "i": 107, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853344.4743948, "cmd": "A5 MaxT 500 #2", "i": 108, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853344.7387638, "cmd": "A5 MaxT 500 #2", "i": 109, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853345.0038142, "cmd": "A5 MaxT 500 #2", "i": 110, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853345.2665174, "cmd": "A5 MaxT 500 #2", "i": 111, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853345.5277634, "cmd": "A5 MaxT 500 #2", "i": 112, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853345.7944071, "cmd": "A5 MaxT 500 #2", "i": 113, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853346.0515516, "cmd": "A5 MaxT 500 #2", "i": 114, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853346.318967, "cmd": "A5 MaxT 500 #2", "i": 115, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853346.5824056, "cmd": "A5 MaxT 500 #2", "i": 116, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853346.8475897, "cmd": "A5 MaxT 500 #2", "i": 117, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853347.1093984, "cmd": "A5 MaxT 500 #2", "i": 118, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853347.3803973, "cmd": "A5 MaxT 500 #2", "i": 119, "lunge": false, "peak": 0.0}
+{"type": "trigger", "t": 1791853347.4078794, "summary": [["A5 MaxT 500", 3, 197.314453125, 229.9603271484375], ["A5 MaxT 500", 11, 202.8900146484375, 229.9383544921875], ["A5 MaxT 500", 83, 200.0775146484375, 229.9383544921875], ["A5 MaxT 500", 106, 200.006103515625, 229.9383544921875], ["A5 MaxT 400", 5, 203.060302734375, 229.9383544921875], ["A5 MaxT 400", 12, 202.8021240234375, 229.9383544921875], ["A5 MaxT 400", 55, 203.0767822265625, 229.9163818359375], ["A5 MaxT 500 #2", 4, 202.1484375, 229.9163818359375], ["A5 MaxT 500 #2", 10, 202.6153564453125, 229.9163818359375], ["A5 MaxT 500 #2", 23, 201.37939453125, 229.9163818359375], ["A5 MaxT 500 #2", 33, 201.0113525390625, 229.8944091796875]]}
